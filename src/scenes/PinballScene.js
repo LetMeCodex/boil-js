@@ -144,6 +144,7 @@ export class PinballScene {
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.rc = rough.canvas(this.canvas);
 
       this.buildTable();
       if (this.balls.length === 0) {

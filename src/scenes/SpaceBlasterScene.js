@@ -140,6 +140,7 @@ export class SpaceBlasterScene {
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.rc = rough.canvas(this.canvas);
 
       if (!this.ship.x || !this.ship.y || this.ship.x === 400) {
         this.ship.x = w / 2;

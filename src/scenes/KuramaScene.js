@@ -183,6 +183,7 @@ export class KuramaScene {
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.rc = rough.canvas(this.canvas);
 
       if (this.threeRenderer && this.threeCamera) {
         this.threeCamera.aspect = w / h;

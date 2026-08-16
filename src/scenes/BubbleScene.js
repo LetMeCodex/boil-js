@@ -102,6 +102,7 @@ export class BubbleScene {
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
       this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.rc = rough.canvas(this.canvas);
 
       if (!this.bubbles || this.bubbles.length === 0) {
         this.spawnInitialBubbles();

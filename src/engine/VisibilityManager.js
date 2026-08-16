@@ -8,38 +8,23 @@
 export class VisibilityManager {
   constructor() {
     this.observedScenes = new Map();
-
-    this.observer = new IntersectionObserver((entries) => {
-      entries.forEach(entry => {
-        const scene = this.observedScenes.get(entry.target);
-        if (scene) {
-          if (entry.isIntersecting) {
-            if (typeof scene.resume === 'function') scene.resume();
-          } else {
-            if (typeof scene.suspend === 'function') scene.suspend();
-          }
-        }
-      });
-    }, {
-      rootMargin: '400px 0px 400px 0px',
-      threshold: 0.0
-    });
   }
 
   register(element, sceneInstance) {
     if (!element || !sceneInstance) return;
     this.observedScenes.set(element, sceneInstance);
-    this.observer.observe(element);
+    // Always ensure scene is running
+    if (typeof sceneInstance.resume === 'function') {
+      sceneInstance.resume();
+    }
   }
 
   unregister(element) {
     if (!element) return;
-    this.observer.unobserve(element);
     this.observedScenes.delete(element);
   }
 
   destroy() {
-    this.observer.disconnect();
     this.observedScenes.clear();
   }
 }
