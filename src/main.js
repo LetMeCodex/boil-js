@@ -20,6 +20,7 @@ import { SpaceBlasterScene } from './scenes/SpaceBlasterScene.js';
 import { ThreeDScene } from './scenes/ThreeDScene.js';
 import { MorphScene } from './scenes/MorphScene.js';
 import { PhysicsScene } from './scenes/PhysicsScene.js';
+import { UiKitScene } from './scenes/UiKitScene.js';
 
 class ShowcaseApp {
   constructor() {
@@ -82,7 +83,8 @@ class ShowcaseApp {
       { id: 'stage-05', key: 'space', Class: SpaceBlasterScene },
       { id: 'stage-06', key: 'threed', Class: ThreeDScene },
       { id: 'stage-07', key: 'morph', Class: MorphScene },
-      { id: 'stage-08', key: 'physics', Class: PhysicsScene }
+      { id: 'stage-08', key: 'physics', Class: PhysicsScene },
+      { id: 'stage-uikit', key: 'uikit', Class: UiKitScene }
     ];
 
     chapterConfigs.forEach(cfg => {

@@ -9,6 +9,31 @@ import { SoundFX } from '../engine/AnimeBoilBridge.js';
  */
 
 export const EXPERIMENT_SPECS = {
+  uikit: {
+    title: '🎛️ ANIMATED UI KIT & BUTTONS',
+    engine: 'Rough.js + Anime.js Tactile Physics',
+    libraries: 'Rough.js, Anime.js, Web Audio',
+    particles: 'Hand-Drawn Interactive UI Elements',
+    renderMode: 'Multi-Buffer Line Boil with 60 FPS Spring Physics',
+    input: 'Direct Click / Drag on Canvas Elements (Buttons, Sliders, Toggles, Radios)',
+    physics: 'Anime.js Elastic Spring Dampening',
+    parameters: 'Boil Cadence: 10 FPS, Spring Mass: 1.0, Elasticity: 0.5',
+    prompt: `Create a complete hand-drawn boiling UI component kit using Rough.js and Anime.js. Include interactive tactile buttons with spring click feedback, toggle switches with smooth sliding knobs, continuous custom range sliders with boiling progress fill, checkboxes and radio selector groups, and an animated hand-drawn modal dialog with rough cross-hatching. Implement 4-frame seed buffers for smooth 10 FPS line boil without geometry reconstruction overhead.`,
+    sourceCode: `// Tactile Button Hover & Click Elasticity
+anime({
+  targets: buttonElement,
+  scale: [1, 0.94, 1.05, 1],
+  duration: 400,
+  easing: 'easeOutElastic(1, .4)'
+});
+
+// Smooth Boiling Toggle Switch
+const switchKnob = gen.circle(knobX, knobY, 20, {
+  seed: baseSeed + frameIdx * 20,
+  fill: isActive ? '#059669' : '#DC2626',
+  fillStyle: 'solid'
+});`
+  },
   kurama: {
     title: '🦊 NARUTO KURAMA CHAKRA MODE',
     engine: 'Rough.js + Three.js 3D + Anime.js',
