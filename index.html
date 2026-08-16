@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="parchment">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rough & Anime Boiling Effect Studio — Ultra Kinetic Motion Lab</title>
+  <meta name="description" content="State-of-the-art interactive playground and animation engine for hand-drawn line boil effects using Rough.js, Anime.js, Three.js, and Matter.js.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/src/style.css">
+</head>
+<body>
+  <!-- Ambient Paper Grain Noise Overlay -->
+  <div class="noise-overlay" aria-hidden="true"></div>
+
+  <div id="app" class="app-container">
+    <!-- Top Navigation / Header -->
+    <header class="app-header">
+      <div class="header-left">
+        <div class="brand-badge">
+          <canvas id="brand-logo-canvas" width="44" height="44" class="brand-canvas"></canvas>
+          <div class="brand-text">
+            <div class="brand-title">
+              <span>BOIL</span><span class="brand-highlight">.JS</span>
+              <span class="version-tag">Ultra Arcade</span>
+            </div>
+            <p class="brand-subtitle">Kinetic Hand-Drawn Animation Lab</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Navigation Tabs -->
+      <nav class="nav-tabs" role="tablist" aria-label="Main Experience Tabs">
+        <button class="nav-tab active" data-scene="textmotion" role="tab" aria-selected="true" id="tab-textmotion">
+          <span class="tab-icon">✨</span>
+          <span class="tab-label">Text Motion 3D</span>
+          <span class="new-pill">Bézier GLSL</span>
+        </button>
+        <button class="nav-tab" data-scene="pinball" role="tab" aria-selected="false" id="tab-pinball">
+          <span class="tab-icon">🏓</span>
+          <span class="tab-label">Pinball Arcade</span>
+          <span class="new-pill">HOT</span>
+        </button>
+        <button class="nav-tab" data-scene="puppet" role="tab" aria-selected="false" id="tab-puppet">
+          <span class="tab-icon">🐙</span>
+          <span class="tab-label">Puppet Monster</span>
+        </button>
+        <button class="nav-tab" data-scene="bubble" role="tab" aria-selected="false" id="tab-bubble">
+          <span class="tab-icon">🫧</span>
+          <span class="tab-label">Bubble Popper</span>
+        </button>
+        <button class="nav-tab" data-scene="space" role="tab" aria-selected="false" id="tab-space">
+          <span class="tab-icon">🚀</span>
+          <span class="tab-label">Space Blaster</span>
+        </button>
+        <button class="nav-tab" data-scene="threed" role="tab" aria-selected="false" id="tab-threed">
+          <span class="tab-icon">🧊</span>
+          <span class="tab-label">3D Dimension</span>
+        </button>
+        <button class="nav-tab" data-scene="physics" role="tab" aria-selected="false" id="tab-physics">
+          <span class="tab-icon">⚡</span>
+          <span class="tab-label">Physics Sandbox</span>
+        </button>
+        <button class="nav-tab" data-scene="morph" role="tab" aria-selected="false" id="tab-morph">
+          <span class="tab-icon">🌀</span>
+          <span class="tab-label">Vector Morph</span>
+        </button>
+        <button class="nav-tab" data-scene="vortex" role="tab" aria-selected="false" id="tab-vortex">
+          <span class="tab-icon">🕳️</span>
+          <span class="tab-label">Black Hole</span>
+        </button>
+        <button class="nav-tab" data-scene="synth" role="tab" aria-selected="false" id="tab-synth">
+          <span class="tab-icon">🎹</span>
+          <span class="tab-label">Audio Synth</span>
+        </button>
+        <button class="nav-tab" data-scene="kinetic" role="tab" aria-selected="false" id="tab-kinetic">
+          <span class="tab-icon">⚙️</span>
+          <span class="tab-label">Kinetic Lab</span>
+        </button>
+        <button class="nav-tab" data-scene="sketchpad" role="tab" aria-selected="false" id="tab-sketchpad">
+          <span class="tab-icon">✏️</span>
+          <span class="tab-label">Sketchpad</span>
+        </button>
+        <button class="nav-tab" data-scene="character" role="tab" aria-selected="false" id="tab-character">
+          <span class="tab-icon">🤖</span>
+          <span class="tab-label">Mascot</span>
+        </button>
+        <button class="nav-tab" data-scene="uikit" role="tab" aria-selected="false" id="tab-uikit">
+          <span class="tab-icon">🎛️</span>
+          <span class="tab-label">UI Kit</span>
+        </button>
+        <button class="nav-tab" data-scene="calligraphy" role="tab" aria-selected="false" id="tab-calligraphy">
+          <span class="tab-icon">✒️</span>
+          <span class="tab-label">Calligraphy</span>
+        </button>
+        <button class="nav-tab" data-scene="charts" role="tab" aria-selected="false" id="tab-charts">
+          <span class="tab-icon">📊</span>
+          <span class="tab-label">Charts</span>
+        </button>
+        <button class="nav-tab" data-scene="code" role="tab" aria-selected="false" id="tab-code">
+          <span class="tab-icon">💻</span>
+          <span class="tab-label">Code Lab</span>
+        </button>
+      </nav>
+
+      <!-- Global Controls & Status -->
+      <div class="header-right">
+        <!-- Global FPS / Boil Cadence Pill -->
+        <div class="global-fps-pill" title="Boiling frame rate (cycles per second)">
+          <span class="fps-indicator-dot"></span>
+          <span class="fps-label">Boil Rate:</span>
+          <span id="global-fps-val" class="fps-value">10 FPS</span>
+          <input type="range" id="global-fps-slider" min="2" max="24" value="10" step="1" class="mini-range" aria-label="Global Boil FPS">
+        </div>
+
+        <!-- Audio toggle -->
+        <button id="audio-toggle-btn" class="icon-btn" title="Toggle organic tactile sound effects" aria-label="Toggle sound">
+          <span class="btn-icon">🔊</span>
+        </button>
+
+        <!-- Theme Switcher -->
+        <button id="theme-toggle-btn" class="icon-btn" title="Toggle warm parchment / slate dark theme" aria-label="Toggle theme">
+          <span class="theme-icon">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Viewport / Canvas Stage -->
+    <main class="stage-wrapper">
+      <div id="scene-container" class="scene-container">
+        <!-- Dynamic scene DOM / Canvas will be injected here -->
+      </div>
+    </main>
+
+    <!-- Bottom Technical Explainer & Status Bar -->
+    <footer class="app-footer">
+      <div class="footer-stat">
+        <span class="stat-badge">STACK</span>
+        <span class="stat-text">Rough.js + Anime.js + Three.js GLSL + Matter.js + GSAP & Lenis</span>
+      </div>
+      <div class="footer-stat highlight-stat">
+        <span class="stat-badge pulse-badge">PLAYFUL ARCADE</span>
+        <span class="stat-text">Pinball Arcade • Squishy Monster • Bubble Popper • Asteroids Blaster</span>
+      </div>
+      <div class="footer-shortcuts">
+        <kbd>Space</kbd> Action/Launch
+        <kbd>A</kbd>/<kbd>D</kbd> Flippers
+        <kbd>R</kbd> Reseed
+      </div>
+    </footer>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
