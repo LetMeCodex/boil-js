@@ -75,6 +75,12 @@ export class ShowcaseScrollEngine {
         if (progressEl) {
           progressEl.style.width = `${self.progress * 100}%`;
         }
+        if (this.onUpdate) {
+          this.onUpdate({
+            masterProgress: self.progress,
+            velocity: this.velocity
+          });
+        }
       }
     });
   }

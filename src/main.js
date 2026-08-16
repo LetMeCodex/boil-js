@@ -9,7 +9,7 @@ import { DevTools } from './showcase/DevTools.js';
 import { HeroLab } from './showcase/HeroLab.js';
 import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
-import { KineticCollageScene } from './collage/KineticCollageScene.js';
+import { KineticCollageScene } from './engine/KineticCollageScene.js';
 
 // Scene Imports
 import { TextMotionScene } from './scenes/TextMotionScene.js';
@@ -43,10 +43,26 @@ class ShowcaseApp {
   }
 
   initCollageBackground() {
-    const wrap = document.getElementById('paper-collage-background-wrap');
-    if (wrap) {
-      this.collageScene = new KineticCollageScene(wrap);
-    }
+    const canvas = document.getElementById('kinetic-collage-bg');
+    if (!canvas) return;
+    this.collageScene = new KineticCollageScene(canvas, { quality: 'desktop' });
+    this.collageScene.init();
+
+    window.boilScene = {
+      setExperiment: (i) => this.collageScene.setExperiment(i),
+      setScrollProgress: (p) => this.collageScene.setScroll(p),
+      setMouse: (x, y) => this.collageScene.setMouse(x, y),
+      setReducedMotion: (v) => this.collageScene.setReducedMotion(v),
+    };
+
+    const onMove = (e) => {
+      this.collageScene.setMouse((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+    };
+    const onResize = () => this.collageScene.resize();
+    const onVis = () => this.collageScene.setVisible(!document.hidden);
+    window.addEventListener('pointermove', onMove, { passive: true });
+    window.addEventListener('resize', onResize);
+    document.addEventListener('visibilitychange', onVis);
   }
 
   initTheme() {
@@ -154,12 +170,16 @@ class ShowcaseApp {
     const chapterSections = Array.from(document.querySelectorAll('.showcase-chapter-section'));
 
     this.scrollEngine = new ShowcaseScrollEngine((state) => {
-      if (this.heroLab && state.chapterIndex === 0) {
+      if (this.heroLab && state.chapterIndex === 0 && state.chapterProgress !== undefined) {
         this.heroLab.setScrollProgress(state.chapterProgress);
       }
       if (this.collageScene) {
-        this.collageScene.setScroll(state.masterProgress);
-        this.collageScene.setExperiment(state.chapterIndex);
+        if (state.masterProgress !== undefined) {
+          this.collageScene.setScroll(state.masterProgress);
+        }
+        if (state.chapterIndex !== undefined) {
+          this.collageScene.setExperiment(state.chapterIndex);
+        }
       }
     });
 
