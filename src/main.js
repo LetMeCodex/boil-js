@@ -11,8 +11,8 @@ import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
 
 // Scene Imports
-import { KuramaScene } from './scenes/KuramaScene.js';
 import { TextMotionScene } from './scenes/TextMotionScene.js';
+import { KuramaScene } from './scenes/KuramaScene.js';
 import { PinballScene } from './scenes/PinballScene.js';
 import { PuppetScene } from './scenes/PuppetScene.js';
 import { BubbleScene } from './scenes/BubbleScene.js';
@@ -60,7 +60,7 @@ class ShowcaseApp {
 
   initDevTools() {
     DevTools.init();
-    window.DevTools = DevTools;
+    window.DevTools = DevTools; // Expose for inline handlers
   }
 
   initHero() {
@@ -74,8 +74,8 @@ class ShowcaseApp {
     this.visibilityManager = new VisibilityManager();
 
     const chapterConfigs = [
-      { id: 'stage-kurama', key: 'kurama', Class: KuramaScene },
       { id: 'stage-01', key: 'textmotion', Class: TextMotionScene },
+      { id: 'stage-kurama', key: 'kurama', Class: KuramaScene },
       { id: 'stage-02', key: 'pinball', Class: PinballScene },
       { id: 'stage-03', key: 'puppet', Class: PuppetScene },
       { id: 'stage-04', key: 'bubble', Class: BubbleScene },
@@ -106,7 +106,7 @@ class ShowcaseApp {
 
   bindChapterToolbarButtons() {
     document.querySelectorAll('.tool-btn').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', (e) => {
         const action = btn.getAttribute('data-action');
         const key = btn.getAttribute('data-key');
         const targetId = btn.getAttribute('data-target');
@@ -152,6 +152,7 @@ class ShowcaseApp {
       this.scrollEngine.setupTriggers(chapterSections);
     }
 
+    // Bind nav item click smooth scrolling
     document.querySelectorAll('.lab-index-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -166,7 +167,7 @@ class ShowcaseApp {
 
     document.getElementById('btn-hero-explore')?.addEventListener('click', (e) => {
       e.preventDefault();
-      const targetEl = document.querySelector('#section-kurama');
+      const targetEl = document.querySelector('#section-01');
       if (targetEl) {
         SoundFX.playPop(580);
         this.scrollEngine.scrollToElement(targetEl, 1.2);
@@ -174,7 +175,7 @@ class ShowcaseApp {
     });
 
     document.getElementById('btn-hero-source')?.addEventListener('click', () => {
-      DevTools.openSource('kurama');
+      DevTools.openSource('textmotion');
     });
   }
 
