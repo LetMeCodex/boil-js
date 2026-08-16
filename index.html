@@ -3,150 +3,527 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Rough & Anime Boiling Effect Studio — Ultra Kinetic Motion Lab</title>
-  <meta name="description" content="State-of-the-art interactive playground and animation engine for hand-drawn line boil effects using Rough.js, Anime.js, Three.js, and Matter.js.">
+  <title>BOIL.JS — Kinetic Hand-Drawn Animation Lab & Showcase</title>
+  <meta name="description" content="An experimental kinetic animation laboratory and interactive showcase featuring WebGL, physics, SVG, 3D cel-shading, and particle systems.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;500;600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="/src/style.css">
 </head>
 <body>
   <!-- Ambient Paper Grain Noise Overlay -->
   <div class="noise-overlay" aria-hidden="true"></div>
 
-  <div id="app" class="app-container">
-    <!-- Top Navigation / Header -->
-    <header class="app-header">
-      <div class="header-left">
-        <div class="brand-badge">
-          <canvas id="brand-logo-canvas" width="44" height="44" class="brand-canvas"></canvas>
-          <div class="brand-text">
-            <div class="brand-title">
-              <span>BOIL</span><span class="brand-highlight">.JS</span>
-              <span class="version-tag">Ultra Arcade</span>
-            </div>
-            <p class="brand-subtitle">Kinetic Hand-Drawn Animation Lab</p>
-          </div>
+  <!-- Global Master Scroll Progress Bar -->
+  <div class="global-scroll-track">
+    <div id="global-scroll-progress" class="global-scroll-fill"></div>
+  </div>
+
+  <div id="app" class="showcase-app">
+    <!-- Floating Laboratory Index Navigation -->
+    <header class="showcase-nav-header">
+      <div class="nav-brand-group">
+        <canvas id="brand-logo-canvas" width="36" height="36" class="brand-canvas"></canvas>
+        <div class="brand-text">
+          <span class="brand-title">BOIL<span class="brand-dot">.JS</span></span>
+          <span class="brand-sub">LAB SHOWCASE</span>
         </div>
       </div>
 
-      <!-- Navigation Tabs -->
-      <nav class="nav-tabs" role="tablist" aria-label="Main Experience Tabs">
-        <button class="nav-tab active" data-scene="textmotion" role="tab" aria-selected="true" id="tab-textmotion">
-          <span class="tab-icon">✨</span>
-          <span class="tab-label">Text Motion 3D</span>
-          <span class="new-pill">Bézier GLSL</span>
-        </button>
-        <button class="nav-tab" data-scene="pinball" role="tab" aria-selected="false" id="tab-pinball">
-          <span class="tab-icon">🏓</span>
-          <span class="tab-label">Pinball Arcade</span>
-          <span class="new-pill">HOT</span>
-        </button>
-        <button class="nav-tab" data-scene="puppet" role="tab" aria-selected="false" id="tab-puppet">
-          <span class="tab-icon">🐙</span>
-          <span class="tab-label">Puppet Monster</span>
-        </button>
-        <button class="nav-tab" data-scene="bubble" role="tab" aria-selected="false" id="tab-bubble">
-          <span class="tab-icon">🫧</span>
-          <span class="tab-label">Bubble Popper</span>
-        </button>
-        <button class="nav-tab" data-scene="space" role="tab" aria-selected="false" id="tab-space">
-          <span class="tab-icon">🚀</span>
-          <span class="tab-label">Space Blaster</span>
-        </button>
-        <button class="nav-tab" data-scene="threed" role="tab" aria-selected="false" id="tab-threed">
-          <span class="tab-icon">🧊</span>
-          <span class="tab-label">3D Dimension</span>
-        </button>
-        <button class="nav-tab" data-scene="physics" role="tab" aria-selected="false" id="tab-physics">
-          <span class="tab-icon">⚡</span>
-          <span class="tab-label">Physics Sandbox</span>
-        </button>
-        <button class="nav-tab" data-scene="morph" role="tab" aria-selected="false" id="tab-morph">
-          <span class="tab-icon">🌀</span>
-          <span class="tab-label">Vector Morph</span>
-        </button>
-        <button class="nav-tab" data-scene="vortex" role="tab" aria-selected="false" id="tab-vortex">
-          <span class="tab-icon">🕳️</span>
-          <span class="tab-label">Black Hole</span>
-        </button>
-        <button class="nav-tab" data-scene="synth" role="tab" aria-selected="false" id="tab-synth">
-          <span class="tab-icon">🎹</span>
-          <span class="tab-label">Audio Synth</span>
-        </button>
-        <button class="nav-tab" data-scene="kinetic" role="tab" aria-selected="false" id="tab-kinetic">
-          <span class="tab-icon">⚙️</span>
-          <span class="tab-label">Kinetic Lab</span>
-        </button>
-        <button class="nav-tab" data-scene="sketchpad" role="tab" aria-selected="false" id="tab-sketchpad">
-          <span class="tab-icon">✏️</span>
-          <span class="tab-label">Sketchpad</span>
-        </button>
-        <button class="nav-tab" data-scene="character" role="tab" aria-selected="false" id="tab-character">
-          <span class="tab-icon">🤖</span>
-          <span class="tab-label">Mascot</span>
-        </button>
-        <button class="nav-tab" data-scene="uikit" role="tab" aria-selected="false" id="tab-uikit">
-          <span class="tab-icon">🎛️</span>
-          <span class="tab-label">UI Kit</span>
-        </button>
-        <button class="nav-tab" data-scene="calligraphy" role="tab" aria-selected="false" id="tab-calligraphy">
-          <span class="tab-icon">✒️</span>
-          <span class="tab-label">Calligraphy</span>
-        </button>
-        <button class="nav-tab" data-scene="charts" role="tab" aria-selected="false" id="tab-charts">
-          <span class="tab-icon">📊</span>
-          <span class="tab-label">Charts</span>
-        </button>
-        <button class="nav-tab" data-scene="code" role="tab" aria-selected="false" id="tab-code">
-          <span class="tab-icon">💻</span>
-          <span class="tab-label">Code Lab</span>
-        </button>
+      <!-- Laboratory Chapter Index -->
+      <nav class="lab-index-nav" aria-label="Laboratory Chapters">
+        <a href="#section-01" class="lab-index-item active" data-chapter="0">
+          <span class="index-num">01</span><span class="index-name">TEXT</span>
+        </a>
+        <a href="#section-02" class="lab-index-item" data-chapter="1">
+          <span class="index-num">02</span><span class="index-name">PINBALL</span>
+        </a>
+        <a href="#section-03" class="lab-index-item" data-chapter="2">
+          <span class="index-num">03</span><span class="index-name">PUPPET</span>
+        </a>
+        <a href="#section-04" class="lab-index-item" data-chapter="3">
+          <span class="index-num">04</span><span class="index-name">BUBBLE</span>
+        </a>
+        <a href="#section-05" class="lab-index-item" data-chapter="4">
+          <span class="index-num">05</span><span class="index-name">SPACE</span>
+        </a>
+        <a href="#section-06" class="lab-index-item" data-chapter="5">
+          <span class="index-num">06</span><span class="index-name">3D</span>
+        </a>
+        <a href="#section-07" class="lab-index-item" data-chapter="6">
+          <span class="index-num">07</span><span class="index-name">VECTOR</span>
+        </a>
+        <a href="#section-08" class="lab-index-item" data-chapter="7">
+          <span class="index-num">08</span><span class="index-name">PHYSICS</span>
+        </a>
       </nav>
 
-      <!-- Global Controls & Status -->
-      <div class="header-right">
-        <!-- Global FPS / Boil Cadence Pill -->
+      <!-- Global Controls -->
+      <div class="nav-controls-group">
         <div class="global-fps-pill" title="Boiling frame rate (cycles per second)">
           <span class="fps-indicator-dot"></span>
-          <span class="fps-label">Boil Rate:</span>
           <span id="global-fps-val" class="fps-value">10 FPS</span>
-          <input type="range" id="global-fps-slider" min="2" max="24" value="10" step="1" class="mini-range" aria-label="Global Boil FPS">
+          <input type="range" id="global-fps-slider" min="2" max="24" value="10" step="1" class="mini-range" aria-label="Boil Rate">
         </div>
-
-        <!-- Audio toggle -->
-        <button id="audio-toggle-btn" class="icon-btn" title="Toggle organic tactile sound effects" aria-label="Toggle sound">
+        <button id="audio-toggle-btn" class="icon-btn" title="Toggle audio haptics" aria-label="Toggle sound">
           <span class="btn-icon">🔊</span>
         </button>
-
-        <!-- Theme Switcher -->
         <button id="theme-toggle-btn" class="icon-btn" title="Toggle warm parchment / slate dark theme" aria-label="Toggle theme">
           <span class="theme-icon">🌙</span>
         </button>
       </div>
     </header>
 
-    <!-- Main Viewport / Canvas Stage -->
-    <main class="stage-wrapper">
-      <div id="scene-container" class="scene-container">
-        <!-- Dynamic scene DOM / Canvas will be injected here -->
+    <!-- =========================================================================
+         00. LIVING HERO SECTION
+         ========================================================================= -->
+    <section id="section-hero" class="showcase-hero-section">
+      <div class="hero-canvas-container">
+        <canvas id="hero-living-canvas"></canvas>
       </div>
-    </main>
+      <div class="hero-content-overlay">
+        <div class="hero-badge-pill">
+          <span class="badge-dot"></span>
+          <span>EXPERIMENTAL MOTION LABORATORY</span>
+        </div>
+        <h1 class="hero-headline">
+          KINETIC HAND-DRAWN<br>
+          <span class="hero-accent">ANIMATION LAB</span>
+        </h1>
+        <p class="hero-tagline">
+          "Experiments in motion. Things that probably didn't need to move."
+        </p>
 
-    <!-- Bottom Technical Explainer & Status Bar -->
-    <footer class="app-footer">
-      <div class="footer-stat">
-        <span class="stat-badge">STACK</span>
-        <span class="stat-text">Rough.js + Anime.js + Three.js GLSL + Matter.js + GSAP & Lenis</span>
+        <div class="hero-actions">
+          <a href="#section-01" class="tactile-hero-btn primary" id="btn-hero-explore">
+            <span>EXPLORE EXPERIMENTS ↓</span>
+          </a>
+          <button class="tactile-hero-btn outline" id="btn-hero-source" data-cursor="CODE">
+            <span>VIEW SOURCE ↗</span>
+          </button>
+        </div>
+
+        <div class="hero-metadata-bar">
+          <div class="meta-pill"><span class="meta-accent">08</span> EXPERIMENTS</div>
+          <div class="meta-pill"><span class="meta-accent">14,000+</span> PARTICLES</div>
+          <div class="meta-pill">WEBGL / PHYSICS / SVG</div>
+          <div class="meta-pill">OPEN SOURCE MIT</div>
+        </div>
       </div>
-      <div class="footer-stat highlight-stat">
-        <span class="stat-badge pulse-badge">PLAYFUL ARCADE</span>
-        <span class="stat-text">Pinball Arcade • Squishy Monster • Bubble Popper • Asteroids Blaster</span>
+    </section>
+
+    <!-- =========================================================================
+         01. CHAPTER 01 — 3D TEXT MOTION (CREATE ➔ MATTER)
+         ========================================================================= -->
+    <section id="section-01" class="showcase-chapter-section" data-key="textmotion">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 01</span>
+          <h2 class="chapter-title">3D Text Motion</h2>
+          <p class="chapter-subtitle">14,000 GPU particles transforming through 3D cubic Bézier trajectories.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="textmotion" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="textmotion" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="textmotion" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="textmotion" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-01">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
       </div>
-      <div class="footer-shortcuts">
-        <kbd>Space</kbd> Action/Launch
-        <kbd>A</kbd>/<kbd>D</kbd> Flippers
-        <kbd>R</kbd> Reseed
+      <div id="stage-01" class="chapter-stage-container">
+        <!-- TextMotionScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         02. CHAPTER 02 — PINBALL ARCADE
+         ========================================================================= -->
+    <section id="section-02" class="showcase-chapter-section" data-key="pinball">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 02</span>
+          <h2 class="chapter-title">Pinball Arcade</h2>
+          <p class="chapter-subtitle">Matter.js physical pinball machine with flippers, musical bumpers, and multiball.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="pinball" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="pinball" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="pinball" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="pinball" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-02">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-02" class="chapter-stage-container">
+        <!-- PinballScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         03. CHAPTER 03 — PUPPET MONSTER
+         ========================================================================= -->
+    <section id="section-03" class="showcase-chapter-section" data-key="puppet">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 03</span>
+          <h2 class="chapter-title">Puppet Monster</h2>
+          <p class="chapter-subtitle">Articulated ragdoll constraint physics, snack feeding, and interactive tickling.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="puppet" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="puppet" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="puppet" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="puppet" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-03">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-03" class="chapter-stage-container">
+        <!-- PuppetScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         04. CHAPTER 04 — BUBBLE POPPER & SLIME
+         ========================================================================= -->
+    <section id="section-04" class="showcase-chapter-section" data-key="bubble">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 04</span>
+          <h2 class="chapter-title">Bubble Popper & Slime</h2>
+          <p class="chapter-subtitle">Buoyant floating bubbles with slicing pop mechanics and stretchy slime webs.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="bubble" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="bubble" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="bubble" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="bubble" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-04">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-04" class="chapter-stage-container">
+        <!-- BubbleScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         05. CHAPTER 05 — SPACE BLASTER
+         ========================================================================= -->
+    <section id="section-05" class="showcase-chapter-section" data-key="space">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 05</span>
+          <h2 class="chapter-title">Space Blaster</h2>
+          <p class="chapter-subtitle">Vector arcade asteroids physics with rocket thrusters and destructible boiling rocks.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="space" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="space" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="space" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="space" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-05">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-05" class="chapter-stage-container">
+        <!-- SpaceBlasterScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         06. CHAPTER 06 — 3D DIMENSION & CEL SHADING
+         ========================================================================= -->
+    <section id="section-06" class="showcase-chapter-section" data-key="threed">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 06</span>
+          <h2 class="chapter-title">3D Dimension</h2>
+          <p class="chapter-subtitle">Three.js hardware cel-shading with stepped vertex noise jitter and cross-hatching.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="threed" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="threed" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="threed" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="threed" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-06">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-06" class="chapter-stage-container">
+        <!-- ThreeDScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         07. CHAPTER 07 — VECTOR PATH MORPH
+         ========================================================================= -->
+    <section id="section-07" class="showcase-chapter-section" data-key="morph">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 07</span>
+          <h2 class="chapter-title">Vector Path Morph</h2>
+          <p class="chapter-subtitle">Continuous geometric SVG morphing across 8 shapes with hand-drawn boiling line paths.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="morph" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="morph" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="morph" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="morph" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-07">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-07" class="chapter-stage-container">
+        <!-- MorphScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         08. CHAPTER 08 — PHYSICS SANDBOX
+         ========================================================================= -->
+    <section id="section-08" class="showcase-chapter-section" data-key="physics">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">CHAPTER 08</span>
+          <h2 class="chapter-title">Physics Sandbox</h2>
+          <p class="chapter-subtitle">Open-ended 2D rigid-body playground with kinetic shockwaves and gravity inverters.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="physics" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="physics" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="physics" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="physics" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-08">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-08" class="chapter-stage-container">
+        <!-- PhysicsScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         09. LIVING TECH ECOSYSTEM
+         ========================================================================= -->
+    <section id="section-tech" class="showcase-tech-section">
+      <div class="section-title-wrapper">
+        <span class="section-eyebrow">TECHNOLOGY ECOSYSTEM</span>
+        <h2 class="section-main-title">Living Animation Architecture</h2>
+        <p class="section-desc">Six interconnected creative-coding libraries driving real-time procedural kinetic graphics.</p>
+      </div>
+
+      <div class="tech-cards-grid">
+        <div class="tech-card" id="tech-three">
+          <div class="tech-card-header">
+            <span class="tech-icon">🧊</span>
+            <span class="tech-name">THREE.JS</span>
+          </div>
+          <p class="tech-desc">Hardware WebGL 3D rendering, custom GLSL shaders, camera choreography, and distance fog.</p>
+          <div class="tech-tag">WebGL / Shaders</div>
+        </div>
+
+        <div class="tech-card" id="tech-matter">
+          <div class="tech-card-header">
+            <span class="tech-icon">⚡</span>
+            <span class="tech-name">MATTER.JS</span>
+          </div>
+          <p class="tech-desc">2D rigid-body simulation, verlet constraints, restitution impulses, and ragdoll joints.</p>
+          <div class="tech-tag">Physics Engine</div>
+        </div>
+
+        <div class="tech-card" id="tech-gsap">
+          <div class="tech-card-header">
+            <span class="tech-icon">⏱️</span>
+            <span class="tech-name">GSAP</span>
+          </div>
+          <p class="tech-desc">Master scroll scrub timeline, parametric Bezier interpolation, and velocity synchronization.</p>
+          <div class="tech-tag">Choreography</div>
+        </div>
+
+        <div class="tech-card" id="tech-lenis">
+          <div class="tech-card-header">
+            <span class="tech-icon">🌊</span>
+            <span class="tech-name">LENIS</span>
+          </div>
+          <p class="tech-desc">Inertial smooth scrolling layer providing normalized progress (0.0 to 1.0) and velocity tracking.</p>
+          <div class="tech-tag">Smooth Scroll</div>
+        </div>
+
+        <div class="tech-card" id="tech-anime">
+          <div class="tech-card-header">
+            <span class="tech-icon">🌀</span>
+            <span class="tech-name">ANIME.JS</span>
+          </div>
+          <p class="tech-desc">Micro-motion, elastic spring pulses, SVG path morphing, and autonomous animation loops.</p>
+          <div class="tech-tag">Vector Motion</div>
+        </div>
+
+        <div class="tech-card" id="tech-rough">
+          <div class="tech-card-header">
+            <span class="tech-icon">✏️</span>
+            <span class="tech-name">ROUGH.JS</span>
+          </div>
+          <p class="tech-desc">Hand-drawn sketchy graphics generator with seed-stepped boiling line cadences.</p>
+          <div class="tech-tag">Line Boiling</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         10. KINETIC EXPERIMENT INDEX
+         ========================================================================= -->
+    <section id="section-index" class="showcase-index-section">
+      <div class="section-title-wrapper">
+        <span class="section-eyebrow">EXPERIMENT DIRECTORY</span>
+        <h2 class="section-main-title">Kinetic Laboratory Index</h2>
+      </div>
+
+      <div class="kinetic-index-list">
+        <a href="#section-01" class="index-row-item">
+          <span class="row-num">01</span>
+          <span class="row-title">3D TEXT MOTION</span>
+          <span class="row-tag">14,000 GPU PARTICLES</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-02" class="index-row-item">
+          <span class="row-num">02</span>
+          <span class="row-title">PINBALL ARCADE</span>
+          <span class="row-tag">FLIPPERS & BUMPERS</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-03" class="index-row-item">
+          <span class="row-num">03</span>
+          <span class="row-title">PUPPET MONSTER</span>
+          <span class="row-tag">RAGDOLL CONSTRAINTS</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-04" class="index-row-item">
+          <span class="row-num">04</span>
+          <span class="row-title">BUBBLE POPPER & SLIME</span>
+          <span class="row-tag">SOFT-BODY ELASTICS</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-05" class="index-row-item">
+          <span class="row-num">05</span>
+          <span class="row-title">SPACE BLASTER</span>
+          <span class="row-tag">VECTOR ASTEROIDS</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-06" class="index-row-item">
+          <span class="row-num">06</span>
+          <span class="row-title">3D DIMENSION</span>
+          <span class="row-tag">HARDWARE CEL-SHADING</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-07" class="index-row-item">
+          <span class="row-num">07</span>
+          <span class="row-title">VECTOR PATH MORPH</span>
+          <span class="row-tag">8-SHAPE SVG INTERPOLATION</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-08" class="index-row-item">
+          <span class="row-num">08</span>
+          <span class="row-title">PHYSICS SANDBOX</span>
+          <span class="row-tag">KINETIC SHOCKWAVES</span>
+          <span class="row-arrow">↗</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         11. LIVING CONVERGENCE FOOTER
+         ========================================================================= -->
+    <footer id="section-footer" class="showcase-footer-section">
+      <div class="footer-canvas-container">
+        <canvas id="footer-living-canvas"></canvas>
+      </div>
+
+      <div class="footer-bottom-bar">
+        <div class="footer-brand-group">
+          <span class="footer-brand">BOIL.JS</span>
+          <span class="footer-quote">"Things that probably didn't need to move."</span>
+        </div>
+
+        <div class="footer-links">
+          <a href="https://github.com/LetMeCodex/boil-js" target="_blank" rel="noopener">GITHUB</a>
+          <a href="#section-01">EXPERIMENTS</a>
+          <button class="link-btn" onclick="DevTools.openSource('textmotion')">SOURCE</button>
+          <button class="link-btn" onclick="DevTools.openPrompt('textmotion')">PROMPTS</button>
+        </div>
       </div>
     </footer>
   </div>

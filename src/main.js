@@ -2,7 +2,13 @@ import rough from 'roughjs';
 import anime from 'animejs';
 import { SoundFX } from './engine/AnimeBoilBridge.js';
 import { BoilEngine } from './engine/BoilEngine.js';
-import { CursorTrail } from './utils/CursorTrail.js';
+import { ShowcaseScrollEngine } from './engine/ShowcaseScrollEngine.js';
+import { VisibilityManager } from './engine/VisibilityManager.js';
+import { CursorDirector } from './utils/CursorDirector.js';
+import { DevTools } from './showcase/DevTools.js';
+import { HeroLab } from './showcase/HeroLab.js';
+import { TechEcosystem } from './showcase/TechEcosystem.js';
+import { FooterLab } from './showcase/FooterLab.js';
 
 // Scene Imports
 import { TextMotionScene } from './scenes/TextMotionScene.js';
@@ -11,55 +17,25 @@ import { PuppetScene } from './scenes/PuppetScene.js';
 import { BubbleScene } from './scenes/BubbleScene.js';
 import { SpaceBlasterScene } from './scenes/SpaceBlasterScene.js';
 import { ThreeDScene } from './scenes/ThreeDScene.js';
-import { PhysicsScene } from './scenes/PhysicsScene.js';
 import { MorphScene } from './scenes/MorphScene.js';
-import { VortexScene } from './scenes/VortexScene.js';
-import { AudioSynthScene } from './scenes/AudioSynthScene.js';
-import { KineticScene } from './scenes/KineticScene.js';
-import { Sketchpad } from './studio/Sketchpad.js';
-import { CharacterScene } from './scenes/CharacterScene.js';
-import { UiKitScene } from './scenes/UiKitScene.js';
-import { CalligraphyScene } from './scenes/CalligraphyScene.js';
-import { ChartsScene } from './scenes/ChartsScene.js';
-import { CodeExporter } from './studio/CodeExporter.js';
+import { PhysicsScene } from './scenes/PhysicsScene.js';
 
-class App {
+class ShowcaseApp {
   constructor() {
-    this.currentSceneInstance = null;
-    this.currentSceneKey = 'textmotion';
+    this.scenes = {};
     this.boilFps = 10;
     this.theme = localStorage.getItem('rough-theme') || 'parchment';
     this.soundEnabled = true;
 
-    this.sceneMap = {
-      textmotion: TextMotionScene,
-      pinball: PinballScene,
-      puppet: PuppetScene,
-      bubble: BubbleScene,
-      space: SpaceBlasterScene,
-      threed: ThreeDScene,
-      physics: PhysicsScene,
-      morph: MorphScene,
-      vortex: VortexScene,
-      synth: AudioSynthScene,
-      kinetic: KineticScene,
-      sketchpad: Sketchpad,
-      character: CharacterScene,
-      uikit: UiKitScene,
-      calligraphy: CalligraphyScene,
-      charts: ChartsScene,
-      code: CodeExporter
-    };
-
     this.initTheme();
-    this.initLogoAnimation();
-    this.initCursorTrail();
+    this.initCursor();
+    this.initDevTools();
+    this.initHero();
+    this.initChapters();
+    this.initTechEcosystem();
+    this.initFooter();
+    this.initScrollEngine();
     this.bindGlobalEvents();
-    this.switchScene('textmotion');
-  }
-
-  initCursorTrail() {
-    this.cursorTrail = new CursorTrail();
   }
 
   initTheme() {
@@ -75,72 +51,133 @@ class App {
     localStorage.setItem('rough-theme', this.theme);
     this.initTheme();
     SoundFX.playPop(520);
-    this.switchScene(this.currentSceneKey);
   }
 
-  initLogoAnimation() {
-    const canvas = document.getElementById('brand-logo-canvas');
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    const rc = rough.canvas(canvas);
-    const gen = rough.generator();
+  initCursor() {
+    this.cursor = new CursorDirector();
+  }
 
-    const frames = [0, 1, 2, 3].map(i => {
-      return gen.polygon([[6, 38], [22, 6], [38, 38]], {
-        seed: 100 + i * 50,
-        roughness: 2.2,
-        bowing: 1.8,
-        stroke: '#D97706',
-        strokeWidth: 2.5,
-        fill: '#D97706',
-        fillStyle: 'hachure',
-        hachureAngle: 60
+  initDevTools() {
+    DevTools.init();
+    window.DevTools = DevTools; // Expose for inline handlers
+  }
+
+  initHero() {
+    const heroCanvas = document.getElementById('hero-living-canvas');
+    if (heroCanvas) {
+      this.heroLab = new HeroLab(heroCanvas);
+    }
+  }
+
+  initChapters() {
+    this.visibilityManager = new VisibilityManager();
+
+    const chapterConfigs = [
+      { id: 'stage-01', key: 'textmotion', Class: TextMotionScene },
+      { id: 'stage-02', key: 'pinball', Class: PinballScene },
+      { id: 'stage-03', key: 'puppet', Class: PuppetScene },
+      { id: 'stage-04', key: 'bubble', Class: BubbleScene },
+      { id: 'stage-05', key: 'space', Class: SpaceBlasterScene },
+      { id: 'stage-06', key: 'threed', Class: ThreeDScene },
+      { id: 'stage-07', key: 'morph', Class: MorphScene },
+      { id: 'stage-08', key: 'physics', Class: PhysicsScene }
+    ];
+
+    chapterConfigs.forEach(cfg => {
+      const container = document.getElementById(cfg.id);
+      if (container) {
+        try {
+          const instance = new cfg.Class(container, { boilFps: this.boilFps });
+          this.scenes[cfg.key] = instance;
+          const sectionEl = container.closest('.showcase-chapter-section');
+          if (sectionEl) {
+            this.visibilityManager.register(sectionEl, instance);
+          }
+        } catch (e) {
+          console.error(`Failed to mount scene ${cfg.key}:`, e);
+        }
+      }
+    });
+
+    this.bindChapterToolbarButtons();
+  }
+
+  bindChapterToolbarButtons() {
+    document.querySelectorAll('.tool-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const action = btn.getAttribute('data-action');
+        const key = btn.getAttribute('data-key');
+        const targetId = btn.getAttribute('data-target');
+        const sceneInstance = this.scenes[key];
+
+        if (action === 'inspect') {
+          DevTools.openInspector(key);
+        } else if (action === 'source') {
+          DevTools.openSource(key);
+        } else if (action === 'prompt') {
+          DevTools.openPrompt(key);
+        } else if (action === 'remix') {
+          DevTools.openRemix(key, sceneInstance);
+        } else if (action === 'fullscreen') {
+          const targetEl = document.getElementById(targetId);
+          if (targetEl) DevTools.toggleFullscreen(targetEl);
+        }
       });
     });
-
-    const render = (timestamp) => {
-      ctx.clearRect(0, 0, 44, 44);
-      const frameIdx = BoilEngine.getFrameIndex(timestamp, 8, 4);
-      rc.draw(frames[frameIdx]);
-      requestAnimationFrame(render);
-    };
-    requestAnimationFrame(render);
   }
 
-  switchScene(sceneKey) {
-    if (!this.sceneMap[sceneKey]) return;
+  initTechEcosystem() {
+    TechEcosystem.init();
+  }
 
-    if (this.currentSceneInstance && typeof this.currentSceneInstance.destroy === 'function') {
-      this.currentSceneInstance.destroy();
+  initFooter() {
+    const footerCanvas = document.getElementById('footer-living-canvas');
+    if (footerCanvas) {
+      this.footerLab = new FooterLab(footerCanvas);
     }
+  }
 
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-      const isActive = tab.getAttribute('data-scene') === sceneKey;
-      tab.classList.toggle('active', isActive);
-      tab.setAttribute('aria-selected', isActive ? 'true' : 'false');
+  initScrollEngine() {
+    const chapterSections = Array.from(document.querySelectorAll('.showcase-chapter-section'));
+
+    this.scrollEngine = new ShowcaseScrollEngine((state) => {
+      if (this.heroLab && state.chapterIndex === 0) {
+        this.heroLab.setScrollProgress(state.chapterProgress);
+      }
     });
 
-    const container = document.getElementById('scene-container');
-    if (!container) return;
+    if (chapterSections.length > 0) {
+      this.scrollEngine.setupTriggers(chapterSections);
+    }
 
-    this.currentSceneKey = sceneKey;
-    const SceneClass = this.sceneMap[sceneKey];
-    this.currentSceneInstance = new SceneClass(container, { boilFps: this.boilFps });
-
-    SoundFX.playPop(440);
-  }
-
-  bindGlobalEvents() {
-    document.querySelectorAll('.nav-tab').forEach(tab => {
-      tab.addEventListener('click', (e) => {
-        const target = e.currentTarget;
-        const scene = target.getAttribute('data-scene');
-        if (scene && scene !== this.currentSceneKey) {
-          this.switchScene(scene);
+    // Bind nav item click smooth scrolling
+    document.querySelectorAll('.lab-index-item').forEach(item => {
+      item.addEventListener('click', (e) => {
+        e.preventDefault();
+        const targetHash = item.getAttribute('href');
+        const targetEl = document.querySelector(targetHash);
+        if (targetEl) {
+          SoundFX.playPop(520);
+          this.scrollEngine.scrollToElement(targetEl, 1.2);
         }
       });
     });
 
+    document.getElementById('btn-hero-explore')?.addEventListener('click', (e) => {
+      e.preventDefault();
+      const targetEl = document.querySelector('#section-01');
+      if (targetEl) {
+        SoundFX.playPop(580);
+        this.scrollEngine.scrollToElement(targetEl, 1.2);
+      }
+    });
+
+    document.getElementById('btn-hero-source')?.addEventListener('click', () => {
+      DevTools.openSource('textmotion');
+    });
+  }
+
+  bindGlobalEvents() {
     document.getElementById('theme-toggle-btn')?.addEventListener('click', () => this.toggleTheme());
 
     const audioBtn = document.getElementById('audio-toggle-btn');
@@ -156,36 +193,13 @@ class App {
     fpsSlider?.addEventListener('input', (e) => {
       this.boilFps = parseInt(e.target.value);
       if (fpsVal) fpsVal.textContent = `${this.boilFps} FPS`;
-      if (this.currentSceneInstance && typeof this.currentSceneInstance.setBoilFps === 'function') {
-        this.currentSceneInstance.setBoilFps(this.boilFps);
-      }
-    });
-
-    window.addEventListener('keydown', (e) => {
-      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') return;
-
-      if (e.code === 'Space') {
-        if (this.currentSceneKey !== 'pinball' && this.currentSceneKey !== 'space') {
-          e.preventDefault();
-          if (this.currentSceneInstance && typeof this.currentSceneInstance.toggleAutoPlay === 'function') {
-            this.currentSceneInstance.toggleAutoPlay();
-          } else if (this.currentSceneInstance && typeof this.currentSceneInstance.togglePlayPause === 'function') {
-            this.currentSceneInstance.togglePlayPause();
-          }
-        }
-      } else if (e.key === 'r' || e.key === 'R') {
-        if (this.currentSceneInstance && typeof this.currentSceneInstance.reseedAll === 'function') {
-          this.currentSceneInstance.reseedAll();
-        }
-      } else if (e.key === 'c' || e.key === 'C') {
-        if (this.currentSceneInstance && typeof this.currentSceneInstance.clear === 'function') {
-          this.currentSceneInstance.clear();
-        }
-      }
+      Object.values(this.scenes).forEach(s => {
+        if (typeof s.setBoilFps === 'function') s.setBoilFps(this.boilFps);
+      });
     });
   }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-  new App();
+  new ShowcaseApp();
 });
