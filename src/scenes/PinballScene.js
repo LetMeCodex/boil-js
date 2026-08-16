@@ -444,13 +444,17 @@ export class PinballScene {
 
       // Render Hand-Drawn Table
       if (this.ctx && this.canvas) {
-        this.ctx.clearRect(0, 0, this.width, this.height);
+        // Reset transform to clear entire physical canvas
+        this.ctx.save();
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.restore();
 
         const frameIdx = BoilEngine.getFrameIndex(timestamp, this.options.boilFps || 10, 4);
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const ink = isDark ? '#F3F4F6' : '#1C1917';
         const amber = isDark ? '#F59E0B' : '#D97706';
-        const gen = rough.generator();
+        const bgPlayfield = isDark ? '#181B22' : '#F8F6F0';
 
         const w = this.width || 800;
         const h = this.height || 520;
@@ -460,117 +464,132 @@ export class PinballScene {
         const tb = h - 20;
         const lx = tr - 55;
 
-        // 0. Table Outer Cabinet & Guides
-        const cabinet = gen.polygon([[tl, tt], [tr, tt], [tr, tb], [tl, tb]], {
-          seed: 1100 + frameIdx * 15,
-          roughness: 1.5,
-          bowing: 1.2,
-          stroke: ink,
-          strokeWidth: 3,
-          fill: isDark ? '#1A1E26' : '#FAF8F3',
-          fillStyle: 'solid'
-        });
-        this.rc.draw(cabinet);
+        // 0. Playfield Background & Frame
+        this.ctx.fillStyle = bgPlayfield;
+        this.ctx.fillRect(tl, tt, tr - tl, tb - tt);
 
-        // Plunger Lane Divider
-        const plungerLane = gen.line(lx, tt + 40, lx, tb, {
-          seed: 1200 + frameIdx * 10,
-          roughness: 1.4,
-          stroke: ink,
-          strokeWidth: 2.5
-        });
-        this.rc.draw(plungerLane);
+        try {
+          if (!this.rc) this.rc = rough.canvas(this.canvas);
 
-        // Slingshot Guides
-        const guideL = gen.line(tl + 20, tb - 130, tl + 110, tb - 65, {
-          seed: 1300 + frameIdx * 10,
-          roughness: 1.6,
-          stroke: amber,
-          strokeWidth: 3
-        });
-        this.rc.draw(guideL);
-
-        const guideR = gen.line(lx - 20, tb - 130, lx - 110, tb - 65, {
-          seed: 1400 + frameIdx * 10,
-          roughness: 1.6,
-          stroke: amber,
-          strokeWidth: 3
-        });
-        this.rc.draw(guideR);
-
-        // 1. Draw Table Bumpers
-        for (let i = 0; i < this.bumpers.length; i++) {
-          const b = this.bumpers[i];
-          const data = b.customData;
-          const currentR = data.baseR * data.scale;
-
-          const bumperSketch = gen.circle(b.position.x, b.position.y, currentR * 2, {
-            seed: data.seed + frameIdx * 30,
-            roughness: 1.8,
-            bowing: 1.5,
+          this.rc.polygon([[tl, tt], [tr, tt], [tr, tb], [tl, tb]], {
+            seed: 1100 + frameIdx * 15,
+            roughness: 1.5,
+            bowing: 1.2,
             stroke: ink,
-            strokeWidth: 3,
-            fill: data.color,
-            fillStyle: 'cross-hatch'
+            strokeWidth: 3
           });
-          this.rc.draw(bumperSketch);
 
-          // Center Core Light
-          const core = gen.circle(b.position.x, b.position.y, currentR * 0.7, {
-            seed: data.seed + 10,
+          // Plunger Lane Divider
+          this.rc.line(lx, tt + 40, lx, tb, {
+            seed: 1200 + frameIdx * 10,
             roughness: 1.4,
-            stroke: '#FFFFFF',
-            strokeWidth: 2,
-            fill: '#FFFFFF',
-            fillStyle: 'solid'
-          });
-          this.rc.draw(core);
-        }
-
-        // 2. Draw Flippers
-        [this.leftFlipper, this.rightFlipper].forEach((f, idx) => {
-          if (!f) return;
-          this.ctx.save();
-          this.ctx.translate(f.position.x, f.position.y);
-          this.ctx.rotate(f.angle);
-
-          const flipperSketch = gen.rectangle(-38, -9, 76, 18, {
-            seed: 5000 + idx * 100 + frameIdx * 20,
-            roughness: 1.5,
-            bowing: 1.2,
             stroke: ink,
-            strokeWidth: 2.5,
-            fill: isDark ? '#F59E0B' : '#D97706',
-            fillStyle: 'solid'
+            strokeWidth: 2.5
           });
-          this.rc.draw(flipperSketch);
-          this.ctx.restore();
-        });
 
-        // 3. Draw Pinballs
-        for (let i = 0; i < this.balls.length; i++) {
-          const b = this.balls[i];
-          const seed = (b.customData?.seed || 1000) + frameIdx * 20;
-
-          const ballSketch = gen.circle(b.position.x, b.position.y, 28, {
-            seed,
-            roughness: 1.5,
-            bowing: 1.2,
-            stroke: ink,
-            strokeWidth: 2,
-            fill: b.customData?.color || '#D97706',
-            fillStyle: 'solid'
+          // Slingshot Guides
+          this.rc.line(tl + 20, tb - 130, tl + 110, tb - 65, {
+            seed: 1300 + frameIdx * 10,
+            roughness: 1.6,
+            stroke: amber,
+            strokeWidth: 3.5
           });
-          this.rc.draw(ballSketch);
 
-          // Specular Glint
-          const glint = gen.circle(b.position.x - 4, b.position.y - 4, 6, {
-            seed: seed + 5,
-            stroke: 'transparent',
-            fill: '#FFFFFF',
-            fillStyle: 'solid'
+          this.rc.line(lx - 20, tb - 130, lx - 110, tb - 65, {
+            seed: 1400 + frameIdx * 10,
+            roughness: 1.6,
+            stroke: amber,
+            strokeWidth: 3.5
           });
-          this.rc.draw(glint);
+
+          // 1. Draw Table Bumpers
+          for (let i = 0; i < this.bumpers.length; i++) {
+            const b = this.bumpers[i];
+            const data = b.customData;
+            const currentR = data.baseR * data.scale;
+
+            this.rc.circle(b.position.x, b.position.y, currentR * 2, {
+              seed: data.seed + frameIdx * 30,
+              roughness: 1.8,
+              bowing: 1.5,
+              stroke: ink,
+              strokeWidth: 3,
+              fill: data.color,
+              fillStyle: 'cross-hatch'
+            });
+
+            this.rc.circle(b.position.x, b.position.y, currentR * 0.7, {
+              seed: data.seed + 10,
+              roughness: 1.4,
+              stroke: '#FFFFFF',
+              strokeWidth: 2,
+              fill: '#FFFFFF',
+              fillStyle: 'solid'
+            });
+          }
+
+          // 2. Draw Flippers
+          [this.leftFlipper, this.rightFlipper].forEach((f, idx) => {
+            if (!f) return;
+            this.ctx.save();
+            this.ctx.translate(f.position.x, f.position.y);
+            this.ctx.rotate(f.angle);
+
+            this.rc.rectangle(-38, -9, 76, 18, {
+              seed: 5000 + idx * 100 + frameIdx * 20,
+              roughness: 1.5,
+              bowing: 1.2,
+              stroke: ink,
+              strokeWidth: 2.5,
+              fill: isDark ? '#F59E0B' : '#D97706',
+              fillStyle: 'solid'
+            });
+            this.ctx.restore();
+          });
+
+          // 3. Draw Pinballs
+          for (let i = 0; i < this.balls.length; i++) {
+            const b = this.balls[i];
+            const seed = (b.customData?.seed || 1000) + frameIdx * 20;
+
+            this.rc.circle(b.position.x, b.position.y, 28, {
+              seed,
+              roughness: 1.5,
+              bowing: 1.2,
+              stroke: ink,
+              strokeWidth: 2,
+              fill: b.customData?.color || '#D97706',
+              fillStyle: 'solid'
+            });
+
+            this.rc.circle(b.position.x - 4, b.position.y - 4, 6, {
+              seed: seed + 5,
+              stroke: 'transparent',
+              fill: '#FFFFFF',
+              fillStyle: 'solid'
+            });
+          }
+        } catch (err) {
+          // Native Canvas 2D Fallback
+          this.ctx.strokeStyle = ink;
+          this.ctx.lineWidth = 3;
+          this.ctx.strokeRect(tl, tt, tr - tl, tb - tt);
+
+          for (const b of this.bumpers) {
+            this.ctx.beginPath();
+            this.ctx.arc(b.position.x, b.position.y, b.customData.baseR, 0, Math.PI * 2);
+            this.ctx.fillStyle = b.customData.color;
+            this.ctx.fill();
+            this.ctx.stroke();
+          }
+
+          for (const b of this.balls) {
+            this.ctx.beginPath();
+            this.ctx.arc(b.position.x, b.position.y, 14, 0, Math.PI * 2);
+            this.ctx.fillStyle = '#D97706';
+            this.ctx.fill();
+            this.ctx.stroke();
+          }
         }
       }
 

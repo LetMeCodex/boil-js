@@ -343,120 +343,146 @@ export class SpaceBlasterScene {
 
       // 4. Render Hand-Drawn Space
       if (this.ctx && this.canvas) {
-        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.save();
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+        this.ctx.restore();
 
         const frameIdx = BoilEngine.getFrameIndex(timestamp, this.options.boilFps || 10, 4);
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const ink = isDark ? '#F3F4F6' : '#1C1917';
-        const gen = rough.generator();
+        const bgSpace = isDark ? '#101318' : '#FAF8F3';
 
-        // 0. Space Starfield
-        for (let s = 0; s < 25; s++) {
-          const sx = ((s * 137.5 + 40) % w);
-          const sy = ((s * 293.7 + 30) % h);
-          const star = gen.circle(sx, sy, 3, {
-            seed: 500 + s + frameIdx * 5,
-            stroke: 'transparent',
-            fill: isDark ? '#9CA3AF' : '#8C827A',
-            fillStyle: 'solid'
-          });
-          this.rc.draw(star);
-        }
+        // Background
+        this.ctx.fillStyle = bgSpace;
+        this.ctx.fillRect(0, 0, w, h);
 
-        // Draw Asteroids
-        for (let i = 0; i < this.asteroids.length; i++) {
-          const a = this.asteroids[i];
+        try {
+          if (!this.rc) this.rc = rough.canvas(this.canvas);
+
+          // 0. Space Starfield
+          for (let s = 0; s < 25; s++) {
+            const sx = ((s * 137.5 + 40) % w);
+            const sy = ((s * 293.7 + 30) % h);
+            this.rc.circle(sx, sy, 3, {
+              seed: 500 + s + frameIdx * 5,
+              stroke: 'transparent',
+              fill: isDark ? '#9CA3AF' : '#8C827A',
+              fillStyle: 'solid'
+            });
+          }
+
+          // Draw Asteroids
+          for (let i = 0; i < this.asteroids.length; i++) {
+            const a = this.asteroids[i];
+            this.ctx.save();
+            this.ctx.translate(a.x, a.y);
+            this.ctx.rotate(a.angle);
+
+            this.rc.polygon(a.points, {
+              seed: a.seed + frameIdx * 20,
+              roughness: 2.0,
+              bowing: 1.8,
+              stroke: ink,
+              strokeWidth: 2.5,
+              fill: a.color,
+              fillStyle: 'cross-hatch'
+            });
+            this.ctx.restore();
+          }
+
+          // Draw Bullets
+          for (let i = 0; i < this.bullets.length; i++) {
+            const b = this.bullets[i];
+            this.rc.circle(b.x, b.y, 8, {
+              seed: b.seed + frameIdx * 10,
+              stroke: '#DC2626',
+              strokeWidth: 2,
+              fill: '#F59E0B',
+              fillStyle: 'solid'
+            });
+          }
+
+          // Draw Particles
+          for (let i = this.particles.length - 1; i >= 0; i--) {
+            const p = this.particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.alpha -= 0.04;
+            if (p.alpha <= 0) {
+              this.particles.splice(i, 1);
+              continue;
+            }
+            this.ctx.save();
+            this.ctx.globalAlpha = p.alpha;
+            this.rc.circle(p.x, p.y, p.size, {
+              seed: 999 + i,
+              stroke: p.color,
+              fill: p.color,
+              fillStyle: 'solid'
+            });
+            this.ctx.restore();
+          }
+
+          // Draw Player Ship (Triangular Spacecraft)
           this.ctx.save();
-          this.ctx.translate(a.x, a.y);
-          this.ctx.rotate(a.angle);
+          this.ctx.translate(this.ship.x, this.ship.y);
+          this.ctx.rotate(this.ship.angle);
 
-          const poly = gen.polygon(a.points, {
-            seed: a.seed + frameIdx * 20,
-            roughness: 2.0,
-            bowing: 1.8,
+          // Rocket Thruster Plume
+          if (this.ship.thrusting) {
+            this.rc.polygon([[-12, -6], [-28, 0], [-12, 6]], {
+              seed: 2000 + frameIdx * 20,
+              roughness: 2.2,
+              stroke: '#DC2626',
+              strokeWidth: 2,
+              fill: '#F59E0B',
+              fillStyle: 'solid'
+            });
+          }
+
+          this.rc.polygon([[20, 0], [-14, -12], [-8, 0], [-14, 12]], {
+            seed: 1000 + frameIdx * 10,
+            roughness: 1.5,
+            bowing: 1.2,
             stroke: ink,
             strokeWidth: 2.5,
-            fill: a.color,
-            fillStyle: 'cross-hatch'
-          });
-          this.rc.draw(poly);
-          this.ctx.restore();
-        }
-
-        // Draw Bullets
-        for (let i = 0; i < this.bullets.length; i++) {
-          const b = this.bullets[i];
-          const bulletSketch = gen.circle(b.x, b.y, 8, {
-            seed: b.seed + frameIdx * 10,
-            stroke: '#DC2626',
-            strokeWidth: 2,
-            fill: '#F59E0B',
+            fill: isDark ? '#3B82F6' : '#0284C7',
             fillStyle: 'solid'
           });
-          this.rc.draw(bulletSketch);
-        }
 
-        // Draw Particles
-        for (let i = this.particles.length - 1; i >= 0; i--) {
-          const p = this.particles[i];
-          p.x += p.vx;
-          p.y += p.vy;
-          p.alpha -= 0.04;
-          if (p.alpha <= 0) {
-            this.particles.splice(i, 1);
-            continue;
+          // Cockpit
+          this.rc.circle(2, 0, 8, {
+            seed: 1005,
+            stroke: '#FFFFFF',
+            fill: '#FFFFFF',
+            fillStyle: 'solid'
+          });
+
+          this.ctx.restore();
+        } catch (err) {
+          // Native Canvas 2D Fallback
+          for (const a of this.asteroids) {
+            this.ctx.beginPath();
+            this.ctx.arc(a.x, a.y, a.r, 0, Math.PI * 2);
+            this.ctx.fillStyle = a.color;
+            this.ctx.fill();
+            this.ctx.stroke();
           }
+
           this.ctx.save();
-          this.ctx.globalAlpha = p.alpha;
-          const dot = gen.circle(p.x, p.y, p.size, {
-            seed: 999 + i,
-            stroke: p.color,
-            fill: p.color,
-            fillStyle: 'solid'
-          });
-          this.rc.draw(dot);
-          this.ctx.restore();
+          this.ctx.translate(this.ship.x, this.ship.y);
+          this.ctx.rotate(this.ship.angle);
+          this.ctx.beginPath();
+          this.ctx.moveTo(20, 0);
+          this.ctx.lineTo(-14, -12);
+          this.ctx.lineTo(-8, 0);
+          this.ctx.lineTo(-14, 12);
+          this.ctx.closePath();
+          this.ctx.fillStyle = '#0284C7';
+          this.ctx.fill();
+          this.ctx.stroke();
         }
-
-        // Draw Player Ship (Triangular Spacecraft)
-        this.ctx.save();
-        this.ctx.translate(this.ship.x, this.ship.y);
-        this.ctx.rotate(this.ship.angle);
-
-        // Rocket Thruster Plume
-        if (this.ship.thrusting) {
-          const plume = gen.polygon([[-12, -6], [-28, 0], [-12, 6]], {
-            seed: 2000 + frameIdx * 20,
-            roughness: 2.2,
-            stroke: '#DC2626',
-            strokeWidth: 2,
-            fill: '#F59E0B',
-            fillStyle: 'solid'
-          });
-          this.rc.draw(plume);
-        }
-
-        const shipPoly = gen.polygon([[20, 0], [-14, -12], [-8, 0], [-14, 12]], {
-          seed: 1000 + frameIdx * 10,
-          roughness: 1.5,
-          bowing: 1.2,
-          stroke: ink,
-          strokeWidth: 2.5,
-          fill: isDark ? '#3B82F6' : '#0284C7',
-          fillStyle: 'solid'
-        });
-        this.rc.draw(shipPoly);
-
-        // Cockpit
-        const cockpit = gen.circle(2, 0, 8, {
-          seed: 1005,
-          stroke: '#FFFFFF',
-          fill: '#FFFFFF',
-          fillStyle: 'solid'
-        });
-        this.rc.draw(cockpit);
-
-        this.ctx.restore();
       }
 
       this.renderLoop = requestAnimationFrame(loop);
