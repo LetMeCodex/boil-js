@@ -5,10 +5,37 @@ import { SoundFX } from '../engine/AnimeBoilBridge.js';
  * ============================================================================
  * DEV TOOLS & EXPERIMENT DEVELOPER SUITE
  * ============================================================================
- * Manages [INSPECT], [VIEW SOURCE], [COPY PROMPT], [REMIX THIS], and [FULLSCREEN].
  */
 
 export const EXPERIMENT_SPECS = {
+  kurama: {
+    title: '00 // KURAMA MODE (CHAKRA / FORM / INSTINCT)',
+    engine: 'Three.js WebGL + Catmull-Rom Splines + GLSL',
+    libraries: 'Three.js, Anime.js, Rough.js, GSAP',
+    particles: '12,000 GPU Particles + 9 Dynamic Volumetric Spline Tails',
+    renderMode: 'GPU Vertex/Fragment Shader + 2D Hand-Drawn Overlay',
+    input: 'Timeline Scrub + Mouse Parallax + Hold to Charge Chakra',
+    physics: 'Procedural Simplex Noise Turbulence + Catmull-Rom Spline Dynamics',
+    parameters: 'Tails: 9, Chakra Intensity: 0.0-1.0, uProgress: 0.0-1.0',
+    prompt: `Create an interactive 3D anime-inspired Kurama Mode transformation experiment in WebGL using Three.js, GLSL shaders, Anime.js, and Rough.js. 
+A dark faceted silhouette character begins in a dormant breathing state, accumulates orange/crimson chakra particles into a pulsing chest core, unleashes a radial shockwave surge, and materializes 9 enormous volumetric Catmull-Rom spline chakra tails sequentially. 
+Each tail animates with procedural noise displacement, secondary harmonic wiggles, and flowing energy shader bands. The character transitions into an illuminated fox avatar with sharp ears and glowing eyes. Include interactive mouse hold-to-charge chakra mechanics and a 2D Rough.js hand-drawn overlay for vector targeting marks and technical annotations.`,
+    sourceCode: `// Catmull-Rom Dynamic 9-Tail Spline Update
+for (let i = 0; i < 9; i++) {
+  const localGrowth = clamp((progress - activationThreshold[i]) / 0.18, 0.0, 1.0);
+  const pts = basePoints[i].map((base, j) => {
+    const waveX = Math.sin(time * freq + phase + j * 0.8) * amp * (j/4);
+    const waveY = Math.cos(time * freq * 0.9 + phase) * amp * (j/4);
+    return new THREE.Vector3(
+      base.x * localGrowth + waveX * localGrowth,
+      base.y * localGrowth + waveY * localGrowth,
+      base.z * localGrowth
+    );
+  });
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const tube = new THREE.TubeGeometry(curve, 28, 0.16 * localGrowth, 6, false);
+}`
+  },
   textmotion: {
     title: '01 // 3D TEXT MOTION',
     engine: 'Three.js / WebGL + Custom GLSL',
@@ -26,14 +53,6 @@ vec3 cubicBezier(vec3 p0, vec3 p1, vec3 p2, vec3 p3, float t) {
          3.0 * oneMinusT * oneMinusT * t * p1 +
          3.0 * oneMinusT * t * t * p2 +
          t * t * t * p3;
-}
-
-// 3D Simplex Curl Turbulence
-vec3 curlNoise(vec3 p, float time) {
-  float x = sin(p.y * 1.8 + time * 0.8) * cos(p.z * 1.5);
-  float y = cos(p.z * 1.8 + time * 0.7) * sin(p.x * 1.5);
-  float z = sin(p.x * 1.8 + time * 0.9) * cos(p.y * 1.5);
-  return vec3(x, y, z);
 }`
   },
   pinball: {
@@ -55,12 +74,6 @@ this.leftConstraint = Matter.Constraint.create({
   bodyB: this.leftFlipper,
   pointB: { x: -len/2, y: 0 },
   stiffness: 0.9
-});
-
-// Bumper collision impulse & chime
-Matter.Events.on(engine, 'collisionStart', (e) => {
-  // Apply radial impulse & play pentatonic note
-  Matter.Body.applyForce(ball, ball.position, { x: dx * 0.18, y: dy * 0.18 });
 });`
   },
   puppet: {
@@ -99,7 +112,6 @@ for (let s = 0; s < segCount; s++) {
     sourceCode: `// Bubble Slicing & Pop Mechanics
 const dist = Math.hypot(cursorX - bubble.x, cursorY - bubble.y);
 if (dist < bubble.r * 1.2) {
-  // Pop bubble, spawn 8 splash spark droplets
   for (let p = 0; p < 8; p++) {
     particles.push({
       x: bubble.x, y: bubble.y,
@@ -118,8 +130,7 @@ if (dist < bubble.r * 1.2) {
     physics: 'Inertial Thrust + Rotational Dynamics + Boundary Wrap',
     parameters: 'Thrust Force: 0.22, Friction: 0.985, Bullet Speed: 11px/f',
     prompt: `Create a retro arcade vector asteroids space blaster game rendered entirely in hand-drawn line boil using Rough.js. The player controls a triangular spaceship with inertial thrusters, turning dynamics, particle smoke emissions, and screen boundary wrapping. Firing ink laser bullets shatters polygonal boiling asteroids into smaller fragments. Include weapon power-ups (Triple Spread Laser) and an Ink Bomb Shockwave.`,
-    sourceCode: `// Asteroid Shatter Physics
-function destroyAsteroid(a) {
+    sourceCode: `function destroyAsteroid(a) {
   if (a.tier > 1) {
     createAsteroid(a.x - 10, a.y - 10, a.r * 0.6, a.tier - 1);
     createAsteroid(a.x + 10, a.y + 10, a.r * 0.6, a.tier - 1);
@@ -346,7 +357,7 @@ export class DevTools {
   }
 
   static openInspector(key) {
-    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.textmotion;
+    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.kurama;
     document.getElementById('inspect-title').textContent = spec.title;
     document.getElementById('inspect-engine').textContent = spec.engine;
     document.getElementById('inspect-libraries').textContent = spec.libraries;
@@ -361,7 +372,7 @@ export class DevTools {
   }
 
   static openSource(key) {
-    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.textmotion;
+    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.kurama;
     document.getElementById('source-title').textContent = `SOURCE // ${spec.title}`;
     document.getElementById('source-code-content').textContent = spec.sourceCode;
 
@@ -379,7 +390,7 @@ export class DevTools {
   }
 
   static openPrompt(key) {
-    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.textmotion;
+    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.kurama;
     document.getElementById('prompt-title').textContent = `PROMPT // ${spec.title}`;
     document.getElementById('prompt-text-content').textContent = spec.prompt;
 
@@ -397,7 +408,7 @@ export class DevTools {
   }
 
   static openRemix(key, sceneInstance) {
-    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.textmotion;
+    const spec = EXPERIMENT_SPECS[key] || EXPERIMENT_SPECS.kurama;
     document.getElementById('remix-title').textContent = `REMIX // ${spec.title}`;
 
     const applyBtn = document.getElementById('btn-apply-remix');
@@ -417,7 +428,7 @@ export class DevTools {
 
   static toggleFullscreen(targetElement) {
     if (!document.fullscreenElement) {
-      targetElement.requestFullscreen().catch(err => {});
+      targetElement.requestFullscreen().catch(() => {});
       SoundFX.playPop(600);
     } else {
       document.exitFullscreen();
@@ -453,7 +464,5 @@ export class DevTools {
     });
   }
 
-  static bindGlobalTriggers() {
-    // Dynamic delegation
-  }
+  static bindGlobalTriggers() {}
 }

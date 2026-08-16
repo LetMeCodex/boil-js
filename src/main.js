@@ -11,6 +11,7 @@ import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
 
 // Scene Imports
+import { KuramaScene } from './scenes/KuramaScene.js';
 import { TextMotionScene } from './scenes/TextMotionScene.js';
 import { PinballScene } from './scenes/PinballScene.js';
 import { PuppetScene } from './scenes/PuppetScene.js';
@@ -59,7 +60,7 @@ class ShowcaseApp {
 
   initDevTools() {
     DevTools.init();
-    window.DevTools = DevTools; // Expose for inline handlers
+    window.DevTools = DevTools;
   }
 
   initHero() {
@@ -73,6 +74,7 @@ class ShowcaseApp {
     this.visibilityManager = new VisibilityManager();
 
     const chapterConfigs = [
+      { id: 'stage-kurama', key: 'kurama', Class: KuramaScene },
       { id: 'stage-01', key: 'textmotion', Class: TextMotionScene },
       { id: 'stage-02', key: 'pinball', Class: PinballScene },
       { id: 'stage-03', key: 'puppet', Class: PuppetScene },
@@ -104,7 +106,7 @@ class ShowcaseApp {
 
   bindChapterToolbarButtons() {
     document.querySelectorAll('.tool-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
         const key = btn.getAttribute('data-key');
         const targetId = btn.getAttribute('data-target');
@@ -150,7 +152,6 @@ class ShowcaseApp {
       this.scrollEngine.setupTriggers(chapterSections);
     }
 
-    // Bind nav item click smooth scrolling
     document.querySelectorAll('.lab-index-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
@@ -165,7 +166,7 @@ class ShowcaseApp {
 
     document.getElementById('btn-hero-explore')?.addEventListener('click', (e) => {
       e.preventDefault();
-      const targetEl = document.querySelector('#section-01');
+      const targetEl = document.querySelector('#section-kurama');
       if (targetEl) {
         SoundFX.playPop(580);
         this.scrollEngine.scrollToElement(targetEl, 1.2);
@@ -173,7 +174,7 @@ class ShowcaseApp {
     });
 
     document.getElementById('btn-hero-source')?.addEventListener('click', () => {
-      DevTools.openSource('textmotion');
+      DevTools.openSource('kurama');
     });
   }
 

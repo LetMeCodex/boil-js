@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>BOIL.JS — Kinetic Hand-Drawn Animation Lab & Showcase</title>
-  <meta name="description" content="An experimental kinetic animation laboratory and interactive showcase featuring WebGL, physics, SVG, 3D cel-shading, and particle systems.">
+  <meta name="description" content="An experimental kinetic animation laboratory and interactive showcase featuring Kurama Mode, WebGL, physics, SVG, 3D cel-shading, and particle systems.">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
@@ -32,28 +32,31 @@
 
       <!-- Laboratory Chapter Index -->
       <nav class="lab-index-nav" aria-label="Laboratory Chapters">
-        <a href="#section-01" class="lab-index-item active" data-chapter="0">
+        <a href="#section-kurama" class="lab-index-item active" data-chapter="0">
+          <span class="index-num">🔥</span><span class="index-name">KURAMA</span>
+        </a>
+        <a href="#section-01" class="lab-index-item" data-chapter="1">
           <span class="index-num">01</span><span class="index-name">TEXT</span>
         </a>
-        <a href="#section-02" class="lab-index-item" data-chapter="1">
+        <a href="#section-02" class="lab-index-item" data-chapter="2">
           <span class="index-num">02</span><span class="index-name">PINBALL</span>
         </a>
-        <a href="#section-03" class="lab-index-item" data-chapter="2">
+        <a href="#section-03" class="lab-index-item" data-chapter="3">
           <span class="index-num">03</span><span class="index-name">PUPPET</span>
         </a>
-        <a href="#section-04" class="lab-index-item" data-chapter="3">
+        <a href="#section-04" class="lab-index-item" data-chapter="4">
           <span class="index-num">04</span><span class="index-name">BUBBLE</span>
         </a>
-        <a href="#section-05" class="lab-index-item" data-chapter="4">
+        <a href="#section-05" class="lab-index-item" data-chapter="5">
           <span class="index-num">05</span><span class="index-name">SPACE</span>
         </a>
-        <a href="#section-06" class="lab-index-item" data-chapter="5">
+        <a href="#section-06" class="lab-index-item" data-chapter="6">
           <span class="index-num">06</span><span class="index-name">3D</span>
         </a>
-        <a href="#section-07" class="lab-index-item" data-chapter="6">
+        <a href="#section-07" class="lab-index-item" data-chapter="7">
           <span class="index-num">07</span><span class="index-name">VECTOR</span>
         </a>
-        <a href="#section-08" class="lab-index-item" data-chapter="7">
+        <a href="#section-08" class="lab-index-item" data-chapter="8">
           <span class="index-num">08</span><span class="index-name">PHYSICS</span>
         </a>
       </nav>
@@ -95,8 +98,8 @@
         </p>
 
         <div class="hero-actions">
-          <a href="#section-01" class="tactile-hero-btn primary" id="btn-hero-explore">
-            <span>EXPLORE EXPERIMENTS ↓</span>
+          <a href="#section-kurama" class="tactile-hero-btn primary" id="btn-hero-explore">
+            <span>ENTER EXPERIMENTS ↓</span>
           </a>
           <button class="tactile-hero-btn outline" id="btn-hero-source" data-cursor="CODE">
             <span>VIEW SOURCE ↗</span>
@@ -104,11 +107,44 @@
         </div>
 
         <div class="hero-metadata-bar">
-          <div class="meta-pill"><span class="meta-accent">08</span> EXPERIMENTS</div>
+          <div class="meta-pill"><span class="meta-accent">09</span> EXPERIMENTS</div>
           <div class="meta-pill"><span class="meta-accent">14,000+</span> PARTICLES</div>
           <div class="meta-pill">WEBGL / PHYSICS / SVG</div>
           <div class="meta-pill">OPEN SOURCE MIT</div>
         </div>
+      </div>
+    </section>
+
+    <!-- =========================================================================
+         PREMIER FEATURE: KURAMA MODE TRANSFORMATION
+         ========================================================================= -->
+    <section id="section-kurama" class="showcase-chapter-section" data-key="kurama">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number" style="color: #EA580C;">PREMIER LAB EXPERIMENT</span>
+          <h2 class="chapter-title">Kurama Mode // Chakra Transformation</h2>
+          <p class="chapter-subtitle">Procedural faceted fox avatar, 9 dynamic Catmull-Rom spline tails, 12,000 GPU particles, and 2D Rough.js annotations.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="kurama" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="kurama" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="kurama" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="kurama" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-kurama">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-kurama" class="chapter-stage-container">
+        <!-- KuramaScene will mount here -->
       </div>
     </section>
 
@@ -453,6 +489,12 @@
       </div>
 
       <div class="kinetic-index-list">
+        <a href="#section-kurama" class="index-row-item">
+          <span class="row-num">🔥</span>
+          <span class="row-title">KURAMA MODE (CHAKRA TRANSFORMATION)</span>
+          <span class="row-tag">9 SPLINE TAILS & 12K PARTICLES</span>
+          <span class="row-arrow">↗</span>
+        </a>
         <a href="#section-01" class="index-row-item">
           <span class="row-num">01</span>
           <span class="row-title">3D TEXT MOTION</span>
@@ -520,9 +562,10 @@
 
         <div class="footer-links">
           <a href="https://github.com/LetMeCodex/boil-js" target="_blank" rel="noopener">GITHUB</a>
+          <a href="#section-kurama">KURAMA MODE</a>
           <a href="#section-01">EXPERIMENTS</a>
-          <button class="link-btn" onclick="DevTools.openSource('textmotion')">SOURCE</button>
-          <button class="link-btn" onclick="DevTools.openPrompt('textmotion')">PROMPTS</button>
+          <button class="link-btn" onclick="DevTools.openSource('kurama')">SOURCE</button>
+          <button class="link-btn" onclick="DevTools.openPrompt('kurama')">PROMPTS</button>
         </div>
       </div>
     </footer>
