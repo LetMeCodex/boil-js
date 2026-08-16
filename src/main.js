@@ -22,6 +22,7 @@ import { ThreeDScene } from './scenes/ThreeDScene.js';
 import { MorphScene } from './scenes/MorphScene.js';
 import { PhysicsScene } from './scenes/PhysicsScene.js';
 import { UiKitScene } from './scenes/UiKitScene.js';
+import { AudioSynthScene } from './scenes/AudioSynthScene.js';
 
 class ShowcaseApp {
   constructor() {
@@ -109,7 +110,8 @@ class ShowcaseApp {
       { id: 'stage-06', key: 'threed', Class: ThreeDScene },
       { id: 'stage-07', key: 'morph', Class: MorphScene },
       { id: 'stage-08', key: 'physics', Class: PhysicsScene },
-      { id: 'stage-uikit', key: 'uikit', Class: UiKitScene }
+      { id: 'stage-uikit', key: 'uikit', Class: UiKitScene },
+      { id: 'stage-synth', key: 'synth', Class: AudioSynthScene }
     ];
 
     chapterConfigs.forEach(cfg => {

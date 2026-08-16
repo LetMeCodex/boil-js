@@ -65,6 +65,9 @@
         <a href="#section-uikit" class="lab-index-item" data-chapter="uikit">
           <span class="index-num">🎛️</span><span class="index-name">UI KIT</span>
         </a>
+        <a href="#section-synth" class="lab-index-item" data-chapter="synth">
+          <span class="index-num">🎹</span><span class="index-name">PIANO</span>
+        </a>
       </nav>
 
       <!-- Global Controls -->
@@ -452,6 +455,39 @@
     </section>
 
     <!-- =========================================================================
+         FEATURED: INTERACTIVE PIANO & WEB AUDIO SYNTHESIZER
+         ========================================================================= -->
+    <section id="section-synth" class="showcase-chapter-section" data-key="synth">
+      <div class="chapter-header">
+        <div class="chapter-title-group">
+          <span class="chapter-number">AUDIO-REACTIVE LAB</span>
+          <h2 class="chapter-title">🎹 Interactive Piano & Audio Synth</h2>
+          <p class="chapter-subtitle">Playable hand-drawn boiling piano keys with Web Audio oscillators, FFT spectrum visualizer, and lo-fi arpeggio.</p>
+        </div>
+        <div class="chapter-toolbar">
+          <button class="tool-btn" data-action="inspect" data-key="synth" data-cursor="INSPECT">
+            <span>🔍 Inspect</span>
+          </button>
+          <button class="tool-btn" data-action="source" data-key="synth" data-cursor="CODE">
+            <span>📋 Source</span>
+          </button>
+          <button class="tool-btn" data-action="prompt" data-key="synth" data-cursor="PROMPT">
+            <span>✨ Prompt</span>
+          </button>
+          <button class="tool-btn" data-action="remix" data-key="synth" data-cursor="REMIX">
+            <span>🎛️ Remix</span>
+          </button>
+          <button class="tool-btn" data-action="fullscreen" data-target="stage-synth">
+            <span>⛶ Fullscreen</span>
+          </button>
+        </div>
+      </div>
+      <div id="stage-synth" class="chapter-stage-container">
+        <!-- AudioSynthScene will mount here -->
+      </div>
+    </section>
+
+    <!-- =========================================================================
          09. LIVING TECH ECOSYSTEM
          ========================================================================= -->
     <section id="section-tech" class="showcase-tech-section">
@@ -586,6 +622,12 @@
           <span class="row-num">🎛️</span>
           <span class="row-title">ANIMATED UI KIT & BUTTONS</span>
           <span class="row-tag">TACTILE SPRING MICRO-INTERACTIONS</span>
+          <span class="row-arrow">↗</span>
+        </a>
+        <a href="#section-synth" class="index-row-item">
+          <span class="row-num">🎹</span>
+          <span class="row-title">INTERACTIVE PIANO & SYNTH</span>
+          <span class="row-tag">WEB AUDIO API & FFT SPECTRUM</span>
           <span class="row-arrow">↗</span>
         </a>
       </div>

@@ -9,6 +9,32 @@ import { SoundFX } from '../engine/AnimeBoilBridge.js';
  */
 
 export const EXPERIMENT_SPECS = {
+  synth: {
+    title: '🎹 INTERACTIVE PIANO & AUDIO SYNTH',
+    engine: 'Web Audio API + Rough.js + Anime.js',
+    libraries: 'Web Audio API, Rough.js, Anime.js',
+    particles: '16 FFT Boiling Spectrum Bars + Sound Waves',
+    renderMode: '2D Hand-Drawn Boiling Piano Canvas + Frequency Spectrum',
+    input: 'Keyboard (A-K keys) + Mouse Click on Piano Keys',
+    physics: 'Harmonic Oscillator Frequencies & Filter Envelopes',
+    parameters: 'C4-C5 Pentatonic Octave, 16-Band FFT Analyser, Lo-Fi Arpeggiator',
+    prompt: `Build an interactive hand-drawn boiling piano and audio synthesizer using the Web Audio API, Rough.js, and Anime.js. Render clickable hand-drawn piano keys that play real synthesized triangle waveforms with lowpass resonant biquad filtering. Include an interactive 16-band FFT boiling frequency visualizer that reacts dynamically to key presses and an automated lo-fi arpeggio sequencer.`,
+    sourceCode: `// Web Audio Tone Synthesis
+playTone(freq, duration = 0.35) {
+  const osc = this.audioCtx.createOscillator();
+  const filter = this.audioCtx.createBiquadFilter();
+  const gain = this.audioCtx.createGain();
+  osc.type = 'triangle';
+  osc.frequency.setValueAtTime(freq, this.audioCtx.currentTime);
+  filter.type = 'lowpass';
+  filter.frequency.setValueAtTime(1600, this.audioCtx.currentTime);
+  gain.gain.setValueAtTime(0.01, this.audioCtx.currentTime);
+  gain.gain.linearRampToValueAtTime(0.3, this.audioCtx.currentTime + 0.03);
+  gain.gain.exponentialRampToValueAtTime(0.001, this.audioCtx.currentTime + duration);
+  osc.connect(filter); filter.connect(gain); gain.connect(this.audioCtx.destination);
+  osc.start(); osc.stop(this.audioCtx.currentTime + duration);
+}`
+  },
   uikit: {
     title: '🎛️ ANIMATED UI KIT & BUTTONS',
     engine: 'Rough.js + Anime.js Tactile Physics',
