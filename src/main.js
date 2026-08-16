@@ -21,6 +21,8 @@ import { ThreeDScene } from './scenes/ThreeDScene.js';
 import { MorphScene } from './scenes/MorphScene.js';
 import { PhysicsScene } from './scenes/PhysicsScene.js';
 import { UiKitScene } from './scenes/UiKitScene.js';
+import { EdgeCityScene } from './scenes/EdgeCityScene.js';
+import { EdgeCityBackground } from './engine/EdgeCityBackground.js';
 
 class ShowcaseApp {
   constructor() {
@@ -32,6 +34,7 @@ class ShowcaseApp {
     this.initTheme();
     this.initCursor();
     this.initDevTools();
+    this.initBackground();
     this.initHero();
     this.initChapters();
     this.initTechEcosystem();
@@ -46,6 +49,9 @@ class ShowcaseApp {
     if (themeBtn) {
       themeBtn.innerHTML = this.theme === 'dark' ? '<span class="theme-icon">☀️</span>' : '<span class="theme-icon">🌙</span>';
     }
+    if (this.edgeCityBg) {
+      this.edgeCityBg.setTheme(this.theme);
+    }
   }
 
   toggleTheme() {
@@ -53,6 +59,14 @@ class ShowcaseApp {
     localStorage.setItem('rough-theme', this.theme);
     this.initTheme();
     SoundFX.playPop(520);
+  }
+
+  initBackground() {
+    try {
+      this.edgeCityBg = new EdgeCityBackground();
+    } catch (e) {
+      console.warn('EdgeCityBackground init deferred:', e);
+    }
   }
 
   initCursor() {
@@ -82,6 +96,7 @@ class ShowcaseApp {
       { id: 'stage-04', key: 'bubble', Class: BubbleScene },
       { id: 'stage-05', key: 'space', Class: SpaceBlasterScene },
       { id: 'stage-06', key: 'threed', Class: ThreeDScene },
+      { id: 'stage-edgecity', key: 'edgecity', Class: EdgeCityScene },
       { id: 'stage-07', key: 'morph', Class: MorphScene },
       { id: 'stage-08', key: 'physics', Class: PhysicsScene },
       { id: 'stage-uikit', key: 'uikit', Class: UiKitScene }
