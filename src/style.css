@@ -1015,6 +1015,78 @@ main, header, section, footer, aside, dl, pre,
   color: var(--orange);
 }
 
+/* Floating HUD Phase Pills (Chapter 01 & Stage Canvases) */
+.hud-phase-pills {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  padding: 4px;
+  background: var(--paper-card);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-subtle);
+  backdrop-filter: blur(8px);
+}
+
+.hud-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.03em;
+  cursor: pointer;
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  color: var(--ink);
+  transition: transform 0.15s var(--ease-elastic), background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.hud-pill-btn .pill-index {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.65rem;
+  color: var(--orange);
+  letter-spacing: 0.05em;
+}
+
+.hud-pill-btn .pill-label {
+  font-family: var(--font-mono);
+  font-weight: 600;
+  color: var(--ink);
+  letter-spacing: 0.04em;
+}
+
+.hud-pill-btn:hover {
+  transform: translateY(-1px);
+  background: var(--orange-faint);
+  border-color: var(--orange);
+}
+
+.hud-pill-btn:hover .pill-label {
+  color: var(--orange);
+}
+
+.hud-pill-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
+}
+
+.hud-pill-btn.active .pill-index {
+  color: var(--orange);
+}
+
+.hud-pill-btn.active .pill-label {
+  color: var(--paper);
+}
+
 /* Stat & HUD Badges */
 .stat-badge {
   display: inline-flex;
