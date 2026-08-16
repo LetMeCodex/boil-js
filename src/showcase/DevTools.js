@@ -108,32 +108,37 @@ vec3 curlNoise(vec3 p, float time) {
   return vec3(x, y, z);
 }`
   },
+  arkanoid: {
+    title: '02 // SKETCH BRICK BREAKER',
+    engine: 'Canvas 2D + Rough.js + Anime.js',
+    libraries: 'Rough.js, Anime.js, Web Audio API',
+    particles: 'Kinetic Brick Shards + Multiball Spheres',
+    renderMode: '2D Hand-Drawn Neo-Arkanoid Boil',
+    input: 'Mouse / Touch Aim + Keyboard (A/D/Space)',
+    physics: 'Angle-Reflective Paddle & Brick Collision Physics',
+    parameters: 'Ball Speed: 1.0x-1.8x, Paddle Width: 110px, Combo Chains: Up to 5x',
+    prompt: `Build an interactive hand-drawn neo-Arkanoid brick breaker arcade game using Rough.js and Anime.js. The player aims an elastic boiling paddle using the mouse or keyboard to bounce kinetic spheres into multi-tiered colored bricks (Ruby, Amber, Emerald, Sapphire, Amethyst). Golden bricks drop powerup capsules including 3x Multiball frenzy, Wide Paddle extensions, and Laser Blaster turrets. Include pentatonic chime collision sound effects, particle debris explosions, and combo multiplier streaks.`,
+    sourceCode: `// Paddle Angle-Reflection Physics
+const hitOffset = (ball.x - paddle.x) / (paddle.w / 2); // -1.0 to 1.0
+const maxAngle = Math.PI * 0.38; // 68 degrees
+const angle = hitOffset * maxAngle - Math.PI / 2;
+const speed = Math.min(currentSpeed * 1.02, 11 * speedMult);
+ball.vx = Math.cos(angle) * speed;
+ball.vy = Math.sin(angle) * speed;`
+  },
   pinball: {
-    title: '02 // PINBALL ARCADE',
-    engine: 'Matter.js + Rough.js + Web Audio API',
-    libraries: 'Matter.js, Rough.js, Anime.js',
-    particles: '4x Multiball Rigid-Bodies',
-    renderMode: '2D Canvas Hand-Drawn Boil',
-    input: 'Keyboard (A/D/Space) + Pointer Drag',
-    physics: 'Rigid-Body 2D Physics + Spring Constraints',
-    parameters: 'Restitution: 1.6x, Gravity: 1.1, Flipper Speed: 0.42 rad/s',
-    prompt: `Build an interactive hand-drawn boiling Pinball & Pachinko arcade game using Matter.js, Rough.js, and Anime.js. Include realistic left and right flippers hinged with revolute constraints, a pull-back spring plunger launcher, 3 musical bouncy bumpers that trigger pentatonic Web Audio chimes on collision and blast balls with radial impulse, rotating spinners, multitrack scoring, and 4x multiball frenzy with confetti celebration.`,
-    sourceCode: `// Matter.js Flipper Constraint
-this.leftFlipper = Matter.Bodies.rectangle(pivotX + len/2, flipperY, len, 18, {
-  density: 0.08, restitution: 0.3
-});
-this.leftConstraint = Matter.Constraint.create({
-  pointA: { x: pivotX, y: flipperY },
-  bodyB: this.leftFlipper,
-  pointB: { x: -len/2, y: 0 },
-  stiffness: 0.9
-});
-
-// Bumper collision impulse & chime
-Matter.Events.on(engine, 'collisionStart', (e) => {
-  // Apply radial impulse & play pentatonic note
-  Matter.Body.applyForce(ball, ball.position, { x: dx * 0.18, y: dy * 0.18 });
-});`
+    title: '02 // SKETCH BRICK BREAKER',
+    engine: 'Canvas 2D + Rough.js + Anime.js',
+    libraries: 'Rough.js, Anime.js, Web Audio API',
+    particles: 'Kinetic Brick Shards + Multiball Spheres',
+    renderMode: '2D Hand-Drawn Neo-Arkanoid Boil',
+    input: 'Mouse / Touch Aim + Keyboard (A/D/Space)',
+    physics: 'Angle-Reflective Paddle & Brick Collision Physics',
+    parameters: 'Ball Speed: 1.0x-1.8x, Paddle Width: 110px, Combo Chains: Up to 5x',
+    prompt: `Build an interactive hand-drawn neo-Arkanoid brick breaker arcade game using Rough.js and Anime.js. The player aims an elastic boiling paddle using the mouse or keyboard to bounce kinetic spheres into multi-tiered colored bricks.`,
+    sourceCode: `// Paddle Angle-Reflection Physics
+const hitOffset = (ball.x - paddle.x) / (paddle.w / 2);
+const angle = hitOffset * (Math.PI * 0.38) - Math.PI / 2;`
   },
   puppet: {
     title: '03 // PUPPET MONSTER',
@@ -180,23 +185,36 @@ if (dist < bubble.r * 1.2) {
   }
 }`
   },
+  slingshot: {
+    title: '05 // SLINGSHOT SIEGE',
+    engine: 'Physics Demolition + Rough.js',
+    libraries: 'Rough.js, Anime.js, Web Audio API',
+    particles: 'Explosive Shrapnel + Tumbling Castle Blocks',
+    renderMode: 'Hand-Drawn Procedural Vector Physics',
+    input: 'Mouse / Touch Elastic Slingshot Pull & Aim',
+    physics: 'Parabolic Ballistics + Rigid-Body Block Stacking',
+    parameters: 'Catapult Velocity: 1.2x, Gravity: 0.38, Destruction Goal: 100%',
+    prompt: `Build an interactive hand-drawn physics slingshot demolition game using Rough.js and Anime.js. The player pulls back an elastic slingshot pouch with real-time dotted parabolic trajectory prediction to launch kinetic heavy boulders, explosive ink bombs, and triple cluster splitters into destructible multi-tiered fortress towers. Stacked wooden beams and stone pillars tumble, collide, shatter into debris particles, and compute a total demolition percentage.`,
+    sourceCode: `// Slingshot Ballistics & Impulse
+const speed = powerMult * 0.22;
+const vx = (slingshot.x - pouch.x) * speed;
+const vy = (slingshot.y - pouch.y) * speed;
+projectiles.push({ x: slingshot.x, y: slingshot.y, vx, vy, mass: 2.5 });`
+  },
   space: {
-    title: '05 // SPACE BLASTER',
-    engine: 'Vector Physics + Rough.js Line Boil',
-    libraries: 'Rough.js, Anime.js',
-    particles: 'Rocket Thruster Smoke + Asteroid Debris',
-    renderMode: 'Hand-Drawn Vector Polygon Rendering',
-    input: 'Keyboard (WASD/Arrows/Space) + On-Screen Buttons',
-    physics: 'Inertial Thrust + Rotational Dynamics + Boundary Wrap',
-    parameters: 'Thrust Force: 0.22, Friction: 0.985, Bullet Speed: 11px/f',
-    prompt: `Create a retro arcade vector asteroids space blaster game rendered entirely in hand-drawn line boil using Rough.js. The player controls a triangular spaceship with inertial thrusters, turning dynamics, particle smoke emissions, and screen boundary wrapping. Firing ink laser bullets shatters polygonal boiling asteroids into smaller fragments. Include weapon power-ups (Triple Spread Laser) and an Ink Bomb Shockwave.`,
-    sourceCode: `// Asteroid Shatter Physics
-function destroyAsteroid(a) {
-  if (a.tier > 1) {
-    createAsteroid(a.x - 10, a.y - 10, a.r * 0.6, a.tier - 1);
-    createAsteroid(a.x + 10, a.y + 10, a.r * 0.6, a.tier - 1);
-  }
-}`
+    title: '05 // SLINGSHOT SIEGE',
+    engine: 'Physics Demolition + Rough.js',
+    libraries: 'Rough.js, Anime.js, Web Audio API',
+    particles: 'Explosive Shrapnel + Tumbling Castle Blocks',
+    renderMode: 'Hand-Drawn Procedural Vector Physics',
+    input: 'Mouse / Touch Elastic Slingshot Pull & Aim',
+    physics: 'Parabolic Ballistics + Rigid-Body Block Stacking',
+    parameters: 'Catapult Velocity: 1.2x, Gravity: 0.38, Destruction Goal: 100%',
+    prompt: `Build an interactive hand-drawn physics slingshot demolition game using Rough.js and Anime.js.`,
+    sourceCode: `// Slingshot Ballistics & Impulse
+const speed = powerMult * 0.22;
+const vx = (slingshot.x - pouch.x) * speed;
+const vy = (slingshot.y - pouch.y) * speed;`
   },
   threed: {
     title: '06 // 3D DIMENSION',

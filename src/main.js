@@ -14,10 +14,10 @@ import { KineticCollageScene } from './engine/KineticCollageScene.js';
 // Scene Imports
 import { TextMotionScene } from './scenes/TextMotionScene.js';
 import { KuramaScene } from './scenes/KuramaScene.js';
-import { PinballScene } from './scenes/PinballScene.js';
+import { ArkanoidScene } from './scenes/ArkanoidScene.js';
 import { PuppetScene } from './scenes/PuppetScene.js';
 import { BubbleScene } from './scenes/BubbleScene.js';
-import { SpaceBlasterScene } from './scenes/SpaceBlasterScene.js';
+import { SlingshotScene } from './scenes/SlingshotScene.js';
 import { ThreeDScene } from './scenes/ThreeDScene.js';
 import { MorphScene } from './scenes/MorphScene.js';
 import { PhysicsScene } from './scenes/PhysicsScene.js';
@@ -103,10 +103,10 @@ class ShowcaseApp {
     const chapterConfigs = [
       { id: 'stage-01', key: 'textmotion', Class: TextMotionScene },
       { id: 'stage-kurama', key: 'kurama', Class: KuramaScene },
-      { id: 'stage-02', key: 'pinball', Class: PinballScene },
+      { id: 'stage-02', key: 'arkanoid', Class: ArkanoidScene },
       { id: 'stage-03', key: 'puppet', Class: PuppetScene },
       { id: 'stage-04', key: 'bubble', Class: BubbleScene },
-      { id: 'stage-05', key: 'space', Class: SpaceBlasterScene },
+      { id: 'stage-05', key: 'slingshot', Class: SlingshotScene },
       { id: 'stage-06', key: 'threed', Class: ThreeDScene },
       { id: 'stage-07', key: 'morph', Class: MorphScene },
       { id: 'stage-08', key: 'physics', Class: PhysicsScene },
