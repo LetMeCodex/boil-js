@@ -88,8 +88,10 @@ export class BoilEngine {
    * @returns {number} Active frame index
    */
   static getFrameIndex(timestamp, fps = 10, frameCount = 4) {
-    if (frameCount <= 1) return 0;
-    return Math.floor((timestamp * fps) / 1000) % frameCount;
+    const t = (typeof timestamp === 'number' && !isNaN(timestamp) && timestamp > 0) ? timestamp : performance.now();
+    const rate = Math.max(1, fps || 10);
+    const count = Math.max(1, frameCount || 4);
+    return Math.floor((t * rate) / 1000) % count;
   }
 
   /**

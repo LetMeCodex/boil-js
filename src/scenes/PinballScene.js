@@ -448,7 +448,54 @@ export class PinballScene {
         const frameIdx = BoilEngine.getFrameIndex(timestamp, this.options.boilFps || 10, 4);
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
         const ink = isDark ? '#F3F4F6' : '#1C1917';
+        const amber = isDark ? '#F59E0B' : '#D97706';
         const gen = rough.generator();
+
+        const w = this.width || 800;
+        const h = this.height || 520;
+        const tl = w * 0.12;
+        const tr = w * 0.88;
+        const tt = 20;
+        const tb = h - 20;
+        const lx = tr - 55;
+
+        // 0. Table Outer Cabinet & Guides
+        const cabinet = gen.polygon([[tl, tt], [tr, tt], [tr, tb], [tl, tb]], {
+          seed: 1100 + frameIdx * 15,
+          roughness: 1.5,
+          bowing: 1.2,
+          stroke: ink,
+          strokeWidth: 3,
+          fill: isDark ? '#1A1E26' : '#FAF8F3',
+          fillStyle: 'solid'
+        });
+        this.rc.draw(cabinet);
+
+        // Plunger Lane Divider
+        const plungerLane = gen.line(lx, tt + 40, lx, tb, {
+          seed: 1200 + frameIdx * 10,
+          roughness: 1.4,
+          stroke: ink,
+          strokeWidth: 2.5
+        });
+        this.rc.draw(plungerLane);
+
+        // Slingshot Guides
+        const guideL = gen.line(tl + 20, tb - 130, tl + 110, tb - 65, {
+          seed: 1300 + frameIdx * 10,
+          roughness: 1.6,
+          stroke: amber,
+          strokeWidth: 3
+        });
+        this.rc.draw(guideL);
+
+        const guideR = gen.line(lx - 20, tb - 130, lx - 110, tb - 65, {
+          seed: 1400 + frameIdx * 10,
+          roughness: 1.6,
+          stroke: amber,
+          strokeWidth: 3
+        });
+        this.rc.draw(guideR);
 
         // 1. Draw Table Bumpers
         for (let i = 0; i < this.bumpers.length; i++) {

@@ -349,6 +349,19 @@ export class SpaceBlasterScene {
         const ink = isDark ? '#F3F4F6' : '#1C1917';
         const gen = rough.generator();
 
+        // 0. Space Starfield
+        for (let s = 0; s < 25; s++) {
+          const sx = ((s * 137.5 + 40) % w);
+          const sy = ((s * 293.7 + 30) % h);
+          const star = gen.circle(sx, sy, 3, {
+            seed: 500 + s + frameIdx * 5,
+            stroke: 'transparent',
+            fill: isDark ? '#9CA3AF' : '#8C827A',
+            fillStyle: 'solid'
+          });
+          this.rc.draw(star);
+        }
+
         // Draw Asteroids
         for (let i = 0; i < this.asteroids.length; i++) {
           const a = this.asteroids[i];
@@ -361,7 +374,7 @@ export class SpaceBlasterScene {
             roughness: 2.0,
             bowing: 1.8,
             stroke: ink,
-            strokeWidth: 2,
+            strokeWidth: 2.5,
             fill: a.color,
             fillStyle: 'cross-hatch'
           });
@@ -408,6 +421,19 @@ export class SpaceBlasterScene {
         this.ctx.save();
         this.ctx.translate(this.ship.x, this.ship.y);
         this.ctx.rotate(this.ship.angle);
+
+        // Rocket Thruster Plume
+        if (this.ship.thrusting) {
+          const plume = gen.polygon([[-12, -6], [-28, 0], [-12, 6]], {
+            seed: 2000 + frameIdx * 20,
+            roughness: 2.2,
+            stroke: '#DC2626',
+            strokeWidth: 2,
+            fill: '#F59E0B',
+            fillStyle: 'solid'
+          });
+          this.rc.draw(plume);
+        }
 
         const shipPoly = gen.polygon([[20, 0], [-14, -12], [-8, 0], [-14, 12]], {
           seed: 1000 + frameIdx * 10,
