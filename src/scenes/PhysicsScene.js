@@ -137,9 +137,10 @@ export class PhysicsScene {
       }
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    this.resizeHandler = resize;
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupMouseInteraction();
   }
 
@@ -179,10 +180,10 @@ export class PhysicsScene {
     Matter.World.add(this.world, this.mouseConstraint);
 
     // Direct pointer drag & fling fallback for guaranteed responsiveness
-    let isGrabbing = false;
-    let grabbedBody = null;
+    this.isGrabbing = false;
+    this.grabbedBody = null;
 
-    this.canvas.addEventListener('pointerdown', (e) => {
+    this.onCanvasPointerDown = (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -191,8 +192,8 @@ export class PhysicsScene {
       const dynamicBodies = this.world.bodies.filter(b => !b.isStatic);
       for (const b of dynamicBodies) {
         if (Math.hypot(b.position.x - x, b.position.y - y) < 45) {
-          isGrabbing = true;
-          grabbedBody = b;
+          this.isGrabbing = true;
+          this.grabbedBody = b;
           Matter.Body.setVelocity(b, { x: 0, y: 0 });
           SoundFX.playPop(520);
           return;
@@ -201,29 +202,41 @@ export class PhysicsScene {
 
       // If clicked on empty canvas, trigger shockwave explosion!
       this.triggerShockwave(x, y);
-    });
+    };
 
-    window.addEventListener('pointermove', (e) => {
-      if (isGrabbing && grabbedBody) {
+    this.onWindowPointerMove = (e) => {
+      if (!this.canvas) return;
+      if (this.isGrabbing && this.grabbedBody) {
         const rect = this.canvas.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        Matter.Body.setPosition(grabbedBody, { x, y });
-        Matter.Body.setVelocity(grabbedBody, { x: 0, y: 0 });
+        Matter.Body.setPosition(this.grabbedBody, { x, y });
+        Matter.Body.setVelocity(this.grabbedBody, { x: 0, y: 0 });
       }
-    });
+    };
 
-    window.addEventListener('pointerup', (e) => {
-      if (isGrabbing && grabbedBody) {
-        isGrabbing = false;
-        Matter.Body.setVelocity(grabbedBody, {
+    this.onWindowPointerUp = () => {
+      if (this.isGrabbing && this.grabbedBody) {
+        this.isGrabbing = false;
+        Matter.Body.setVelocity(this.grabbedBody, {
           x: (Math.random() - 0.5) * 8,
           y: -5 - Math.random() * 5
         });
-        grabbedBody = null;
+        this.grabbedBody = null;
         SoundFX.playPop(580);
       }
-    });
+    };
+
+    this.onBlur = () => {
+      this.isGrabbing = false;
+      this.grabbedBody = null;
+    };
+
+    this.canvas.addEventListener('pointerdown', this.onCanvasPointerDown);
+    window.addEventListener('pointermove', this.onWindowPointerMove);
+    window.addEventListener('pointerup', this.onWindowPointerUp);
+    window.addEventListener('pointercancel', this.onWindowPointerUp);
+    window.addEventListener('blur', this.onBlur);
   }
 
   spawnDefaultScene() {
@@ -431,9 +444,13 @@ export class PhysicsScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
     let lastTime = performance.now();
 
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const dt = Math.min(32, timestamp - lastTime);
       lastTime = timestamp;
 
@@ -551,6 +568,7 @@ export class PhysicsScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -558,9 +576,8 @@ export class PhysicsScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   setBoilFps(fps) {
@@ -620,8 +637,24 @@ export class PhysicsScene {
   }
 
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
-    Matter.World.clear(this.world, false);
-    Matter.Engine.clear(this.matterEngine);
+    this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.onCanvasPointerDown) {
+      this.canvas.removeEventListener('pointerdown', this.onCanvasPointerDown);
+    }
+    if (this.onWindowPointerMove) {
+      window.removeEventListener('pointermove', this.onWindowPointerMove);
+      window.removeEventListener('pointerup', this.onWindowPointerUp);
+      window.removeEventListener('pointercancel', this.onWindowPointerUp);
+      window.removeEventListener('blur', this.onBlur);
+    }
+    if (this.world) {
+      Matter.World.clear(this.world, false);
+    }
+    if (this.matterEngine) {
+      Matter.Engine.clear(this.matterEngine);
+    }
   }
 }

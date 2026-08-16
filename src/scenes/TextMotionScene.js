@@ -349,9 +349,13 @@ export class TextMotionScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
     let lastTime = performance.now();
 
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const delta = Math.min(0.05, (timestamp - lastTime) * 0.001);
       lastTime = timestamp;
 
@@ -362,7 +366,9 @@ export class TextMotionScene {
       this.updatePhaseUI();
 
       // Camera Rig update
-      this.cameraRig.update(this.progress, delta);
+      if (this.cameraRig) {
+        this.cameraRig.update(this.progress, delta);
+      }
 
       // Shader Uniforms update
       if (this.material) {
@@ -376,7 +382,10 @@ export class TextMotionScene {
         this.material.uniforms.uMouseActive.value = this.mouseActive;
       }
 
-      this.renderer.render(this.scene, this.camera);
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.render(this.scene, this.camera);
+      }
+
       this.renderLoop = requestAnimationFrame(loop);
     };
     this.renderLoop = requestAnimationFrame(loop);
@@ -427,6 +436,7 @@ export class TextMotionScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -434,15 +444,18 @@ export class TextMotionScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   destroy() {
     this.suspend();
     if (this.autoPlayAnim) this.autoPlayAnim.pause();
-    window.removeEventListener('resize', this.resizeHandler);
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.geometry) this.geometry.dispose();
+    if (this.material) this.material.dispose();
     if (this.renderer) {
       this.renderer.dispose();
       this.renderer.forceContextLoss();

@@ -165,27 +165,30 @@ export class ArkanoidScene {
       if (this.paddle.targetX === 400) this.paddle.targetX = w / 2;
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    this.resizeHandler = resize;
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupMouseTracking();
   }
 
   setupMouseTracking() {
-    const handleMove = (e) => {
+    this.handlePointerMove = (e) => {
+      if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const mouseX = clientX - rect.left;
       this.paddle.targetX = Math.max(this.paddle.w / 2 + 10, Math.min(this.width - this.paddle.w / 2 - 10, mouseX));
     };
 
-    this.canvas.addEventListener('mousemove', handleMove);
-    this.canvas.addEventListener('touchmove', handleMove, { passive: true });
-
-    this.canvas.addEventListener('click', () => {
+    this.handleCanvasClick = () => {
       this.launchStuckBalls();
       if (this.paddle.isLaser) this.fireLasers();
-    });
+    };
+
+    this.canvas.addEventListener('mousemove', this.handlePointerMove);
+    this.canvas.addEventListener('touchmove', this.handlePointerMove, { passive: true });
+    this.canvas.addEventListener('click', this.handleCanvasClick);
   }
 
   bindEvents() {
@@ -230,6 +233,7 @@ export class ArkanoidScene {
       if (e.code === 'ArrowLeft' || e.code === 'KeyA') this.keys.left = true;
       if (e.code === 'ArrowRight' || e.code === 'KeyD') this.keys.right = true;
       if (e.code === 'Space') {
+        if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) return;
         e.preventDefault();
         this.launchStuckBalls();
         if (this.paddle.isLaser) this.fireLasers();
@@ -241,8 +245,14 @@ export class ArkanoidScene {
       if (e.code === 'ArrowRight' || e.code === 'KeyD') this.keys.right = false;
     };
 
+    this.blurHandler = () => {
+      this.keys.left = false;
+      this.keys.right = false;
+    };
+
     window.addEventListener('keydown', this.keyDownHandler);
     window.addEventListener('keyup', this.keyUpHandler);
+    window.addEventListener('blur', this.blurHandler);
 
     // Speed Slider
     document.getElementById('slider-arkanoid-speed')?.addEventListener('input', (e) => {
@@ -392,7 +402,12 @@ export class ArkanoidScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const w = this.width || 800;
       const h = this.height || 520;
 
@@ -755,18 +770,32 @@ export class ArkanoidScene {
   }
 
   suspend() {
-    // Keep running
-  }
-
-  resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
+    this.running = false;
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
     }
   }
 
+  resume() {
+    if (this.running) return;
+    this.startRenderLoop();
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
-    window.removeEventListener('keydown', this.keyDownHandler);
-    window.removeEventListener('keyup', this.keyUpHandler);
+    this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.handlePointerMove) {
+      this.canvas.removeEventListener('mousemove', this.handlePointerMove);
+      this.canvas.removeEventListener('touchmove', this.handlePointerMove);
+      this.canvas.removeEventListener('click', this.handleCanvasClick);
+    }
+    if (this.keyDownHandler) {
+      window.removeEventListener('keydown', this.keyDownHandler);
+      window.removeEventListener('keyup', this.keyUpHandler);
+      window.removeEventListener('blur', this.blurHandler);
+    }
   }
 }

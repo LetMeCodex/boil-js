@@ -6,6 +6,7 @@ import { SoundFX } from '../engine/AnimeBoilBridge.js';
 export class HeroLab {
   constructor(canvasElement) {
     this.canvas = canvasElement;
+    if (!this.canvas) return;
     this.ctx = this.canvas.getContext('2d');
     this.rc = rough.canvas(this.canvas);
 
@@ -13,6 +14,7 @@ export class HeroLab {
     this.scrollProgress = 0;
     this.particles = [];
     this.renderLoop = null;
+    this.running = false;
 
     this.initCanvas();
     this.initParticles();
@@ -21,20 +23,25 @@ export class HeroLab {
   }
 
   initCanvas() {
-    const resize = () => {
+    this.resizeHandler = () => {
+      if (!this.canvas || !this.canvas.parentElement) return;
       const rect = this.canvas.parentElement.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
-      this.canvas.style.width = `${rect.width}px`;
-      this.canvas.style.height = `${rect.height}px`;
-      this.ctx.scale(dpr, dpr);
-      this.width = rect.width;
-      this.height = rect.height;
+      const w = Math.max(Math.floor(rect.width), 320);
+      const h = Math.max(Math.floor(rect.height), 420);
+
+      this.canvas.width = w;
+      this.canvas.height = h;
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.rc = rough.canvas(this.canvas);
+      this.width = w;
+      this.height = h;
+      this.initParticles();
     };
 
-    window.addEventListener('resize', resize);
-    resize();
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
   }
 
   initParticles() {
@@ -65,22 +72,29 @@ export class HeroLab {
   }
 
   bindEvents() {
-    this.canvas.addEventListener('mousemove', (e) => {
+    this.onPointerMove = (e) => {
+      if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       this.mouse.x = e.clientX - rect.left;
       this.mouse.y = e.clientY - rect.top;
       this.mouse.active = true;
-    });
+    };
 
-    this.canvas.addEventListener('mouseleave', () => {
+    this.onPointerLeave = () => {
       this.mouse.active = false;
-    });
+    };
+
+    this.canvas.addEventListener('mousemove', this.onPointerMove);
+    this.canvas.addEventListener('mouseleave', this.onPointerLeave);
   }
 
   startRenderLoop() {
-    let lastTime = performance.now();
+    if (this.renderLoop) return;
+    this.running = true;
 
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const w = this.width || 800;
       const h = this.height || 420;
 
@@ -142,7 +156,6 @@ export class HeroLab {
 
           // Interpolate based on scroll and mouse
           if (p > 0.05) {
-            // Explode / orbit outward
             const expand = 1.0 + p * 3.0;
             pt.x += (pt.baseX * expand - pt.x) * 0.1 + pt.vx;
             pt.y += (pt.baseY * expand - pt.y) * 0.1 + pt.vy;
@@ -177,7 +190,27 @@ export class HeroLab {
     this.renderLoop = requestAnimationFrame(loop);
   }
 
+  suspend() {
+    this.running = false;
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (this.running) return;
+    this.startRenderLoop();
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.onPointerMove) {
+      this.canvas.removeEventListener('mousemove', this.onPointerMove);
+      this.canvas.removeEventListener('mouseleave', this.onPointerLeave);
+    }
   }
 }

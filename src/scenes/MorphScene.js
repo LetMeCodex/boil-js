@@ -117,26 +117,26 @@ export class MorphScene {
     this.ctx = this.canvas.getContext('2d');
     this.rc = rough.canvas(this.canvas);
 
-    const resize = () => {
+    this.resizeHandler = () => {
       const wrap = document.getElementById('morph-canvas-wrap');
       const rect = wrap ? wrap.getBoundingClientRect() : null;
-      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 780);
-      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 500);
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.max(rect ? Math.floor(rect.width) : 0, wrap ? wrap.clientWidth : 0, 780);
+      const h = Math.max(rect ? Math.floor(rect.height) : 0, wrap ? wrap.clientHeight : 0, 500);
 
       this.width = w;
       this.height = h;
-      this.canvas.width = Math.floor(w * dpr);
-      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.width = w;
+      this.canvas.height = h;
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
-      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.rc = rough.canvas(this.canvas);
       this.buildMorphShapes();
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
   }
 
   buildMorphShapes() {
@@ -246,14 +246,22 @@ export class MorphScene {
 
         this.updateActivePill(this.currentShapeIdx);
 
-        if (this.isAutoMorphing) {
-          setTimeout(() => this.startAutoMorph(), 400);
+        if (this.isAutoMorphing && this.running) {
+          this.autoMorphTimeout = setTimeout(() => {
+            if (this.isAutoMorphing && this.running) {
+              this.startAutoMorph();
+            }
+          }, 400);
         }
       }
     });
   }
 
   morphToTarget(idx) {
+    if (this.autoMorphTimeout) {
+      clearTimeout(this.autoMorphTimeout);
+      this.autoMorphTimeout = null;
+    }
     if (this.morphTimeline) this.morphTimeline.pause();
     this.targetShapeIdx = idx;
     this.morphT = 0;
@@ -282,9 +290,15 @@ export class MorphScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       if (this.ctx && this.canvas && this.shapePresets) {
-        this.ctx.clearRect(0, 0, this.width, this.height);
+        this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+        this.ctx.clearRect(0, 0, this.width || 800, this.height || 500);
 
         const frameIdx = BoilEngine.getFrameIndex(timestamp, this.options.boilFps || 10, 4);
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -298,32 +312,34 @@ export class MorphScene {
         const fromPts = this.shapePresets[this.currentShapeIdx];
         const toPts = this.shapePresets[this.targetShapeIdx];
 
-        const morphedPts = [];
-        for (let i = 0; i < this.pointCount; i++) {
-          const p1 = fromPts[i];
-          const p2 = toPts[i];
-          const x = p1[0] + (p2[0] - p1[0]) * this.morphT;
-          const y = p1[1] + (p2[1] - p1[1]) * this.morphT;
-          morphedPts.push([x, y]);
+        if (fromPts && toPts) {
+          const morphedPts = [];
+          for (let i = 0; i < this.pointCount; i++) {
+            const p1 = fromPts[i];
+            const p2 = toPts[i];
+            const x = p1[0] + (p2[0] - p1[0]) * this.morphT;
+            const y = p1[1] + (p2[1] - p1[1]) * this.morphT;
+            morphedPts.push([x, y]);
+          }
+
+          // Render Morphing Boiling Polygon
+          const gen = rough.generator();
+          const seed = 9000 + frameIdx * 37;
+
+          const morphedShape = gen.polygon(morphedPts, {
+            seed,
+            roughness: this.settings.roughness,
+            bowing: this.settings.bowing,
+            stroke: ink,
+            strokeWidth: 3,
+            fill: amber,
+            fillStyle: this.settings.fillStyle,
+            hachureAngle: 45 + this.morphT * 90,
+            fillWeight: 2
+          });
+
+          this.rc.draw(morphedShape);
         }
-
-        // Render Morphing Boiling Polygon
-        const gen = rough.generator();
-        const seed = 9000 + frameIdx * 37;
-
-        const morphedShape = gen.polygon(morphedPts, {
-          seed,
-          roughness: this.settings.roughness,
-          bowing: this.settings.bowing,
-          stroke: ink,
-          strokeWidth: 3,
-          fill: amber,
-          fillStyle: this.settings.fillStyle,
-          hachureAngle: 45 + this.morphT * 90,
-          fillWeight: 2
-        });
-
-        this.rc.draw(morphedShape);
       }
       this.renderLoop = requestAnimationFrame(loop);
     };
@@ -365,6 +381,10 @@ export class MorphScene {
         if (text) text.textContent = 'Pause Morph';
         this.startAutoMorph();
       } else {
+        if (this.autoMorphTimeout) {
+          clearTimeout(this.autoMorphTimeout);
+          this.autoMorphTimeout = null;
+        }
         if (this.morphTimeline) this.morphTimeline.pause();
         if (icon) icon.textContent = '▶️';
         if (text) text.textContent = 'Resume Morph';
@@ -405,6 +425,10 @@ export class MorphScene {
     });
 
     document.getElementById('slider-morph-progress')?.addEventListener('input', (e) => {
+      if (this.autoMorphTimeout) {
+        clearTimeout(this.autoMorphTimeout);
+        this.autoMorphTimeout = null;
+      }
       if (this.morphTimeline) this.morphTimeline.pause();
       this.isAutoMorphing = false;
       this.morphT = parseInt(e.target.value) / 100;
@@ -413,20 +437,37 @@ export class MorphScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
     }
+    if (this.autoMorphTimeout) {
+      clearTimeout(this.autoMorphTimeout);
+      this.autoMorphTimeout = null;
+    }
+    if (this.morphTimeline) {
+      this.morphTimeline.pause();
+    }
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
+    if (this.running) return;
+    this.running = true;
+    this.startRenderLoop();
+    if (this.isAutoMorphing) {
+      if (this.morphTimeline && !this.morphTimeline.completed) {
+        this.morphTimeline.play();
+      } else {
+        this.startAutoMorph();
+      }
     }
   }
 
   destroy() {
     this.suspend();
-    if (this.morphTimeline) this.morphTimeline.pause();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
   }
 }

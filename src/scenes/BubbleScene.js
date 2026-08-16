@@ -108,9 +108,10 @@ export class BubbleScene {
       }
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    this.resizeHandler = resize;
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupInteractions();
   }
 
@@ -151,6 +152,7 @@ export class BubbleScene {
 
   setupInteractions() {
     const checkPopAt = (clientX, clientY) => {
+      if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       const x = clientX - rect.left;
       const y = clientY - rect.top;
@@ -165,32 +167,36 @@ export class BubbleScene {
       }
     };
 
-    // Click pop
-    this.canvas.addEventListener('click', (e) => {
-      checkPopAt(e.clientX, e.clientY);
-    });
+    this.isSlicing = false;
 
-    // Drag / Slice pop
-    let isSlicing = false;
-    this.canvas.addEventListener('mousedown', (e) => {
-      isSlicing = true;
+    this.onCanvasPointerDown = (e) => {
+      this.isSlicing = true;
       const rect = this.canvas.getBoundingClientRect();
       this.dragStart = { x: e.clientX - rect.left, y: e.clientY - rect.top };
-    });
+      this.dragEnd = { ...this.dragStart };
+      checkPopAt(e.clientX, e.clientY);
+    };
 
-    window.addEventListener('mousemove', (e) => {
-      if (isSlicing) {
+    this.onWindowPointerMove = (e) => {
+      if (!this.canvas) return;
+      if (this.isSlicing) {
         checkPopAt(e.clientX, e.clientY);
         const rect = this.canvas.getBoundingClientRect();
         this.dragEnd = { x: e.clientX - rect.left, y: e.clientY - rect.top };
       }
-    });
+    };
 
-    window.addEventListener('mouseup', () => {
-      isSlicing = false;
+    this.onWindowPointerUp = () => {
+      this.isSlicing = false;
       this.dragStart = null;
       this.dragEnd = null;
-    });
+    };
+
+    this.canvas.addEventListener('pointerdown', this.onCanvasPointerDown);
+    window.addEventListener('pointermove', this.onWindowPointerMove);
+    window.addEventListener('pointerup', this.onWindowPointerUp);
+    window.addEventListener('pointercancel', this.onWindowPointerUp);
+    window.addEventListener('blur', this.onWindowPointerUp);
   }
 
   popBubble(b, index) {
@@ -237,36 +243,37 @@ export class BubbleScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       if (this.ctx && this.canvas) {
         this.ctx.clearRect(0, 0, this.width, this.height);
 
         const frameIdx = BoilEngine.getFrameIndex(timestamp, this.options.boilFps || 10, 4);
         const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
-        const ink = isDark ? '#F3F4F6' : '#1C1917';
         const gen = rough.generator();
 
-        const w = this.width || 800;
-        const h = this.height || 500;
-
-        // 1. Update & Render Bubbles
+        // 1. Update & Render Soap Bubbles
         for (let i = 0; i < this.bubbles.length; i++) {
           const b = this.bubbles[i];
 
-          // Buoyancy drift & sine wobble
+          // Buoyant upward float
           b.y += b.speedY;
           b.x = b.baseX + Math.sin(timestamp * b.wobbleFreq + b.wobblePhase) * b.wobbleAmp;
 
-          // Wrap around top
+          // Wrap bottom if floated past top
           if (b.y < -b.r * 2) {
-            b.y = h + b.r * 2;
-            b.baseX = w * 0.1 + Math.random() * (w * 0.8);
+            b.y = this.height + b.r;
+            b.x = Math.random() * this.width;
+            b.baseX = b.x;
           }
 
-          // Wobbly ellipse deformation
-          const wobbleScaleX = 1 + Math.sin(timestamp * 0.006 + b.seed) * 0.08;
-          const wobbleScaleY = 1 + Math.cos(timestamp * 0.006 + b.seed) * 0.08;
-
+          // Elastic Wobble Scale
+          const wobbleScaleX = 1 + Math.sin(timestamp * 0.005 + i) * 0.12;
+          const wobbleScaleY = 1 + Math.cos(timestamp * 0.005 + i) * 0.12;
           const seed = b.seed + frameIdx * 20;
 
           // Main Bubble Ring
@@ -335,6 +342,7 @@ export class BubbleScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -342,9 +350,8 @@ export class BubbleScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   setBoilFps(fps) {
@@ -378,5 +385,17 @@ export class BubbleScene {
 
   destroy() {
     this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.onCanvasPointerDown) {
+      this.canvas.removeEventListener('pointerdown', this.onCanvasPointerDown);
+    }
+    if (this.onWindowPointerMove) {
+      window.removeEventListener('pointermove', this.onWindowPointerMove);
+      window.removeEventListener('pointerup', this.onWindowPointerUp);
+      window.removeEventListener('pointercancel', this.onWindowPointerUp);
+      window.removeEventListener('blur', this.onWindowPointerUp);
+    }
   }
 }

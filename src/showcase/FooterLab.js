@@ -10,6 +10,7 @@ export class FooterLab {
     this.rc = rough.canvas(this.canvas);
     this.particles = [];
     this.renderLoop = null;
+    this.running = false;
 
     this.initCanvas();
     this.initParticles();
@@ -17,19 +18,25 @@ export class FooterLab {
   }
 
   initCanvas() {
-    const resize = () => {
+    this.resizeHandler = () => {
+      if (!this.canvas || !this.canvas.parentElement) return;
       const rect = this.canvas.parentElement.getBoundingClientRect();
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = 240 * dpr;
-      this.canvas.style.width = `${rect.width}px`;
-      this.canvas.style.height = `240px`;
-      this.ctx.scale(dpr, dpr);
-      this.width = rect.width;
-      this.height = 240;
+      const w = Math.max(Math.floor(rect.width), 320);
+      const h = 240;
+
+      this.canvas.width = w;
+      this.canvas.height = h;
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
+      this.rc = rough.canvas(this.canvas);
+      this.width = w;
+      this.height = h;
+      this.initParticles();
     };
-    window.addEventListener('resize', resize);
-    resize();
+
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
   }
 
   initParticles() {
@@ -53,7 +60,12 @@ export class FooterLab {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const w = this.width || 800;
       const h = 240;
 
@@ -75,6 +87,7 @@ export class FooterLab {
 
           const dot = gen.circle(pt.x, pt.y, pt.size, {
             seed: pt.seed + frameIdx * 10,
+            roughness: 1.4,
             stroke: pt.color,
             fill: pt.color,
             fillStyle: 'solid'
@@ -95,7 +108,23 @@ export class FooterLab {
     this.renderLoop = requestAnimationFrame(loop);
   }
 
+  suspend() {
+    this.running = false;
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (this.running) return;
+    this.startRenderLoop();
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
   }
 }

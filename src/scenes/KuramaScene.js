@@ -177,12 +177,13 @@ export class KuramaScene {
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       this.width = w;
+      this.width = w;
       this.height = h;
-      this.canvas.width = Math.floor(w * dpr);
-      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.width = w;
+      this.canvas.height = h;
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
-      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.rc = rough.canvas(this.canvas);
 
       if (this.threeRenderer && this.threeCamera) {
@@ -192,18 +193,19 @@ export class KuramaScene {
       }
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    this.resizeHandler = resize;
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
 
     // Pointer Tracking
-    const handlePointer = (e) => {
+    this.pointerHandler = (e) => {
       const rect = this.canvas.getBoundingClientRect();
       this.mouse.x = e.clientX - rect.left;
       this.mouse.y = e.clientY - rect.top;
     };
-    this.canvas.addEventListener('pointerdown', handlePointer);
-    this.canvas.addEventListener('pointermove', handlePointer);
+    this.canvas.addEventListener('pointerdown', this.pointerHandler);
+    this.canvas.addEventListener('pointermove', this.pointerHandler);
   }
 
   setupThreeAvatar() {
@@ -312,9 +314,13 @@ export class KuramaScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
     let lastTime = performance.now();
 
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const dt = Math.min(32, timestamp - lastTime);
       lastTime = timestamp;
 
@@ -708,6 +714,7 @@ export class KuramaScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -715,13 +722,19 @@ export class KuramaScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   destroy() {
     this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.pointerHandler && this.canvas) {
+      this.canvas.removeEventListener('pointerdown', this.pointerHandler);
+      this.canvas.removeEventListener('pointermove', this.pointerHandler);
+    }
     if (this.threeRenderer) {
       this.threeRenderer.dispose();
       this.threeRenderer.forceContextLoss();

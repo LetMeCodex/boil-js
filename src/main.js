@@ -4,25 +4,13 @@ import { SoundFX } from './engine/AnimeBoilBridge.js';
 import { BoilEngine } from './engine/BoilEngine.js';
 import { ShowcaseScrollEngine } from './engine/ShowcaseScrollEngine.js';
 import { VisibilityManager } from './engine/VisibilityManager.js';
+import { EXPERIMENTS, getExperimentByKey } from './engine/ExperimentRegistry.js';
 import { CursorDirector } from './utils/CursorDirector.js';
 import { DevTools } from './showcase/DevTools.js';
 import { HeroLab } from './showcase/HeroLab.js';
 import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
 import { KineticCollageScene } from './engine/KineticCollageScene.js';
-
-// Scene Imports
-import { TextMotionScene } from './scenes/TextMotionScene.js';
-import { KuramaScene } from './scenes/KuramaScene.js';
-import { ArkanoidScene } from './scenes/ArkanoidScene.js';
-import { PuppetScene } from './scenes/PuppetScene.js';
-import { BubbleScene } from './scenes/BubbleScene.js';
-import { SlingshotScene } from './scenes/SlingshotScene.js';
-import { ThreeDScene } from './scenes/ThreeDScene.js';
-import { MorphScene } from './scenes/MorphScene.js';
-import { PhysicsScene } from './scenes/PhysicsScene.js';
-import { UiKitScene } from './scenes/UiKitScene.js';
-import { AudioSynthScene } from './scenes/AudioSynthScene.js';
 
 class ShowcaseApp {
   constructor() {
@@ -31,6 +19,7 @@ class ShowcaseApp {
     this.theme = localStorage.getItem('rough-theme') || 'parchment';
     this.soundEnabled = true;
 
+    this.initDebugSuite();
     this.initTheme();
     this.initCursor();
     this.initDevTools();
@@ -43,27 +32,46 @@ class ShowcaseApp {
     this.bindGlobalEvents();
   }
 
+  initDebugSuite() {
+    window.BOIL_DEBUG = {
+      sceneStatuses: {},
+      failedScenes: [],
+      activeScene: null,
+      fps: 60,
+      scenes: this.scenes,
+      reportSceneError: (key, error) => {
+        console.error(`[BOIL.JS ERROR in ${key}]:`, error);
+        window.BOIL_DEBUG.failedScenes.push({ key, error: error.message || String(error) });
+        window.BOIL_DEBUG.sceneStatuses[key] = 'ERROR';
+      }
+    };
+  }
+
   initCollageBackground() {
     const canvas = document.getElementById('kinetic-collage-bg');
     if (!canvas) return;
-    this.collageScene = new KineticCollageScene(canvas, { quality: 'desktop' });
-    this.collageScene.init();
+    try {
+      this.collageScene = new KineticCollageScene(canvas, { quality: 'desktop' });
+      this.collageScene.init();
 
-    window.boilScene = {
-      setExperiment: (i) => this.collageScene.setExperiment(i),
-      setScrollProgress: (p) => this.collageScene.setScroll(p),
-      setMouse: (x, y) => this.collageScene.setMouse(x, y),
-      setReducedMotion: (v) => this.collageScene.setReducedMotion(v),
-    };
+      window.boilScene = {
+        setExperiment: (i) => this.collageScene?.setExperiment(i),
+        setScrollProgress: (p) => this.collageScene?.setScroll(p),
+        setMouse: (x, y) => this.collageScene?.setMouse(x, y),
+        setReducedMotion: (v) => this.collageScene?.setReducedMotion(v),
+      };
 
-    const onMove = (e) => {
-      this.collageScene.setMouse((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
-    };
-    const onResize = () => this.collageScene.resize();
-    const onVis = () => this.collageScene.setVisible(!document.hidden);
-    window.addEventListener('pointermove', onMove, { passive: true });
-    window.addEventListener('resize', onResize);
-    document.addEventListener('visibilitychange', onVis);
+      const onMove = (e) => {
+        this.collageScene?.setMouse((e.clientX / window.innerWidth) * 2 - 1, (e.clientY / window.innerHeight) * 2 - 1);
+      };
+      const onResize = () => this.collageScene?.resize();
+      const onVis = () => this.collageScene?.setVisible(!document.hidden);
+      window.addEventListener('pointermove', onMove, { passive: true });
+      window.addEventListener('resize', onResize);
+      document.addEventListener('visibilitychange', onVis);
+    } catch (err) {
+      console.warn('Kinetic collage background initialization warning:', err);
+    }
   }
 
   initTheme() {
@@ -87,46 +95,51 @@ class ShowcaseApp {
 
   initDevTools() {
     DevTools.init();
-    window.DevTools = DevTools; // Expose for inline handlers
+    window.DevTools = DevTools;
   }
 
   initHero() {
     const heroCanvas = document.getElementById('hero-living-canvas');
     if (heroCanvas) {
-      this.heroLab = new HeroLab(heroCanvas);
+      try {
+        this.heroLab = new HeroLab(heroCanvas);
+        this.scenes.hero = this.heroLab;
+        window.BOIL_DEBUG.sceneStatuses.hero = 'RUNNING';
+      } catch (err) {
+        window.BOIL_DEBUG.reportSceneError('hero', err);
+      }
     }
   }
 
   initChapters() {
     this.visibilityManager = new VisibilityManager();
 
-    const chapterConfigs = [
-      { id: 'stage-01', key: 'textmotion', Class: TextMotionScene },
-      { id: 'stage-kurama', key: 'kurama', Class: KuramaScene },
-      { id: 'stage-02', key: 'arkanoid', Class: ArkanoidScene },
-      { id: 'stage-03', key: 'puppet', Class: PuppetScene },
-      { id: 'stage-04', key: 'bubble', Class: BubbleScene },
-      { id: 'stage-05', key: 'slingshot', Class: SlingshotScene },
-      { id: 'stage-06', key: 'threed', Class: ThreeDScene },
-      { id: 'stage-07', key: 'morph', Class: MorphScene },
-      { id: 'stage-08', key: 'physics', Class: PhysicsScene },
-      { id: 'stage-uikit', key: 'uikit', Class: UiKitScene },
-      { id: 'stage-synth', key: 'synth', Class: AudioSynthScene }
-    ];
+    EXPERIMENTS.forEach(exp => {
+      const container = document.getElementById(exp.stageId);
+      if (!container) {
+        console.warn(`Stage container #${exp.stageId} for experiment ${exp.key} not found.`);
+        return;
+      }
 
-    chapterConfigs.forEach(cfg => {
-      const container = document.getElementById(cfg.id);
-      if (container) {
-        try {
-          const instance = new cfg.Class(container, { boilFps: this.boilFps });
-          this.scenes[cfg.key] = instance;
-          const sectionEl = container.closest('.showcase-chapter-section');
-          if (sectionEl) {
-            this.visibilityManager.register(sectionEl, instance);
-          }
-        } catch (e) {
-          console.error(`Failed to mount scene ${cfg.key}:`, e);
+      try {
+        const instance = new exp.SceneClass(container, { boilFps: this.boilFps });
+        this.scenes[exp.key] = instance;
+        window.BOIL_DEBUG.sceneStatuses[exp.key] = 'MOUNTED';
+
+        const sectionEl = document.getElementById(exp.sectionId) || container.closest('.showcase-chapter-section');
+        if (sectionEl) {
+          this.visibilityManager.register(sectionEl, instance);
         }
+      } catch (err) {
+        window.BOIL_DEBUG.reportSceneError(exp.key, err);
+        container.innerHTML = `
+          <div class="scene-error-card" style="padding: 40px; text-align: center; border: 2px dashed #DC2626; border-radius: 12px; background: rgba(220, 38, 38, 0.05); margin: 20px;">
+            <div style="font-size: 2rem; margin-bottom: 8px;">⚠️</div>
+            <div style="font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: #DC2626;">EXPERIMENT TEMPORARILY UNAVAILABLE</div>
+            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; font-family: 'Fira Code', monospace;">${exp.title} (${exp.key})</div>
+            <p style="font-size: 0.8rem; margin-top: 12px; color: var(--text-secondary);">${err.message || 'Scene failed to initialize'}</p>
+          </div>
+        `;
       }
     });
 
@@ -135,7 +148,7 @@ class ShowcaseApp {
 
   bindChapterToolbarButtons() {
     document.querySelectorAll('.tool-btn').forEach(btn => {
-      btn.addEventListener('click', (e) => {
+      btn.addEventListener('click', () => {
         const action = btn.getAttribute('data-action');
         const key = btn.getAttribute('data-key');
         const targetId = btn.getAttribute('data-target');
@@ -164,7 +177,13 @@ class ShowcaseApp {
   initFooter() {
     const footerCanvas = document.getElementById('footer-living-canvas');
     if (footerCanvas) {
-      this.footerLab = new FooterLab(footerCanvas);
+      try {
+        this.footerLab = new FooterLab(footerCanvas);
+        this.scenes.footer = this.footerLab;
+        window.BOIL_DEBUG.sceneStatuses.footer = 'RUNNING';
+      } catch (err) {
+        window.BOIL_DEBUG.reportSceneError('footer', err);
+      }
     }
   }
 
@@ -240,6 +259,19 @@ class ShowcaseApp {
       Object.values(this.scenes).forEach(s => {
         if (typeof s.setBoilFps === 'function') s.setBoilFps(this.boilFps);
       });
+    });
+
+    // Handle background tab switching and visibility
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        this.visibilityManager?.pauseAll();
+      } else {
+        this.visibilityManager?.resumeVisible();
+      }
+    });
+
+    window.addEventListener('blur', () => {
+      // Release any stuck dragging or keys in active scenes
     });
   }
 }

@@ -153,7 +153,7 @@ export class AudioSynthScene {
     this.ctx = this.canvas.getContext('2d');
     this.rc = rough.canvas(this.canvas);
 
-    const resize = () => {
+    this.resizeHandler = () => {
       const wrap = document.getElementById('synth-canvas-wrap');
       const rect = wrap ? wrap.getBoundingClientRect() : null;
       const w = Math.max(rect ? Math.floor(rect.width) : 0, wrap ? wrap.clientWidth : 0, 780);
@@ -169,14 +169,14 @@ export class AudioSynthScene {
       this.rc = rough.canvas(this.canvas);
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupKeyInteraction();
   }
 
   setupKeyInteraction() {
-    this.canvas.addEventListener('click', (e) => {
+    this.canvasClickHandler = (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -192,7 +192,8 @@ export class AudioSynthScene {
           this.triggerNote(idx);
         }
       }
-    });
+    };
+    this.canvas.addEventListener('click', this.canvasClickHandler);
 
     this.keyHandler = (e) => {
       if (e.repeat || e.target.tagName === 'INPUT') return;
@@ -256,7 +257,12 @@ export class AudioSynthScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       if (this.ctx && this.canvas) {
         this.ctx.clearRect(0, 0, this.width, this.height);
 
@@ -387,22 +393,41 @@ export class AudioSynthScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
     }
+    if (this.arpTimer) {
+      clearInterval(this.arpTimer);
+      this.arpTimer = null;
+      this.isPlayingArp = false;
+      const btnText = document.getElementById('arp-btn-text');
+      if (btnText) btnText.textContent = '🎵 Play Lo-Fi Arpeggio';
+    }
+    if (this.audioCtx && this.audioCtx.state === 'running') {
+      this.audioCtx.suspend().catch(() => {});
+    }
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   destroy() {
     this.suspend();
-    if (this.arpTimer) clearInterval(this.arpTimer);
-    if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
-    if (this.audioCtx) this.audioCtx.close();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.canvasClickHandler) {
+      this.canvas.removeEventListener('click', this.canvasClickHandler);
+    }
+    if (this.keyHandler) {
+      window.removeEventListener('keydown', this.keyHandler);
+    }
+    if (this.audioCtx && this.audioCtx.state !== 'closed') {
+      this.audioCtx.close().catch(() => {});
+    }
   }
 }

@@ -158,21 +158,23 @@ export class SlingshotScene {
       this.slingshot.pouchY = this.slingshot.y;
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    this.resizeHandler = resize;
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupSlingshotInteraction();
   }
 
   setupSlingshotInteraction() {
     const getPos = (e) => {
+      if (!this.canvas) return { x: 0, y: 0 };
       const rect = this.canvas.getBoundingClientRect();
       const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const clientY = e.touches ? e.touches[0].clientY : e.clientY;
       return { x: clientX - rect.left, y: clientY - rect.top };
     };
 
-    const onStart = (e) => {
+    this.onPointerStart = (e) => {
       const pos = getPos(e);
       const dist = Math.hypot(pos.x - this.slingshot.x, pos.y - this.slingshot.y);
       if (dist < 60) {
@@ -185,7 +187,7 @@ export class SlingshotScene {
       }
     };
 
-    const onMove = (e) => {
+    this.onPointerMove = (e) => {
       if (!this.slingshot.isDragging) return;
       const pos = getPos(e);
       const dx = pos.x - this.slingshot.x;
@@ -202,7 +204,7 @@ export class SlingshotScene {
       }
     };
 
-    const onEnd = () => {
+    this.onPointerEnd = () => {
       if (!this.slingshot.isDragging) return;
       this.slingshot.isDragging = false;
 
@@ -218,13 +220,15 @@ export class SlingshotScene {
       this.slingshot.pouchY = this.slingshot.y;
     };
 
-    this.canvas.addEventListener('mousedown', onStart);
-    window.addEventListener('mousemove', onMove);
-    window.addEventListener('mouseup', onEnd);
+    this.canvas.addEventListener('mousedown', this.onPointerStart);
+    window.addEventListener('mousemove', this.onPointerMove);
+    window.addEventListener('mouseup', this.onPointerEnd);
 
-    this.canvas.addEventListener('touchstart', onStart, { passive: true });
-    window.addEventListener('touchmove', onMove, { passive: true });
-    window.addEventListener('touchend', onEnd);
+    this.canvas.addEventListener('touchstart', this.onPointerStart, { passive: true });
+    window.addEventListener('touchmove', this.onPointerMove, { passive: true });
+    window.addEventListener('touchend', this.onPointerEnd);
+    window.addEventListener('touchcancel', this.onPointerEnd);
+    window.addEventListener('blur', this.onPointerEnd);
   }
 
   bindEvents() {
@@ -400,7 +404,12 @@ export class SlingshotScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const w = this.width || 800;
       const h = this.height || 520;
       const groundY = h - 60;
@@ -687,16 +696,34 @@ export class SlingshotScene {
   }
 
   suspend() {
-    // Keep alive
-  }
-
-  resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
+    this.running = false;
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
     }
   }
 
+  resume() {
+    if (this.running) return;
+    this.startRenderLoop();
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.onPointerStart) {
+      this.canvas.removeEventListener('mousedown', this.onPointerStart);
+      this.canvas.removeEventListener('touchstart', this.onPointerStart);
+    }
+    if (this.onPointerMove) {
+      window.removeEventListener('mousemove', this.onPointerMove);
+      window.removeEventListener('mouseup', this.onPointerEnd);
+      window.removeEventListener('touchmove', this.onPointerMove);
+      window.removeEventListener('touchend', this.onPointerEnd);
+      window.removeEventListener('touchcancel', this.onPointerEnd);
+      window.removeEventListener('blur', this.onPointerEnd);
+    }
   }
 }

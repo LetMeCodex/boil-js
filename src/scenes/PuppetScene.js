@@ -124,9 +124,10 @@ export class PuppetScene {
       this.buildCreature();
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    this.resizeHandler = resize;
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupMouseInteraction();
   }
 
@@ -153,10 +154,10 @@ export class PuppetScene {
     Matter.World.add(this.world, this.mouseConstraint);
 
     // Direct pointer drag & tracking
-    let isGrabbing = false;
-    let grabbedBody = null;
+    this.isGrabbing = false;
+    this.grabbedBody = null;
 
-    this.canvas.addEventListener('pointerdown', (e) => {
+    this.onCanvasPointerDown = (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -167,8 +168,8 @@ export class PuppetScene {
       const allBodies = this.world.bodies.filter(b => !b.isStatic);
       for (const b of allBodies) {
         if (Math.hypot(b.position.x - x, b.position.y - y) < 60) {
-          isGrabbing = true;
-          grabbedBody = b;
+          this.isGrabbing = true;
+          this.grabbedBody = b;
           Matter.Body.setVelocity(b, { x: 0, y: 0 });
           SoundFX.playPop(520);
           return;
@@ -179,32 +180,44 @@ export class PuppetScene {
       const snackTypes = ['donut', 'apple', 'fish'];
       const chosen = snackTypes[Math.floor(Math.random() * snackTypes.length)];
       this.spawnSnack(chosen, x, y);
-    });
+    };
 
-    window.addEventListener('pointermove', (e) => {
+    this.onWindowPointerMove = (e) => {
+      if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
       this.mouseWorld.x = x;
       this.mouseWorld.y = y;
 
-      if (isGrabbing && grabbedBody) {
-        Matter.Body.setPosition(grabbedBody, { x, y });
-        Matter.Body.setVelocity(grabbedBody, { x: 0, y: 0 });
+      if (this.isGrabbing && this.grabbedBody) {
+        Matter.Body.setPosition(this.grabbedBody, { x, y });
+        Matter.Body.setVelocity(this.grabbedBody, { x: 0, y: 0 });
       }
-    });
+    };
 
-    window.addEventListener('pointerup', (e) => {
-      if (isGrabbing && grabbedBody) {
-        isGrabbing = false;
-        Matter.Body.setVelocity(grabbedBody, {
+    this.onWindowPointerUp = () => {
+      if (this.isGrabbing && this.grabbedBody) {
+        this.isGrabbing = false;
+        Matter.Body.setVelocity(this.grabbedBody, {
           x: (Math.random() - 0.5) * 6,
           y: -4 - Math.random() * 4
         });
-        grabbedBody = null;
+        this.grabbedBody = null;
         SoundFX.playPop(620);
       }
-    });
+    };
+
+    this.onBlur = () => {
+      this.isGrabbing = false;
+      this.grabbedBody = null;
+    };
+
+    this.canvas.addEventListener('pointerdown', this.onCanvasPointerDown);
+    window.addEventListener('pointermove', this.onWindowPointerMove);
+    window.addEventListener('pointerup', this.onWindowPointerUp);
+    window.addEventListener('pointercancel', this.onWindowPointerUp);
+    window.addEventListener('blur', this.onBlur);
   }
 
   buildCreature() {
@@ -392,9 +405,13 @@ export class PuppetScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
     let lastTime = performance.now();
 
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       const dt = Math.min(32, timestamp - lastTime);
       lastTime = timestamp;
 
@@ -590,6 +607,7 @@ export class PuppetScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -597,9 +615,8 @@ export class PuppetScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   setBoilFps(fps) {
@@ -643,8 +660,24 @@ export class PuppetScene {
   }
 
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
-    Matter.World.clear(this.world, false);
-    Matter.Engine.clear(this.matterEngine);
+    this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.onCanvasPointerDown) {
+      this.canvas.removeEventListener('pointerdown', this.onCanvasPointerDown);
+    }
+    if (this.onWindowPointerMove) {
+      window.removeEventListener('pointermove', this.onWindowPointerMove);
+      window.removeEventListener('pointerup', this.onWindowPointerUp);
+      window.removeEventListener('pointercancel', this.onWindowPointerUp);
+      window.removeEventListener('blur', this.onBlur);
+    }
+    if (this.world) {
+      Matter.World.clear(this.world, false);
+    }
+    if (this.matterEngine) {
+      Matter.Engine.clear(this.matterEngine);
+    }
   }
 }

@@ -111,7 +111,7 @@ export class UiKitScene {
     this.ctx = this.canvas.getContext('2d');
     this.rc = rough.canvas(this.canvas);
 
-    const resize = () => {
+    this.resizeHandler = () => {
       const wrap = document.getElementById('uikit-canvas-wrap');
       const rect = wrap ? wrap.getBoundingClientRect() : null;
       const w = Math.max(rect ? Math.floor(rect.width) : 0, wrap ? wrap.clientWidth : 0, 780);
@@ -128,9 +128,9 @@ export class UiKitScene {
       this.buildUiBuffers();
     };
 
-    window.addEventListener('resize', resize);
-    resize();
-    setTimeout(resize, 100);
+    window.addEventListener('resize', this.resizeHandler);
+    this.resizeHandler();
+    setTimeout(this.resizeHandler, 100);
     this.setupInteraction();
   }
 
@@ -218,7 +218,9 @@ export class UiKitScene {
   }
 
   setupInteraction() {
-    this.canvas.addEventListener('click', (e) => {
+    this.isDraggingSlider = false;
+
+    this.onCanvasPointerDown = (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
@@ -234,6 +236,7 @@ export class UiKitScene {
           duration: 350,
           easing: 'easeOutElastic(1, .5)'
         });
+        return;
       }
 
       // Click Button 2
@@ -246,6 +249,7 @@ export class UiKitScene {
           duration: 300,
           easing: 'easeOutElastic(1, .5)'
         });
+        return;
       }
 
       // Click Toggle
@@ -261,6 +265,7 @@ export class UiKitScene {
           easing: 'easeOutElastic(1, .5)'
         });
         this.buildUiBuffers();
+        return;
       }
 
       // Click Checkbox 1
@@ -268,6 +273,7 @@ export class UiKitScene {
           y >= this.check1Bounds.y - 5 && y <= this.check1Bounds.y + 30) {
         SoundFX.playPop(490);
         this.state.checked1 = !this.state.checked1;
+        return;
       }
 
       // Click Checkbox 2
@@ -275,6 +281,7 @@ export class UiKitScene {
           y >= this.check2Bounds.y - 5 && y <= this.check2Bounds.y + 30) {
         SoundFX.playPop(490);
         this.state.checked2 = !this.state.checked2;
+        return;
       }
 
       // Click Radio 1
@@ -282,6 +289,7 @@ export class UiKitScene {
           y >= this.radio1Bounds.y && y <= this.radio1Bounds.y + this.radio1Bounds.h) {
         SoundFX.playPop(540);
         this.state.radioSelected = 'starter';
+        return;
       }
 
       // Click Radio 2
@@ -289,39 +297,47 @@ export class UiKitScene {
           y >= this.radio2Bounds.y && y <= this.radio2Bounds.y + this.radio2Bounds.h) {
         SoundFX.playPop(540);
         this.state.radioSelected = 'pro';
+        return;
       }
-    });
 
-    // Slider Dragging
-    let isDraggingSlider = false;
-    this.canvas.addEventListener('mousedown', (e) => {
-      const rect = this.canvas.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      // Slider click or drag start
       if (x >= this.sliderBounds.x - 10 && x <= this.sliderBounds.x + this.sliderBounds.w + 10 &&
           y >= this.sliderBounds.y - 15 && y <= this.sliderBounds.y + 25) {
-        isDraggingSlider = true;
+        this.isDraggingSlider = true;
+        const val = Math.max(0, Math.min(100, Math.round(((x - this.sliderBounds.x) / this.sliderBounds.w) * 100)));
+        this.state.sliderValue = val;
       }
-    });
+    };
 
-    window.addEventListener('mousemove', (e) => {
-      if (!isDraggingSlider) return;
+    this.onWindowPointerMove = (e) => {
+      if (!this.isDraggingSlider || !this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const val = Math.max(0, Math.min(100, Math.round(((x - this.sliderBounds.x) / this.sliderBounds.w) * 100)));
       this.state.sliderValue = val;
-    });
+    };
 
-    window.addEventListener('mouseup', () => {
-      if (isDraggingSlider) {
-        isDraggingSlider = false;
+    this.onWindowPointerUp = () => {
+      if (this.isDraggingSlider) {
+        this.isDraggingSlider = false;
         SoundFX.playPop(600);
       }
-    });
+    };
+
+    this.canvas.addEventListener('pointerdown', this.onCanvasPointerDown);
+    window.addEventListener('pointermove', this.onWindowPointerMove);
+    window.addEventListener('pointerup', this.onWindowPointerUp);
+    window.addEventListener('pointercancel', this.onWindowPointerUp);
+    window.addEventListener('blur', this.onWindowPointerUp);
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       if (this.ctx && this.canvas && this.uiBuffers && this.uiBuffers.frames) {
         this.ctx.clearRect(0, 0, this.width, this.height);
 
@@ -536,6 +552,7 @@ export class UiKitScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -543,12 +560,23 @@ export class UiKitScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   destroy() {
     this.suspend();
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.canvas && this.onCanvasPointerDown) {
+      this.canvas.removeEventListener('pointerdown', this.onCanvasPointerDown);
+    }
+    if (this.onWindowPointerMove) {
+      window.removeEventListener('pointermove', this.onWindowPointerMove);
+      window.removeEventListener('pointerup', this.onWindowPointerUp);
+      window.removeEventListener('pointercancel', this.onWindowPointerUp);
+      window.removeEventListener('blur', this.onWindowPointerUp);
+    }
   }
 }

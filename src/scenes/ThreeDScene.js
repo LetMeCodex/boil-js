@@ -638,7 +638,12 @@ export class ThreeDScene {
   }
 
   startRenderLoop() {
+    if (this.renderLoop) return;
+    this.running = true;
+
     const loop = (timestamp) => {
+      if (!this.running) return;
+
       // 1. Performance FPS Monitor
       this.fpsData.frames++;
       if (timestamp - this.fpsData.lastTime >= 1000) {
@@ -657,21 +662,29 @@ export class ThreeDScene {
       this.targetRotations.y += 0.005 * this.settings.speed;
       this.targetRotations.x += 0.002 * this.settings.speed;
 
-      this.meshGroup.rotation.x = this.rotations.x;
-      this.meshGroup.rotation.y = this.rotations.y;
+      if (this.meshGroup) {
+        this.meshGroup.rotation.x = this.rotations.x;
+        this.meshGroup.rotation.y = this.rotations.y;
+      }
 
       // 3. Update Shader Uniforms
       const timeInSec = timestamp * 0.001;
-      this.sketchMaterial.uniforms.uTime.value = timeInSec;
-      this.sketchMaterial.uniforms.uBoilFps.value = this.boilFps;
+      if (this.sketchMaterial) {
+        this.sketchMaterial.uniforms.uTime.value = timeInSec;
+        this.sketchMaterial.uniforms.uBoilFps.value = this.boilFps;
+      }
 
       // Update custom scene animations
-      for (let i = 0; i < this.customAnimObjects.length; i++) {
-        this.customAnimObjects[i].update(timeInSec);
+      if (this.customAnimObjects) {
+        for (let i = 0; i < this.customAnimObjects.length; i++) {
+          this.customAnimObjects[i].update(timeInSec);
+        }
       }
 
       // 4. Render GPU Frame
-      this.renderer.render(this.scene, this.camera);
+      if (this.renderer && this.scene && this.camera) {
+        this.renderer.render(this.scene, this.camera);
+      }
 
       this.renderLoop = requestAnimationFrame(loop);
     };
@@ -739,6 +752,7 @@ export class ThreeDScene {
   }
 
   suspend() {
+    this.running = false;
     if (this.renderLoop) {
       cancelAnimationFrame(this.renderLoop);
       this.renderLoop = null;
@@ -746,14 +760,18 @@ export class ThreeDScene {
   }
 
   resume() {
-    if (!this.renderLoop) {
-      this.startRenderLoop();
-    }
+    if (this.running) return;
+    this.startRenderLoop();
   }
 
   destroy() {
     this.suspend();
-    window.removeEventListener('resize', this.resizeHandler);
+    if (this.resizeHandler) {
+      window.removeEventListener('resize', this.resizeHandler);
+    }
+    if (this.sketchMaterial) {
+      this.sketchMaterial.dispose();
+    }
     if (this.renderer) {
       this.renderer.dispose();
       this.renderer.forceContextLoss();
