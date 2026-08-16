@@ -15,12 +15,14 @@ import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
 import { KineticCollageScene } from './engine/KineticCollageScene.js';
 import { renderIcon } from './utils/SvgIcons.js';
+import { initTheme, getTheme, toggleTheme, subscribeTheme } from './utils/theme.js';
+import { ThemeToggle } from './showcase/ThemeToggle.js';
 
 class ShowcaseApp {
   constructor() {
     this.scenes = {};
     this.boilFps = 10;
-    this.theme = localStorage.getItem('rough-theme') || 'parchment';
+    this.theme = initTheme();
     this.soundEnabled = true;
 
     // Real FPS Tracker
@@ -77,7 +79,7 @@ class ShowcaseApp {
     let frame = 0;
     const draw = () => {
       ctx.clearRect(0, 0, 28, 28);
-      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const isDark = getTheme() === 'night';
       const color = isDark ? '#F59E0B' : '#E8790C';
 
       rc.circle(14, 14, 20, {
@@ -103,11 +105,18 @@ class ShowcaseApp {
       this.collageScene = new KineticCollageScene(canvas, { quality: 'desktop' });
       this.collageScene.init();
 
+      // Synchronize theme with background collage
+      this.collageScene.setNight(getTheme() === 'night');
+      this.offTheme = subscribeTheme((t) => {
+        this.collageScene?.setNight(t === 'night');
+      });
+
       window.boilScene = {
         setExperiment: (i) => this.collageScene?.setExperiment(i),
         setScrollProgress: (p) => this.collageScene?.setScroll(p),
         setMouse: (x, y) => this.collageScene?.setMouse(x, y),
         setReducedMotion: (v) => this.collageScene?.setReducedMotion(v),
+        setNight: (v) => this.collageScene?.setNight(v),
       };
 
       const onMove = (e) => {
@@ -124,18 +133,14 @@ class ShowcaseApp {
   }
 
   initTheme() {
-    document.documentElement.setAttribute('data-theme', this.theme);
-    const themeIconSpan = document.getElementById('theme-btn-icon');
-    if (themeIconSpan) {
-      themeIconSpan.innerHTML = this.theme === 'dark' ? renderIcon('sun') : renderIcon('moon');
+    const themeBtn = document.getElementById('theme-toggle-btn');
+    if (themeBtn) {
+      this.themeToggle = new ThemeToggle(themeBtn);
     }
   }
 
   toggleTheme() {
-    this.theme = this.theme === 'parchment' ? 'dark' : 'parchment';
-    localStorage.setItem('rough-theme', this.theme);
-    this.initTheme();
-    SoundFX.playPop(520);
+    toggleTheme();
   }
 
   initCursor() {
