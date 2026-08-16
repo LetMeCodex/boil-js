@@ -34,6 +34,7 @@ class ShowcaseApp {
     this.initTheme();
     this.initCursor();
     this.initBrandLogo();
+    this.initAnimatedFavicon();
     this.initDevTools();
     this.initLabUi();
     this.initCollageBackground();
@@ -77,25 +78,124 @@ class ShowcaseApp {
     const rc = rough.canvas(canvas);
 
     let frame = 0;
-    const draw = () => {
-      ctx.clearRect(0, 0, 32, 32);
-      const isDark = getTheme() === 'night';
-      const color = isDark ? '#F59E0B' : '#E8790C';
+    let angle = 0;
 
-      rc.circle(16, 16, 22, {
-        seed: 100 + (frame % 4) * 10,
-        roughness: 1.5,
-        stroke: color,
-        strokeWidth: 2,
-        fill: color,
+    const draw = () => {
+      ctx.clearRect(0, 0, 44, 44);
+      const isDark = getTheme() === 'night';
+      const mainColor = isDark ? '#FBBF24' : '#E8790C';
+      const accentColor = isDark ? '#F59E0B' : '#D97706';
+      const inkColor = isDark ? '#F3F4F6' : '#1C1917';
+
+      // 1. Outer Boiling Kinetic Ring with hatching
+      rc.circle(22, 22, 34, {
+        seed: 1000 + (frame % 4) * 20,
+        roughness: 1.6,
+        stroke: mainColor,
+        strokeWidth: 2.2,
+        fill: isDark ? 'rgba(245, 158, 11, 0.15)' : 'rgba(232, 121, 12, 0.12)',
         fillStyle: 'dots'
+      });
+
+      // 2. Orbiting Boiling Kinetic Satellites
+      angle += 0.08;
+      for (let i = 0; i < 3; i++) {
+        const a = angle + (i * Math.PI * 2) / 3;
+        const ox = 22 + Math.cos(a) * 12;
+        const oy = 22 + Math.sin(a) * 12;
+        rc.circle(ox, oy, 4, {
+          seed: 2000 + i * 50 + (frame % 4) * 10,
+          roughness: 1.3,
+          stroke: 'transparent',
+          fill: mainColor,
+          fillStyle: 'solid'
+        });
+      }
+
+      // 3. Center Kinetic Star/Boiling Core
+      rc.circle(22, 22, 12, {
+        seed: 3000 + (frame % 4) * 15,
+        roughness: 1.8,
+        stroke: inkColor,
+        strokeWidth: 1.5,
+        fill: accentColor,
+        fillStyle: 'solid'
       });
     };
 
     setInterval(() => {
       frame++;
       draw();
-    }, 140);
+    }, 110);
+  }
+
+  initAnimatedFavicon() {
+    let faviconLink = document.getElementById('dynamic-favicon');
+    if (!faviconLink) {
+      faviconLink = document.createElement('link');
+      faviconLink.id = 'dynamic-favicon';
+      faviconLink.rel = 'icon';
+      faviconLink.type = 'image/png';
+      document.head.appendChild(faviconLink);
+    }
+
+    const offscreenCanvas = document.createElement('canvas');
+    offscreenCanvas.width = 32;
+    offscreenCanvas.height = 32;
+    const ctx = offscreenCanvas.getContext('2d');
+    const rc = rough.canvas(offscreenCanvas);
+
+    let frame = 0;
+    let angle = 0;
+
+    const renderFavicon = () => {
+      ctx.clearRect(0, 0, 32, 32);
+      const isDark = getTheme() === 'night';
+      const color = isDark ? '#FBBF24' : '#E8790C';
+      const accent = isDark ? '#F59E0B' : '#D97706';
+
+      // Boiling circular badge
+      rc.circle(16, 16, 24, {
+        seed: 500 + (frame % 4) * 15,
+        roughness: 1.6,
+        stroke: color,
+        strokeWidth: 2.5,
+        fill: isDark ? '#1F2937' : '#FFFBEB',
+        fillStyle: 'solid'
+      });
+
+      // Orbiting particles
+      angle += 0.12;
+      for (let i = 0; i < 3; i++) {
+        const a = angle + (i * Math.PI * 2) / 3;
+        const px = 16 + Math.cos(a) * 8;
+        const py = 16 + Math.sin(a) * 8;
+        rc.circle(px, py, 3.5, {
+          seed: 800 + i * 20 + (frame % 4) * 5,
+          stroke: 'transparent',
+          fill: color,
+          fillStyle: 'solid'
+        });
+      }
+
+      // Center boiling core
+      rc.circle(16, 16, 8, {
+        seed: 900 + (frame % 4) * 10,
+        roughness: 1.4,
+        stroke: color,
+        strokeWidth: 1.5,
+        fill: accent,
+        fillStyle: 'solid'
+      });
+
+      faviconLink.href = offscreenCanvas.toDataURL('image/png');
+    };
+
+    // Update favicon every 130ms (kinetic boiling frame rate)
+    setInterval(() => {
+      frame++;
+      renderFavicon();
+    }, 130);
   }
 
   initCollageBackground() {
