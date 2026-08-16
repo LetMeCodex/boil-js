@@ -128,36 +128,43 @@ export class SpaceBlasterScene {
 
     const resize = () => {
       const wrap = document.getElementById('space-canvas-wrap');
-      if (!wrap) return;
-      const rect = wrap.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const rect = wrap ? wrap.getBoundingClientRect() : null;
+      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 780);
+      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 500);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
-      this.canvas.style.width = `${rect.width}px`;
-      this.canvas.style.height = `${rect.height}px`;
-      this.ctx.scale(dpr, dpr);
-      this.width = rect.width;
-      this.height = rect.height;
+      this.width = w;
+      this.height = h;
+      this.canvas.width = Math.floor(w * dpr);
+      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
 
-      this.ship.x = this.width / 2;
-      this.ship.y = this.height / 2;
+      if (!this.ship.x || !this.ship.y || this.ship.x === 400) {
+        this.ship.x = w / 2;
+        this.ship.y = h / 2;
+      }
+      if (this.asteroids.length === 0) {
+        this.spawnAsteroids(5);
+      }
     };
 
     window.addEventListener('resize', resize);
     resize();
+    setTimeout(resize, 100);
   }
 
   spawnAsteroids(count = 5) {
     const w = this.width || 800;
     const h = this.height || 500;
+    this.asteroids = [];
 
     for (let i = 0; i < count; i++) {
       let x = Math.random() * w;
       let y = Math.random() * h;
 
-      // Ensure not on top of ship
-      if (Math.hypot(x - this.ship.x, y - this.ship.y) < 120) {
+      if (Math.hypot(x - this.ship.x, y - this.ship.y) < 140) {
         x = (x + w / 2) % w;
       }
 

@@ -197,7 +197,12 @@ class ShowcaseApp {
         const targetEl = document.querySelector(targetHash);
         if (targetEl) {
           SoundFX.playPop(520);
+          const key = targetEl.getAttribute('data-key');
+          if (key && this.scenes[key] && typeof this.scenes[key].resume === 'function') {
+            this.scenes[key].resume();
+          }
           this.scrollEngine.scrollToElement(targetEl, 1.2);
+          setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
         }
       });
     });

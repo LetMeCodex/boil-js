@@ -324,25 +324,28 @@ export class ThreeDScene {
     this.resizeHandler = () => {
       if (!wrap) return;
       const r = wrap.getBoundingClientRect();
-      this.camera.aspect = r.width / r.height;
+      const w = Math.max(r.width || 0, wrap.clientWidth || 0, 780);
+      const h = Math.max(r.height || 0, wrap.clientHeight || 0, 500);
+      this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(r.width, r.height);
+      this.renderer.setSize(w, h);
     };
     window.addEventListener('resize', this.resizeHandler);
+    setTimeout(this.resizeHandler, 100);
 
     this.setupInteractions();
   }
 
   setupInteractions() {
-    // Mouse Drag Rotation
-    this.canvas.addEventListener('mousedown', (e) => {
+    // Mouse / Touch Drag Rotation
+    this.canvas.addEventListener('pointerdown', (e) => {
       this.mouse.isDown = true;
       this.mouse.lastX = e.clientX;
       this.mouse.lastY = e.clientY;
       SoundFX.playPop(440);
     });
 
-    window.addEventListener('mousemove', (e) => {
+    window.addEventListener('pointermove', (e) => {
       if (!this.mouse.isDown) return;
       const dx = e.clientX - this.mouse.lastX;
       const dy = e.clientY - this.mouse.lastY;
@@ -354,7 +357,7 @@ export class ThreeDScene {
       this.mouse.lastY = e.clientY;
     });
 
-    window.addEventListener('mouseup', () => {
+    window.addEventListener('pointerup', () => {
       this.mouse.isDown = false;
     });
 

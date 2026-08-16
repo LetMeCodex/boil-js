@@ -90,21 +90,27 @@ export class BubbleScene {
 
     const resize = () => {
       const wrap = document.getElementById('bubble-canvas-wrap');
-      if (!wrap) return;
-      const rect = wrap.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const rect = wrap ? wrap.getBoundingClientRect() : null;
+      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 780);
+      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 500);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
-      this.canvas.style.width = `${rect.width}px`;
-      this.canvas.style.height = `${rect.height}px`;
-      this.ctx.scale(dpr, dpr);
-      this.width = rect.width;
-      this.height = rect.height;
+      this.width = w;
+      this.height = h;
+      this.canvas.width = Math.floor(w * dpr);
+      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      if (!this.bubbles || this.bubbles.length === 0) {
+        this.spawnInitialBubbles();
+      }
     };
 
     window.addEventListener('resize', resize);
     resize();
+    setTimeout(resize, 100);
     this.setupInteractions();
   }
 

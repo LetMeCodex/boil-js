@@ -171,28 +171,38 @@ export class KuramaScene {
 
     const resize = () => {
       const wrap = document.getElementById('kurama-canvas-wrap');
-      if (!wrap) return;
-      const rect = wrap.getBoundingClientRect();
+      const rect = wrap ? wrap.getBoundingClientRect() : null;
+      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 780);
+      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 540);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
-      this.canvas.style.width = `${rect.width}px`;
-      this.canvas.style.height = `${rect.height}px`;
-      this.ctx.scale(dpr, dpr);
-      this.width = rect.width;
-      this.height = rect.height;
+      this.width = w;
+      this.height = h;
+      this.canvas.width = Math.floor(w * dpr);
+      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+
+      if (this.threeRenderer && this.threeCamera) {
+        this.threeCamera.aspect = w / h;
+        this.threeCamera.updateProjectionMatrix();
+        this.threeRenderer.setSize(w, h);
+      }
     };
 
     window.addEventListener('resize', resize);
     resize();
+    setTimeout(resize, 100);
 
-    // Mouse Tracking
-    this.canvas.addEventListener('mousemove', (e) => {
+    // Pointer Tracking
+    const handlePointer = (e) => {
       const rect = this.canvas.getBoundingClientRect();
       this.mouse.x = e.clientX - rect.left;
       this.mouse.y = e.clientY - rect.top;
-    });
+    };
+    this.canvas.addEventListener('pointerdown', handlePointer);
+    this.canvas.addEventListener('pointermove', handlePointer);
   }
 
   setupThreeAvatar() {

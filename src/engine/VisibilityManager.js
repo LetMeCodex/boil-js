@@ -21,8 +21,8 @@ export class VisibilityManager {
         }
       });
     }, {
-      rootMargin: '120px 0px 120px 0px',
-      threshold: 0.05
+      rootMargin: '400px 0px 400px 0px',
+      threshold: 0.0
     });
   }
 

@@ -184,14 +184,17 @@ export class TextMotionScene {
     this.resizeHandler = () => {
       if (!wrap) return;
       const r = wrap.getBoundingClientRect();
-      this.camera.aspect = r.width / r.height;
+      const w = Math.max(r.width || 0, wrap.clientWidth || 0, 780);
+      const h = Math.max(r.height || 0, wrap.clientHeight || 0, 500);
+      this.camera.aspect = w / h;
       this.camera.updateProjectionMatrix();
-      this.renderer.setSize(r.width, r.height);
+      this.renderer.setSize(w, h);
       if (this.material) {
         this.material.uniforms.uPixelRatio.value = Math.min(window.devicePixelRatio || 1, 2.0);
       }
     };
     window.addEventListener('resize', this.resizeHandler);
+    setTimeout(this.resizeHandler, 100);
 
     this.setupInteractions(wrap);
   }
