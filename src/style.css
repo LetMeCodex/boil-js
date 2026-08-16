@@ -308,10 +308,10 @@ main, header, section, footer, aside, dl, pre,
 }
 
 .ambient-icon-btn {
-  width: 34px;
-  height: 34px;
-  border-radius: var(--radius-xs);
-  border: 1px solid var(--line);
+  width: 38px;
+  height: 38px;
+  border-radius: 100px;
+  border: 1.5px solid var(--line-strong);
   background: var(--paper-card);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -320,7 +320,7 @@ main, header, section, footer, aside, dl, pre,
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   transition: transform 0.15s var(--ease-elastic), background 0.2s, border-color 0.2s, color 0.2s;
 }
 
@@ -328,7 +328,309 @@ main, header, section, footer, aside, dl, pre,
   background: var(--orange-faint);
   border-color: var(--orange);
   color: var(--orange);
-  transform: translateY(-2px);
+  transform: translateY(-2px) scale(1.05);
+}
+
+/* ==========================================================================
+   3D PHYSICAL CELESTIAL DAY/NIGHT SWITCH
+   ========================================================================== */
+.theme-3d-switch {
+  position: relative;
+  width: 76px;
+  height: 38px;
+  border-radius: 100px;
+  border: 1.5px solid var(--line-strong);
+  background: transparent;
+  padding: 0;
+  cursor: pointer;
+  outline: none;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+  transition: transform 0.2s var(--ease-elastic), box-shadow 0.25s;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.theme-3d-switch:hover {
+  transform: translateY(-2px) scale(1.03);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.18);
+}
+
+.theme-3d-switch:active {
+  transform: translateY(0px) scale(0.96);
+}
+
+.switch-chassis {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 100px;
+  background: linear-gradient(135deg, #3A7BD5 0%, #68A8F4 100%);
+  overflow: hidden;
+  box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.4), inset -1px -2px 4px rgba(255, 255, 255, 0.35);
+  transition: background 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Night Sky Chassis State */
+.theme-3d-switch.night-active .switch-chassis {
+  background: linear-gradient(135deg, #101420 0%, #1A2035 100%);
+  box-shadow: inset 1px 3px 6px rgba(0, 0, 0, 0.6), inset -1px -2px 4px rgba(255, 255, 255, 0.15);
+}
+
+/* 1. Ambient Halos */
+.switch-backdrops {
+  position: absolute;
+  left: 4px;
+  top: 3px;
+  width: 30px;
+  height: 30px;
+  pointer-events: none;
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-3d-switch.night-active .switch-backdrops {
+  transform: translateX(38px);
+}
+
+.switch-backdrop {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 54px;
+  height: 54px;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.14);
+  transition: background 0.4s;
+}
+
+.switch-backdrop::before,
+.switch-backdrop::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.switch-backdrop::before {
+  width: 72px;
+  height: 72px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.switch-backdrop::after {
+  width: 90px;
+  height: 90px;
+  background: rgba(255, 255, 255, 0.04);
+}
+
+/* 2. Layered Clouds (Day State) */
+.switch-clouds {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.45s;
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.theme-3d-switch.night-active .switch-clouds {
+  transform: translateY(35px) scale(0.85);
+  opacity: 0;
+}
+
+.switch-cloud {
+  position: absolute;
+  background: #FFFFFF;
+  border-radius: 50px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
+}
+
+.switch-cloud::before,
+.switch-cloud::after {
+  content: "";
+  position: absolute;
+  background: #FFFFFF;
+  border-radius: 50%;
+}
+
+.switch-cloud.cloud-1 {
+  width: 32px;
+  height: 9px;
+  right: 6px;
+  bottom: 8px;
+  opacity: 0.95;
+}
+
+.switch-cloud.cloud-1::before {
+  width: 14px;
+  height: 14px;
+  top: -7px;
+  left: 6px;
+}
+
+.switch-cloud.cloud-1::after {
+  width: 10px;
+  height: 10px;
+  top: -4px;
+  left: 17px;
+}
+
+.switch-cloud.cloud-2 {
+  width: 26px;
+  height: 8px;
+  right: 22px;
+  bottom: 15px;
+  opacity: 0.65;
+}
+
+.switch-cloud.cloud-2::before {
+  width: 11px;
+  height: 11px;
+  top: -5px;
+  left: 5px;
+}
+
+.switch-cloud.cloud-3 {
+  width: 36px;
+  height: 10px;
+  right: -2px;
+  bottom: 2px;
+  opacity: 0.85;
+}
+
+.switch-cloud.cloud-3::before {
+  width: 16px;
+  height: 16px;
+  top: -8px;
+  left: 8px;
+}
+
+/* 3. Twinkling Constellation Stars (Night State) */
+.switch-stars {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  transition: transform 0.55s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.45s;
+  transform: translateY(-30px);
+  opacity: 0;
+}
+
+.theme-3d-switch.night-active .switch-stars {
+  transform: translateY(0);
+  opacity: 1;
+}
+
+.switch-star {
+  position: absolute;
+  background: #FFFFFF;
+  border-radius: 50%;
+  box-shadow: 0 0 4px #FFFFFF, 0 0 8px rgba(251, 191, 36, 0.6);
+  animation: switch-star-twinkle 1.6s infinite alternate ease-in-out;
+}
+
+.switch-star.star-1 {
+  width: 3.5px;
+  height: 3.5px;
+  left: 14px;
+  top: 9px;
+  animation-delay: 0s;
+}
+
+.switch-star.star-2 {
+  width: 2.5px;
+  height: 2.5px;
+  left: 26px;
+  top: 18px;
+  animation-delay: 0.4s;
+}
+
+.switch-star.star-3 {
+  width: 3px;
+  height: 3px;
+  left: 10px;
+  bottom: 10px;
+  animation-delay: 0.8s;
+}
+
+.switch-star.star-4 {
+  width: 2px;
+  height: 2px;
+  left: 32px;
+  top: 8px;
+  animation-delay: 1.2s;
+}
+
+@keyframes switch-star-twinkle {
+  0% { transform: scale(0.8); opacity: 0.4; }
+  100% { transform: scale(1.3); opacity: 1; }
+}
+
+/* 4. 3D Tactile Sun / Moon Orb (Thumb) */
+.switch-sun-moon {
+  position: absolute;
+  top: 3px;
+  left: 4px;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 32% 32%, #FFF066, #F59E0B 72%, #D97706 100%);
+  box-shadow: inset 1px 2px 3px rgba(255, 255, 255, 0.8), inset -1px -2px 3px rgba(0, 0, 0, 0.35), 0 0 10px rgba(245, 158, 11, 0.65), 1px 3px 6px rgba(0, 0, 0, 0.3);
+  transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1), background 0.45s, box-shadow 0.45s;
+  transform: translateX(0px) rotate(0deg);
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.theme-3d-switch.night-active .switch-sun-moon {
+  transform: translateX(38px) rotate(180deg);
+  background: radial-gradient(circle at 35% 35%, #FFFFFF, #CBD5E1 70%, #94A3B8 100%);
+  box-shadow: inset 1px 2px 3px rgba(255, 255, 255, 0.9), inset -1px -2px 3px rgba(0, 0, 0, 0.45), 0 0 10px rgba(203, 213, 225, 0.6), 1px 3px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Lunar Craters (Visible in Night Mode) */
+.switch-craters {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+}
+
+.crater {
+  position: absolute;
+  background: #94A3B8;
+  border-radius: 50%;
+  box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.55), 0 0.5px 1px rgba(255, 255, 255, 0.4);
+  opacity: 0;
+  transform: scale(0.2);
+  transition: opacity 0.35s ease, transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.theme-3d-switch.night-active .crater {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.crater-1 {
+  width: 7.5px;
+  height: 7.5px;
+  top: 7px;
+  left: 7px;
+}
+
+.crater-2 {
+  width: 5px;
+  height: 5px;
+  top: 17px;
+  left: 17px;
+}
+
+.crater-3 {
+  width: 5.5px;
+  height: 5.5px;
+  top: 18px;
+  left: 6px;
 }
 
 .btn-icon-kbd {
