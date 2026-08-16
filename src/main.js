@@ -17,6 +17,7 @@ import { KineticCollageScene } from './engine/KineticCollageScene.js';
 import { renderIcon } from './utils/SvgIcons.js';
 import { initTheme, getTheme, toggleTheme, subscribeTheme } from './utils/theme.js';
 import { ThemeToggle } from './showcase/ThemeToggle.js';
+import { AnimeBgmEngine } from './engine/AnimeBgmEngine.js';
 
 class ShowcaseApp {
   constructor() {
@@ -24,6 +25,7 @@ class ShowcaseApp {
     this.boilFps = 10;
     this.theme = initTheme();
     this.soundEnabled = true;
+    this.bgm = AnimeBgmEngine.get();
 
     // Real FPS Tracker
     this.fpsHistory = [];
@@ -447,8 +449,26 @@ class ShowcaseApp {
       if (audioIconSpan) {
         audioIconSpan.innerHTML = this.soundEnabled ? renderIcon('soundOn') : renderIcon('soundOff');
       }
-      if (this.soundEnabled) SoundFX.playPop(520);
+      if (this.soundEnabled) {
+        SoundFX.playPop(520);
+        this.bgm.start();
+      } else {
+        this.bgm.stop();
+      }
     });
+
+    // Start background music automatically on first user gesture
+    const startAudioOnFirstInteraction = () => {
+      if (this.soundEnabled) {
+        this.bgm.start();
+      }
+      window.removeEventListener('pointerdown', startAudioOnFirstInteraction);
+      window.removeEventListener('keydown', startAudioOnFirstInteraction);
+      window.removeEventListener('scroll', startAudioOnFirstInteraction);
+    };
+    window.addEventListener('pointerdown', startAudioOnFirstInteraction, { once: true });
+    window.addEventListener('keydown', startAudioOnFirstInteraction, { once: true });
+    window.addEventListener('scroll', startAudioOnFirstInteraction, { once: true });
 
     document.getElementById('shortcuts-btn')?.addEventListener('click', () => {
       const modal = document.getElementById('modal-shortcuts');
@@ -462,8 +482,10 @@ class ShowcaseApp {
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
         this.visibilityManager?.pauseAll();
+        if (this.soundEnabled) this.bgm.stop();
       } else {
         this.visibilityManager?.resumeVisible();
+        if (this.soundEnabled) this.bgm.start();
       }
     });
   }
