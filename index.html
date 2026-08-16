@@ -42,13 +42,13 @@
         </div>
       </a>
 
-      <!-- Right: Ambient Sound & 3D Celestial Day/Night Toggle Switch -->
+      <!-- Right: Ambient Sound & Hand-Drawn 3D Rough.js + Anime.js Day/Night Switch -->
       <div class="ambient-controls-block">
         <button id="audio-toggle-btn" class="ambient-icon-btn" title="Toggle audio haptics [M]" data-tooltip="SOUND [M]" aria-label="Toggle sound">
           <span class="btn-icon-svg" id="audio-btn-icon"></span>
         </button>
-        <button id="theme-toggle-btn" class="theme-3d-switch" title="Toggle Day / Night world [T]" data-tooltip="THEME [T]" aria-label="Toggle Day and Night mode" role="switch" aria-checked="false">
-          <!-- 3D Celestial Switch Content Injected Dynamically by ThemeToggle.js -->
+        <button id="theme-toggle-btn" class="rough-theme-toggle-btn" title="Toggle Day / Night world [T]" data-tooltip="THEME [T]" aria-label="Toggle Day and Night mode" role="switch" aria-checked="false">
+          <canvas id="rough-theme-switch-canvas" class="rough-switch-canvas" width="168" height="84"></canvas>
         </button>
       </div>
     </header>
