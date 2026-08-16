@@ -9,29 +9,6 @@ import { SoundFX } from '../engine/AnimeBoilBridge.js';
  */
 
 export const EXPERIMENT_SPECS = {
-  edgecity: {
-    title: '🏙️ EDGE CITY 3D TOPOLOGICAL LANDSCAPE',
-    engine: 'Three.js WebGL InstancedMesh + Simplex Harmonics',
-    libraries: 'Three.js, Anime.js, WebGL GLSL',
-    particles: '1,024 Instanced Architectural Voxel Towers',
-    renderMode: 'Hardware InstancedMesh with Dynamic Elevation Matrix',
-    input: 'Mouse Tilt Parallax + Interactive Click Shockwaves',
-    physics: 'Multi-Octave Simplex Wave Harmonics + Spline Orbits',
-    parameters: 'Grid: 32×32, Amplitude: 1.6x, Speed: 1.0x, Orbs: 12',
-    prompt: `Create a luxurious, organic 3D architectural landscape inspired by Edge City ("Hello Friends" aesthetic) using Three.js. Render a vast undulating grid of 1,024 instanced voxel building pillars whose elevations oscillate with multi-octave simplex wave harmonics (y = sin(x*0.18 + t)*cos(z*0.18 + t)*1.6). Add floating glowing courier spheres traveling along 3D contour splines, dynamic laser circuit wireframes, interactive click ripple shockwaves, and smooth mouse isometric camera parallax with warm clay, sunset, and obsidian twilight palettes.`,
-    sourceCode: `// Multi-Octave Wave Elevation
-let elevation = (
-  Math.sin(bp.x * 0.18 + time * 1.2) * Math.cos(bp.z * 0.18 + time * 1.0) * 1.6 +
-  Math.sin((bp.x + bp.z) * 0.1 + time * 0.8) * 0.9 +
-  Math.cos(Math.hypot(bp.x, bp.z) * 0.25 - time * 1.5) * 0.7
-) * waveAmp;
-
-// Apply interactive click ripple
-const dist = Math.hypot(bp.x - ripple.x, bp.z - ripple.z);
-if (Math.abs(dist - ripple.radius) < 4.0) {
-  elevation += Math.sin((dist - ripple.radius) * 1.5) * ripple.strength * ripple.alpha;
-}`
-  },
   uikit: {
     title: '🎛️ ANIMATED UI KIT & BUTTONS',
     engine: 'Rough.js + Anime.js Tactile Physics',

@@ -9,6 +9,7 @@ import { DevTools } from './showcase/DevTools.js';
 import { HeroLab } from './showcase/HeroLab.js';
 import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
+import { KineticCollageScene } from './collage/KineticCollageScene.js';
 
 // Scene Imports
 import { TextMotionScene } from './scenes/TextMotionScene.js';
@@ -21,8 +22,6 @@ import { ThreeDScene } from './scenes/ThreeDScene.js';
 import { MorphScene } from './scenes/MorphScene.js';
 import { PhysicsScene } from './scenes/PhysicsScene.js';
 import { UiKitScene } from './scenes/UiKitScene.js';
-import { EdgeCityScene } from './scenes/EdgeCityScene.js';
-import { EdgeCityBackground } from './engine/EdgeCityBackground.js';
 
 class ShowcaseApp {
   constructor() {
@@ -34,7 +33,7 @@ class ShowcaseApp {
     this.initTheme();
     this.initCursor();
     this.initDevTools();
-    this.initBackground();
+    this.initCollageBackground();
     this.initHero();
     this.initChapters();
     this.initTechEcosystem();
@@ -43,14 +42,18 @@ class ShowcaseApp {
     this.bindGlobalEvents();
   }
 
+  initCollageBackground() {
+    const wrap = document.getElementById('paper-collage-background-wrap');
+    if (wrap) {
+      this.collageScene = new KineticCollageScene(wrap);
+    }
+  }
+
   initTheme() {
     document.documentElement.setAttribute('data-theme', this.theme);
     const themeBtn = document.getElementById('theme-toggle-btn');
     if (themeBtn) {
       themeBtn.innerHTML = this.theme === 'dark' ? '<span class="theme-icon">☀️</span>' : '<span class="theme-icon">🌙</span>';
-    }
-    if (this.edgeCityBg) {
-      this.edgeCityBg.setTheme(this.theme);
     }
   }
 
@@ -59,14 +62,6 @@ class ShowcaseApp {
     localStorage.setItem('rough-theme', this.theme);
     this.initTheme();
     SoundFX.playPop(520);
-  }
-
-  initBackground() {
-    try {
-      this.edgeCityBg = new EdgeCityBackground();
-    } catch (e) {
-      console.warn('EdgeCityBackground init deferred:', e);
-    }
   }
 
   initCursor() {
@@ -96,7 +91,6 @@ class ShowcaseApp {
       { id: 'stage-04', key: 'bubble', Class: BubbleScene },
       { id: 'stage-05', key: 'space', Class: SpaceBlasterScene },
       { id: 'stage-06', key: 'threed', Class: ThreeDScene },
-      { id: 'stage-edgecity', key: 'edgecity', Class: EdgeCityScene },
       { id: 'stage-07', key: 'morph', Class: MorphScene },
       { id: 'stage-08', key: 'physics', Class: PhysicsScene },
       { id: 'stage-uikit', key: 'uikit', Class: UiKitScene }
@@ -162,6 +156,10 @@ class ShowcaseApp {
     this.scrollEngine = new ShowcaseScrollEngine((state) => {
       if (this.heroLab && state.chapterIndex === 0) {
         this.heroLab.setScrollProgress(state.chapterProgress);
+      }
+      if (this.collageScene) {
+        this.collageScene.setScroll(state.masterProgress);
+        this.collageScene.setExperiment(state.chapterIndex);
       }
     });
 
