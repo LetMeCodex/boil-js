@@ -78,15 +78,15 @@ class ShowcaseApp {
 
     let frame = 0;
     const draw = () => {
-      ctx.clearRect(0, 0, 28, 28);
+      ctx.clearRect(0, 0, 32, 32);
       const isDark = getTheme() === 'night';
       const color = isDark ? '#F59E0B' : '#E8790C';
 
-      rc.circle(14, 14, 20, {
+      rc.circle(16, 16, 22, {
         seed: 100 + (frame % 4) * 10,
-        roughness: 1.4,
+        roughness: 1.5,
         stroke: color,
-        strokeWidth: 1.8,
+        strokeWidth: 2,
         fill: color,
         fillStyle: 'dots'
       });
@@ -95,7 +95,7 @@ class ShowcaseApp {
     setInterval(() => {
       frame++;
       draw();
-    }, 160);
+    }, 140);
   }
 
   initCollageBackground() {

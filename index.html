@@ -27,13 +27,13 @@
 
   <div id="app" class="showcase-app">
     <!-- =========================================================================
-         KINETIC CONTROL RAIL (NAVBAR)
+         ATMOSPHERIC BRAND HEADER & AMBIENT HUD (NO NAVBAR)
          ========================================================================= -->
-    <header class="kinetic-control-rail" role="banner" id="main-control-rail">
-      <!-- Left: Laboratory Brand ID -->
-      <a href="#section-hero" class="rail-brand-block" aria-label="Boil.js Home">
+    <header class="aesthetic-brand-header" role="banner" id="main-brand-header">
+      <!-- Left: Laboratory Brand ID Blended Perfectly with Background -->
+      <a href="#section-hero" class="brand-ambient-identity" aria-label="Boil.js Home">
         <div class="brand-glyph-box">
-          <canvas id="brand-logo-canvas" width="28" height="28" class="brand-canvas"></canvas>
+          <canvas id="brand-logo-canvas" width="32" height="32" class="brand-canvas"></canvas>
         </div>
         <div class="brand-titles">
           <span class="brand-main">BOIL<span class="brand-dot">.JS</span></span>
@@ -41,101 +41,23 @@
         </div>
       </a>
 
-      <!-- Center: Experiment Navigation Rail (Desktop) -->
-      <nav class="rail-chapter-track" aria-label="Laboratory Experiments" id="rail-nav-track">
-        <!-- Floating Traveling Active Underline -->
-        <div class="nav-travel-indicator" id="nav-travel-indicator"></div>
-
-        <a href="#section-01" class="rail-nav-item active" data-chapter="0" data-key="textmotion">
-          <span class="item-num">01</span>
-          <span class="item-name">TEXT</span>
-        </a>
-        <a href="#section-kurama" class="rail-nav-item" data-chapter="1" data-key="kurama">
-          <span class="item-num">02</span>
-          <span class="item-name">KURAMA</span>
-        </a>
-        <a href="#section-02" class="rail-nav-item" data-chapter="2" data-key="arkanoid">
-          <span class="item-num">03</span>
-          <span class="item-name">BRICKS</span>
-        </a>
-        <a href="#section-03" class="rail-nav-item" data-chapter="3" data-key="puppet">
-          <span class="item-num">04</span>
-          <span class="item-name">PUPPET</span>
-        </a>
-        <a href="#section-04" class="rail-nav-item" data-chapter="4" data-key="bubble">
-          <span class="item-num">05</span>
-          <span class="item-name">BUBBLE</span>
-        </a>
-        <a href="#section-05" class="rail-nav-item" data-chapter="5" data-key="slingshot">
-          <span class="item-num">06</span>
-          <span class="item-name">SIEGE</span>
-        </a>
-        <a href="#section-06" class="rail-nav-item" data-chapter="6" data-key="threed">
-          <span class="item-num">07</span>
-          <span class="item-name">3D</span>
-        </a>
-        <a href="#section-07" class="rail-nav-item" data-chapter="7" data-key="morph">
-          <span class="item-num">08</span>
-          <span class="item-name">VECTOR</span>
-        </a>
-        <a href="#section-08" class="rail-nav-item" data-chapter="8" data-key="physics">
-          <span class="item-num">09</span>
-          <span class="item-name">PHYSICS</span>
-        </a>
-        <a href="#section-uikit" class="rail-nav-item" data-chapter="9" data-key="uikit">
-          <span class="item-num">10</span>
-          <span class="item-name">UI KIT</span>
-        </a>
-        <a href="#section-synth" class="rail-nav-item" data-chapter="10" data-key="synth">
-          <span class="item-num">11</span>
-          <span class="item-name">PIANO</span>
-        </a>
-      </nav>
-
-      <!-- Mobile Chapter Trigger -->
-      <button class="mobile-chapter-trigger" id="btn-mobile-menu" aria-label="Open experiment index">
-        <span class="mobile-active-label" id="mobile-current-chapter">01 TEXT</span>
-        <span class="mobile-arrow">↓</span>
-      </button>
-
-      <!-- Right: Essential Controls -->
-      <div class="rail-controls-block">
-        <div class="rail-meter-pill" title="Live rendering frame rate" data-tooltip="LIVE FPS METER">
+      <!-- Right: Ambient Utility Controls -->
+      <div class="ambient-controls-block">
+        <div class="ambient-meter-pill" title="Live rendering frame rate" data-tooltip="LIVE FPS METER">
           <span class="meter-live-dot"></span>
           <span id="global-fps-val" class="meter-val">60 FPS</span>
         </div>
-        <button id="audio-toggle-btn" class="rail-icon-btn" title="Toggle audio haptics [M]" data-tooltip="SOUND [M]" aria-label="Toggle sound">
+        <button id="audio-toggle-btn" class="ambient-icon-btn" title="Toggle audio haptics [M]" data-tooltip="SOUND [M]" aria-label="Toggle sound">
           <span class="btn-icon-svg" id="audio-btn-icon"></span>
         </button>
-        <button id="theme-toggle-btn" class="rail-icon-btn" title="Toggle parchment / charcoal theme [T]" data-tooltip="THEME [T]" aria-label="Toggle theme">
+        <button id="theme-toggle-btn" class="ambient-icon-btn" title="Toggle parchment / charcoal theme [T]" data-tooltip="THEME [T]" aria-label="Toggle theme">
           <span class="btn-icon-svg" id="theme-btn-icon"></span>
         </button>
-        <button id="shortcuts-btn" class="rail-icon-btn" title="Keyboard shortcuts [?]" data-tooltip="SHORTCUTS [?]" aria-label="Keyboard shortcuts">
+        <button id="shortcuts-btn" class="ambient-icon-btn" title="Keyboard shortcuts [?]" data-tooltip="SHORTCUTS [?]" aria-label="Keyboard shortcuts">
           <span class="btn-icon-kbd">?</span>
         </button>
       </div>
     </header>
-
-    <!-- Mobile Laboratory Index Drawer -->
-    <div class="mobile-index-drawer" id="mobile-index-drawer" style="display: none;">
-      <div class="drawer-header">
-        <span class="drawer-title">LABORATORY INDEX</span>
-        <button class="drawer-close" id="btn-close-drawer">&times;</button>
-      </div>
-      <div class="drawer-links-list">
-        <a href="#section-01" class="drawer-nav-item" data-key="textmotion"><span>01</span> TEXT MOTION</a>
-        <a href="#section-kurama" class="drawer-nav-item" data-key="kurama"><span>02</span> KURAMA MODE</a>
-        <a href="#section-02" class="drawer-nav-item" data-key="arkanoid"><span>03</span> BRICK BREAKER</a>
-        <a href="#section-03" class="drawer-nav-item" data-key="puppet"><span>04</span> PUPPET MONSTER</a>
-        <a href="#section-04" class="drawer-nav-item" data-key="bubble"><span>05</span> BUBBLE POPPER</a>
-        <a href="#section-05" class="drawer-nav-item" data-key="slingshot"><span>06</span> SLINGSHOT SIEGE</a>
-        <a href="#section-06" class="drawer-nav-item" data-key="threed"><span>07</span> 3D DIMENSION</a>
-        <a href="#section-07" class="drawer-nav-item" data-key="morph"><span>08</span> VECTOR MORPH</a>
-        <a href="#section-08" class="drawer-nav-item" data-key="physics"><span>09</span> PHYSICS SANDBOX</a>
-        <a href="#section-uikit" class="drawer-nav-item" data-key="uikit"><span>10</span> ANIMATED UI KIT</a>
-        <a href="#section-synth" class="drawer-nav-item" data-key="synth"><span>11</span> PIANO & SYNTH</a>
-      </div>
-    </div>
 
     <!-- =========================================================================
          00. HERO SECTION — KINETIC LABORATORY PROLOGUE
