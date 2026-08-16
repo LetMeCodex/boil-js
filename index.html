@@ -368,22 +368,28 @@
     <!-- =========================================================================
          13. FINALE & FOOTER — KEEP MAKING THINGS MOVE
          ========================================================================= -->
-    <footer class="lab-footer-stage" role="contentinfo">
-      <div class="footer-registration-mark">+ LAB CONCLUSION</div>
-      <div class="footer-canvas-container">
-        <canvas id="footer-living-canvas"></canvas>
-      </div>
-      <div class="footer-content-overlay">
-        <h2 class="footer-headline">"KEEP MAKING THINGS MOVE."</h2>
-        <p class="footer-statement">Built by creative technologists who believe animation is the soul of software.</p>
+    <footer class="lab-footer-stage" id="section-footer" role="contentinfo">
+      <!-- Dedicated Ambient Animated Living Canvas Background -->
+      <canvas id="footer-living-canvas" class="footer-ambient-bg-canvas"></canvas>
 
-        <div class="footer-nav-row">
+      <!-- Glassmorphic Paper Overlay Content -->
+      <div class="footer-content-overlay" id="footer-content-wrapper">
+        <div class="footer-registration-mark">+ LAB CONCLUSION</div>
+        
+        <div class="footer-brand-emblem-wrap">
+          <canvas id="footer-emblem-canvas" width="220" height="90" class="footer-emblem-canvas"></canvas>
+        </div>
+
+        <h2 class="footer-headline" id="footer-headline">"KEEP MAKING THINGS MOVE."</h2>
+        <p class="footer-statement" id="footer-statement">Built by creative technologists who believe animation is the soul of software.</p>
+
+        <div class="footer-nav-row" id="footer-nav-row">
           <a href="#section-hero" class="footer-nav-link">Top of Laboratory ↑</a>
           <a href="https://github.com/LetMeCodex/boil-js" target="_blank" rel="noopener noreferrer" class="footer-nav-link">GitHub Repository ↗</a>
           <button id="footer-btn-shortcuts" class="footer-nav-link">Keyboard Shortcuts [?]</button>
         </div>
 
-        <div class="footer-bottom-bar">
+        <div class="footer-bottom-bar" id="footer-bottom-bar">
           <span>BOIL.JS // OPEN SOURCE EXPERIMENTAL LAB</span>
           <span>CRAFTED WITH ROUGH.JS & THREE.JS</span>
           <span>© 2026 MIT LICENSE</span>
