@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class AudioSynthScene {
   constructor(container, options = {}) {
@@ -94,15 +95,16 @@ export class AudioSynthScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-toggle-arp" class="tactile-btn amber">
-                <span id="arp-btn-text">🎵 Play Lo-Fi Arpeggio</span>
+                ${renderIcon('play')}
+                <span id="arp-btn-text">Play Lo-Fi Arpeggio</span>
               </button>
             </div>
           </div>
 
           <div class="canvas-wrapper" id="synth-canvas-wrap">
             <canvas id="synth-stage-canvas" class="main-stage-canvas"></canvas>
-            <div id="synth-hint" style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 9999px; pointer-events: none;">
-              🎹 Click hand-drawn piano keys or press A, S, D, F, G, H, J, K on your keyboard
+            <div id="synth-hint" style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Click hand-drawn piano keys or press A, S, D, F, G, H, J, K on keyboard
             </div>
           </div>
         </div>
@@ -111,9 +113,9 @@ export class AudioSynthScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎹 Synth Keyboard</span>
+              <span class="panel-title">SYNTH KEYBOARD</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-secondary);">Playable keys mapped to audio oscillators:</p>
+            <p style="font-size: 0.75rem; color: var(--ink-muted);">Playable keys mapped to audio oscillators:</p>
             <div style="display: flex; gap: 4px; justify-content: center; margin-top: 6px;">
               ${this.notes.map((n, i) => `
                 <button class="tactile-btn outline synth-key-btn" data-idx="${i}" style="padding: 10px 8px; font-size: 0.75rem; min-width: 32px; text-align: center;">
@@ -126,7 +128,7 @@ export class AudioSynthScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎛️ Audio Reactivity</span>
+              <span class="panel-title">AUDIO REACTIVITY</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -137,7 +139,8 @@ export class AudioSynthScene {
             </div>
             <div class="control-group">
               <button id="btn-synth-chord" class="tactile-btn primary" style="width: 100%;">
-                <span>✨ Play Warm Chord</span>
+                ${renderIcon('sparkle')}
+                <span>Play Warm Chord</span>
               </button>
             </div>
           </div>
@@ -233,10 +236,10 @@ export class AudioSynthScene {
 
   toggleArpeggio() {
     this.isPlayingArp = !this.isPlayingArp;
-    const btnText = document.getElementById('arp-btn-text');
+    const btn = document.getElementById('btn-toggle-arp');
 
     if (this.isPlayingArp) {
-      if (btnText) btnText.textContent = '⏸️ Stop Arpeggio';
+      if (btn) btn.innerHTML = `${renderIcon('pause')}<span id="arp-btn-text">Stop Arpeggio</span>`;
       const pattern = [0, 2, 4, 7, 4, 2, 1, 3, 5, 7, 5, 3];
       this.arpStep = 0;
       this.arpTimer = setInterval(() => {
@@ -245,7 +248,7 @@ export class AudioSynthScene {
         this.arpStep++;
       }, 160);
     } else {
-      if (btnText) btnText.textContent = '🎵 Play Lo-Fi Arpeggio';
+      if (btn) btn.innerHTML = `${renderIcon('play')}<span id="arp-btn-text">Play Lo-Fi Arpeggio</span>`;
       if (this.arpTimer) clearInterval(this.arpTimer);
     }
   }
@@ -402,8 +405,8 @@ export class AudioSynthScene {
       clearInterval(this.arpTimer);
       this.arpTimer = null;
       this.isPlayingArp = false;
-      const btnText = document.getElementById('arp-btn-text');
-      if (btnText) btnText.textContent = '🎵 Play Lo-Fi Arpeggio';
+      const btn = document.getElementById('btn-toggle-arp');
+      if (btn) btn.innerHTML = `${renderIcon('play')}<span id="arp-btn-text">Play Lo-Fi Arpeggio</span>`;
     }
     if (this.audioCtx && this.audioCtx.state === 'running') {
       this.audioCtx.suspend().catch(() => {});

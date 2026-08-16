@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class CalligraphyScene {
   constructor(container, options = {}) {
@@ -86,7 +87,8 @@ export class CalligraphyScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-replay-write" class="tactile-btn amber">
-                <span>🔄 Replay Write-On</span>
+                ${renderIcon('reset')}
+                <span>Replay Write-On</span>
               </button>
             </div>
           </div>
@@ -100,7 +102,7 @@ export class CalligraphyScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">✒️ Phrases & Scripts</span>
+              <span class="panel-title">PHRASES & SCRIPTS</span>
             </div>
             <div class="style-pills-grid" style="grid-template-columns: 1fr;">
               <button class="style-pill-btn active" data-preset="Handcrafted Motion">"Handcrafted Motion"</button>
@@ -110,7 +112,7 @@ export class CalligraphyScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⏱️ Scrub & Timeline</span>
+              <span class="panel-title">SCRUB & TIMELINE</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -130,7 +132,7 @@ export class CalligraphyScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎨 Ink & Stroke</span>
+              <span class="panel-title">INK & STROKE</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">

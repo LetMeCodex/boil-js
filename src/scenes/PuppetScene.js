@@ -4,6 +4,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class PuppetScene {
   constructor(container, options = {}) {
@@ -35,18 +36,20 @@ export class PuppetScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-puppet-tickle" class="tactile-btn amber">
-                <span>🪶 Tickle Creature</span>
+                ${renderIcon('sparkle')}
+                <span>Tickle Creature</span>
               </button>
               <button id="btn-puppet-party" class="tactile-btn primary">
-                <span>🎉 Party Mode</span>
+                ${renderIcon('zap')}
+                <span>Party Mode</span>
               </button>
             </div>
           </div>
 
           <div class="canvas-wrapper" id="puppet-canvas-wrap" style="min-height: 500px; user-select: none;">
             <canvas id="puppet-stage-canvas" class="main-stage-canvas"></canvas>
-            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(8px); padding: 4px 12px; border-radius: 9999px; pointer-events: none;">
-              🖱️ Grab tentacles / limbs to fling & stretch • Feed snacks with buttons
+            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Grab tentacles or limbs to fling & stretch • Feed snacks with buttons
             </div>
           </div>
         </div>
@@ -56,37 +59,37 @@ export class PuppetScene {
           <!-- Feed Snacks Section -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🍩 Feed Creature Snacks</span>
+              <span class="panel-title">FEED CREATURE SNACKS</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-secondary);">Drop delicious boiling snacks for the creature to chomp:</p>
+            <p style="font-size: 0.75rem; color: var(--ink-muted);">Drop boiling kinetic snacks for the creature to chomp:</p>
             <div class="style-pills-grid" style="grid-template-columns: 1fr 1fr 1fr; margin-top: 6px;">
-              <button class="tactile-btn outline" id="btn-feed-donut">🍩 Donut</button>
-              <button class="tactile-btn outline" id="btn-feed-apple">🍎 Apple</button>
-              <button class="tactile-btn outline" id="btn-feed-fish">🐟 Fish</button>
+              <button class="tactile-btn outline" id="btn-feed-donut">${renderIcon('donut')}<span>Donut</span></button>
+              <button class="tactile-btn outline" id="btn-feed-apple">${renderIcon('apple')}<span>Apple</span></button>
+              <button class="tactile-btn outline" id="btn-feed-fish">${renderIcon('fish')}<span>Fish</span></button>
             </div>
           </div>
 
           <!-- Creature Model & Costumes -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎩 Dress-Up Costumes</span>
+              <span class="panel-title">DRESS-UP COSTUMES</span>
             </div>
             <div class="style-pills-grid" id="costume-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="style-pill-btn active" data-costume="sunglasses">🕶️ Cool Shades</button>
-              <button class="style-pill-btn" data-costume="partyhat">🥳 Party Hat</button>
-              <button class="style-pill-btn" data-costume="crown">👑 Royal Crown</button>
-              <button class="style-pill-btn" data-costume="none">🚫 No Costume</button>
+              <button class="style-pill-btn active" data-costume="sunglasses">${renderIcon('shades')}<span>Cool Shades</span></button>
+              <button class="style-pill-btn" data-costume="partyhat">${renderIcon('partyhat')}<span>Party Hat</span></button>
+              <button class="style-pill-btn" data-costume="crown">${renderIcon('crown')}<span>Royal Crown</span></button>
+              <button class="style-pill-btn" data-costume="none">${renderIcon('ban')}<span>No Costume</span></button>
             </div>
           </div>
 
           <!-- Creature Switcher -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🐙 Creature Type</span>
+              <span class="panel-title">CREATURE TYPE</span>
             </div>
             <div class="style-pills-grid" id="creature-type-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="style-pill-btn active" data-type="octopus">🐙 Jelly Octopus</button>
-              <button class="style-pill-btn" data-type="ragdoll">🤖 Ragdoll Bot</button>
+              <button class="style-pill-btn active" data-type="octopus">${renderIcon('octopus')}<span>Jelly Octopus</span></button>
+              <button class="style-pill-btn" data-type="ragdoll">${renderIcon('ragdoll')}<span>Ragdoll Bot</span></button>
             </div>
           </div>
         </div>

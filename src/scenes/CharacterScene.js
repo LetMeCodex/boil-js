@@ -2,6 +2,7 @@ import rough from 'roughjs';
 import anime from 'animejs';
 import { BoilShape, BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class CharacterScene {
   constructor(container, options = {}) {
@@ -38,10 +39,12 @@ export class CharacterScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-reseed-char" class="tactile-btn outline" title="Generate new rough seeds">
-                <span>🎲 Reseed</span>
+                ${renderIcon('dice')}
+                <span>Reseed</span>
               </button>
               <button id="btn-wave-char" class="tactile-btn amber" title="Trigger waving gesture">
-                <span>👋 Wave Hello</span>
+                ${renderIcon('sparkle')}
+                <span>Wave Hello</span>
               </button>
             </div>
           </div>
@@ -54,19 +57,19 @@ export class CharacterScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎭 Mascot Actions</span>
+              <span class="panel-title">MASCOT ACTIONS</span>
             </div>
             <div class="style-pills-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="tactile-btn outline" id="btn-action-dance">🕺 Dance</button>
-              <button class="tactile-btn outline" id="btn-action-jump">🦘 Jump</button>
-              <button class="tactile-btn outline" id="btn-action-blink">👀 Blink</button>
-              <button class="tactile-btn outline" id="btn-action-fly">✈️ Fly Plane</button>
+              <button class="tactile-btn outline" id="btn-action-dance">${renderIcon('sparkle')}<span>Dance</span></button>
+              <button class="tactile-btn outline" id="btn-action-jump">${renderIcon('rocket')}<span>Jump</span></button>
+              <button class="tactile-btn outline" id="btn-action-blink">${renderIcon('shades')}<span>Blink</span></button>
+              <button class="tactile-btn outline" id="btn-action-fly">${renderIcon('origami')}<span>Fly Plane</span></button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🍃 Environmental Physics</span>
+              <span class="panel-title">ENVIRONMENTAL PHYSICS</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">

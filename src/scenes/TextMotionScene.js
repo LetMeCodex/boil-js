@@ -5,28 +5,23 @@ import { BezierTrajectoryEngine } from '../engine/BezierTrajectoryEngine.js';
 import { createTextMotionMaterial } from '../engine/TextMotionShaders.js';
 import { CameraRig } from '../engine/CameraRig.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class TextMotionScene {
   constructor(container, options = {}) {
     this.container = container;
     this.options = options;
-    this.renderLoop = null;
-
+    this.particleCount = 14000;
     this.progress = 0;
     this.targetProgress = 0;
-    this.scrollVelocity = 0;
-    this.lastScrollTime = performance.now();
-    this.lastPhase = 0;
-
-    this.particleCount = 14000;
-    this.svgMode = false;
     this.turbulence = 1.0;
     this.reducedMotion = false;
     this.isPlaying = false;
-    this.autoPlayAnim = null;
+    this.svgMode = false;
+    this.running = true;
 
-    this.mouse = new THREE.Vector3(0, 0, 0);
-    this.mousePlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), 0);
+    this.mouse = new THREE.Vector2(0, 0);
+    this.mouseTarget = new THREE.Vector2(0, 0);
     this.raycaster = new THREE.Raycaster();
     this.mouseActive = 0;
 
@@ -47,11 +42,11 @@ export class TextMotionScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-text-autoplay" class="tactile-btn amber">
-                <span id="text-play-icon">▶️</span>
+                <span id="text-play-icon">${renderIcon('play')}</span>
                 <span id="text-play-text">Auto-Play</span>
               </button>
               <button id="btn-text-svg" class="tactile-btn outline">
-                <span>🔲 2D SVG Mode</span>
+                <span>2D SVG Mode</span>
               </button>
             </div>
           </div>
@@ -84,8 +79,8 @@ export class TextMotionScene {
             </div>
 
             <!-- Stage Bottom HUD Hint -->
-            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(10px); padding: 4px 14px; border-radius: 9999px; pointer-events: none; border: 1px solid var(--border-subtle);">
-              🖱️ Scroll mouse wheel or drag timeline to scrub transformation (Reversible)
+            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Scroll mouse wheel or drag timeline to scrub transformation (Reversible)
             </div>
           </div>
         </div>
@@ -94,7 +89,7 @@ export class TextMotionScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⏱️ Master Timeline Scrub</span>
+              <span class="panel-title">MASTER TIMELINE SCRUB</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -103,15 +98,15 @@ export class TextMotionScene {
               </div>
               <input type="range" id="slider-text-progress" min="0" max="100" value="0" step="0.5" class="custom-range">
             </div>
-            <div id="text-phase-desc-card" style="padding: 10px 14px; background: var(--bg-surface-alt); border-radius: 8px; font-size: 0.78rem; line-height: 1.5; color: var(--text-secondary); border: 1px solid var(--border-subtle);">
-              <strong id="phase-title-text" style="color: var(--accent-amber); display: block; margin-bottom: 2px;">PHASE 01: SOLID TYPOGRAPHY</strong>
+            <div id="text-phase-desc-card" style="padding: 10px 14px; background: var(--paper); border-radius: var(--radius-xs); font-size: 0.75rem; line-height: 1.5; color: var(--ink-soft); border: 1px solid var(--line);">
+              <strong id="phase-title-text" style="color: var(--orange); display: block; margin-bottom: 2px;">PHASE 01: SOLID TYPOGRAPHY</strong>
               <span id="phase-body-text">Dense 3D BufferGeometry in architectural typography with harmonic breathing.</span>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🌌 Particle Cloud Config</span>
+              <span class="panel-title">PARTICLE CLOUD CONFIG</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -134,9 +129,9 @@ export class TextMotionScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">📐 Mathematical Spec</span>
+              <span class="panel-title">MATHEMATICAL SPEC</span>
             </div>
-            <p style="font-size: 0.75rem; font-family: 'Fira Code', monospace; line-height: 1.6; color: var(--text-muted);">
+            <p style="font-size: 0.72rem; font-family: 'Fira Code', monospace; line-height: 1.6; color: var(--ink-muted);">
               B(t) = (1-t)³P₀ + 3(1-t)²tP₁ + 3(1-t)t²P₂ + t³P₃<br>
               P₀ ∈ [CREATE] ➔ P₃ ∈ [MATTER]
             </p>
@@ -316,7 +311,7 @@ export class TextMotionScene {
     const text = document.getElementById('text-play-text');
 
     if (this.isPlaying) {
-      if (icon) icon.textContent = '⏸️';
+      if (icon) icon.innerHTML = renderIcon('pause');
       if (text) text.textContent = 'Pause';
 
       const animObj = { p: this.targetProgress };
@@ -332,7 +327,7 @@ export class TextMotionScene {
         }
       });
     } else {
-      if (icon) icon.textContent = '▶️';
+      if (icon) icon.innerHTML = renderIcon('play');
       if (text) text.textContent = 'Auto-Play';
       if (this.autoPlayAnim) this.autoPlayAnim.pause();
     }
@@ -344,7 +339,7 @@ export class TextMotionScene {
     const btn = document.getElementById('btn-text-svg');
     if (btn) {
       btn.classList.toggle('active', this.svgMode);
-      btn.innerHTML = `<span>${this.svgMode ? '🎨 2D SVG Active' : '🔲 2D SVG Mode'}</span>`;
+      btn.innerHTML = `<span>${this.svgMode ? '2D SVG Active' : '2D SVG Mode'}</span>`;
     }
   }
 

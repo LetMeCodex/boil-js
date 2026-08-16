@@ -2,6 +2,7 @@ import rough from 'roughjs';
 import anime from 'animejs';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class ChartsScene {
   constructor(container, options = {}) {
@@ -42,7 +43,8 @@ export class ChartsScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-randomize-data" class="tactile-btn amber">
-                <span>📊 Randomize Dataset</span>
+                ${renderIcon('dice')}
+                <span>Randomize Dataset</span>
               </button>
             </div>
           </div>
@@ -56,11 +58,11 @@ export class ChartsScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">📈 Metric Breakdown</span>
+              <span class="panel-title">METRIC BREAKDOWN</span>
             </div>
             <div id="chart-metrics-list" style="display: flex; flex-direction: column; gap: 8px; font-size: 0.82rem;">
               ${this.data.map(d => `
-                <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: var(--bg-surface-alt); border-radius: 6px;">
+                <div style="display: flex; align-items: center; justify-content: space-between; padding: 4px 8px; background: var(--paper); border: 1px solid var(--line); border-radius: var(--radius-xs);">
                   <span style="display: flex; align-items: center; gap: 6px;">
                     <span style="width: 10px; height: 10px; border-radius: 2px; background: ${d.color};"></span>
                     <strong>${d.label}</strong>
@@ -73,19 +75,19 @@ export class ChartsScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🍩 Traffic Distribution</span>
+              <span class="panel-title">TRAFFIC DISTRIBUTION</span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);">
-              <div style="display: flex; justify-content: space-between;">
-                <span>🟡 Organic Search</span>
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--ink-soft);">
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #D97706;"></span>Organic Search</span>
                 <span>40%</span>
               </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span>🟢 Direct Referral</span>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #059669;"></span>Direct Referral</span>
                 <span>35%</span>
               </div>
-              <div style="display: flex; justify-content: space-between;">
-                <span>🟣 Social Motion</span>
+              <div style="display: flex; justify-content: space-between; align-items: center;">
+                <span style="display: flex; align-items: center; gap: 6px;"><span style="width: 8px; height: 8px; border-radius: 50%; background: #4F46E5;"></span>Social Motion</span>
                 <span>25%</span>
               </div>
             </div>

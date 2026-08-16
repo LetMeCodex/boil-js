@@ -30,7 +30,7 @@ export class KeyboardDirector {
     modal.innerHTML = `
       <div class="dev-modal-card">
         <div class="dev-modal-header">
-          <div class="dev-modal-title">⌨️ LABORATORY KEYBOARD SHORTCUTS</div>
+          <div class="dev-modal-title">LABORATORY KEYBOARD SHORTCUTS</div>
           <button class="dev-modal-close" aria-label="Close">&times;</button>
         </div>
         <div class="dev-modal-body">
@@ -38,7 +38,7 @@ export class KeyboardDirector {
             <div class="shortcut-row"><kbd>1</kbd> – <kbd>9</kbd><span>Jump to Chapters 01 – 09</span></div>
             <div class="shortcut-row"><kbd>U</kbd><span>Jump to UI Kit Lab</span></div>
             <div class="shortcut-row"><kbd>P</kbd><span>Jump to Piano / Synth Lab</span></div>
-            <div class="shortcut-row"><kbd>B</kbd><span>⚡ Trigger Boil Chaos Storm</span></div>
+            <div class="shortcut-row"><kbd>B</kbd><span>Trigger Boil Chaos Storm</span></div>
             <div class="shortcut-row"><kbd>M</kbd><span>Toggle Audio Mute / Sound</span></div>
             <div class="shortcut-row"><kbd>T</kbd><span>Toggle Theme (Parchment / Dark)</span></div>
             <div class="shortcut-row"><kbd>?</kbd><span>Open This Shortcuts Guide</span></div>

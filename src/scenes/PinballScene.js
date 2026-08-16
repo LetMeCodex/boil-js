@@ -4,6 +4,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class PinballScene {
   constructor(container, options = {}) {
@@ -44,10 +45,12 @@ export class PinballScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-pinball-multiball" class="tactile-btn amber">
-                <span>💥 Multiball (4x)</span>
+                ${renderIcon('multiball')}
+                <span>Multiball (4x)</span>
               </button>
               <button id="btn-pinball-reset" class="tactile-btn outline">
-                <span>🔄 New Game</span>
+                ${renderIcon('reset')}
+                <span>New Game</span>
               </button>
             </div>
           </div>
@@ -57,14 +60,15 @@ export class PinballScene {
 
             <!-- On-Screen Flipper Controls (Touch & Click) -->
             <div style="position: absolute; bottom: 16px; left: 24px; right: 24px; display: flex; justify-content: space-between; pointer-events: none;">
-              <button id="btn-flip-left" class="tactile-btn primary" style="pointer-events: auto; padding: 12px 24px; font-size: 1rem; border-radius: 9999px; box-shadow: var(--shadow-lg);">
-                <span>◀ LEFT FLIPPER (A)</span>
+              <button id="btn-flip-left" class="tactile-btn primary" style="pointer-events: auto;">
+                <span>LEFT FLIPPER (A)</span>
               </button>
-              <button id="btn-plunger-pull" class="tactile-btn amber" style="pointer-events: auto; padding: 12px 20px; font-size: 0.9rem; border-radius: 9999px; box-shadow: var(--shadow-lg);">
-                <span>🚀 LAUNCH BALL (SPACE)</span>
+              <button id="btn-plunger-pull" class="tactile-btn amber" style="pointer-events: auto;">
+                ${renderIcon('rocket')}
+                <span>LAUNCH BALL (SPACE)</span>
               </button>
-              <button id="btn-flip-right" class="tactile-btn primary" style="pointer-events: auto; padding: 12px 24px; font-size: 1rem; border-radius: 9999px; box-shadow: var(--shadow-lg);">
-                <span>RIGHT FLIPPER (D) ▶</span>
+              <button id="btn-flip-right" class="tactile-btn primary" style="pointer-events: auto;">
+                <span>RIGHT FLIPPER (D)</span>
               </button>
             </div>
           </div>
@@ -73,17 +77,17 @@ export class PinballScene {
         <!-- Controls & Scoreboard Panel -->
         <div class="controls-panel">
           <!-- Arcade Scoreboard Card -->
-          <div class="panel-card" style="background: var(--bg-surface-alt); border: 2px solid var(--accent-amber);">
+          <div class="panel-card" style="background: var(--paper-card); border: 1px solid var(--orange);">
             <div class="panel-header">
-              <span class="panel-title">🏆 Arcade Scoreboard</span>
+              <span class="panel-title">ARCADE SCOREBOARD</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 8px; text-align: center; padding: 6px 0;">
-              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--accent-amber); line-height: 1;" id="hud-pinball-score">
+              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--orange); line-height: 1;" id="hud-pinball-score">
                 000,000
               </div>
               <div style="display: flex; justify-content: space-around; font-size: 0.78rem; font-family: 'Space Grotesk', sans-serif;">
-                <span>MULTIPLIER: <strong id="hud-pinball-mult" style="color: var(--accent-sage);">1x</strong></span>
-                <span>COMBO: <strong id="hud-pinball-combo" style="color: var(--accent-terracotta);">0</strong></span>
+                <span>MULTIPLIER: <strong id="hud-pinball-mult" style="color: var(--emerald);">1x</strong></span>
+                <span>COMBO: <strong id="hud-pinball-combo" style="color: var(--vermillion);">0</strong></span>
                 <span>BALLS: <strong id="hud-pinball-balls">3</strong></span>
               </div>
             </div>
@@ -92,9 +96,9 @@ export class PinballScene {
           <!-- Controls Guide -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎮 Arcade Controls</span>
+              <span class="panel-title">ARCADE CONTROLS</span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--ink-soft);">
               <div><kbd>A</kbd> or <kbd>←</kbd> : Left Flipper</div>
               <div><kbd>D</kbd> or <kbd>→</kbd> : Right Flipper</div>
               <div><kbd>Space</kbd> (Hold & Release) : Spring Plunger</div>
@@ -104,7 +108,7 @@ export class PinballScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⚡ Bumper Tuning</span>
+              <span class="panel-title">BUMPER TUNING</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">

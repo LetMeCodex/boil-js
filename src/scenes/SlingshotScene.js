@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 /**
  * ============================================================================
@@ -56,10 +57,12 @@ export class SlingshotScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-slingshot-shockwave" class="tactile-btn amber">
-                <span>💥 Ink Shockwave</span>
+                ${renderIcon('sparkle')}
+                <span>Ink Shockwave</span>
               </button>
               <button id="btn-slingshot-reset" class="tactile-btn outline">
-                <span>🔄 Reset Castle</span>
+                ${renderIcon('reset')}
+                <span>Reset Castle</span>
               </button>
             </div>
           </div>
@@ -69,14 +72,17 @@ export class SlingshotScene {
 
             <!-- On-Screen Ammo Selector -->
             <div style="position: absolute; bottom: 16px; left: 24px; display: flex; gap: 10px;">
-              <button id="btn-ammo-boulder" class="tactile-btn primary active" style="padding: 10px 16px; font-size: 0.85rem; border-radius: 9999px;">
-                <span>🪨 Boulder</span>
+              <button id="btn-ammo-boulder" class="tactile-btn primary active">
+                ${renderIcon('crystal')}
+                <span>Boulder</span>
               </button>
-              <button id="btn-ammo-bomb" class="tactile-btn outline" style="padding: 10px 16px; font-size: 0.85rem; border-radius: 9999px;">
-                <span>💣 Ink Bomb</span>
+              <button id="btn-ammo-bomb" class="tactile-btn outline">
+                ${renderIcon('bomb')}
+                <span>Ink Bomb</span>
               </button>
-              <button id="btn-ammo-cluster" class="tactile-btn outline" style="padding: 10px 16px; font-size: 0.85rem; border-radius: 9999px;">
-                <span>🍇 Cluster</span>
+              <button id="btn-ammo-cluster" class="tactile-btn outline">
+                ${renderIcon('cluster')}
+                <span>Cluster</span>
               </button>
             </div>
           </div>
@@ -85,17 +91,17 @@ export class SlingshotScene {
         <!-- Controls & Scoreboard Panel -->
         <div class="controls-panel">
           <!-- Scoreboard Card -->
-          <div class="panel-card" style="background: var(--bg-surface-alt); border: 2px solid var(--accent-terracotta);">
+          <div class="panel-card" style="background: var(--paper-card); border: 1px solid var(--orange);">
             <div class="panel-header">
-              <span class="panel-title">🏰 Demolition Scoreboard</span>
+              <span class="panel-title">DEMOLITION SCOREBOARD</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 8px; text-align: center; padding: 6px 0;">
-              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--accent-terracotta); line-height: 1;" id="hud-slingshot-score">
+              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--orange); line-height: 1;" id="hud-slingshot-score">
                 000,000
               </div>
               <div style="display: flex; justify-content: space-around; font-size: 0.78rem; font-family: 'Space Grotesk', sans-serif;">
-                <span>DESTRUCTION: <strong id="hud-slingshot-pct" style="color: var(--accent-amber);">0%</strong></span>
-                <span>SHOTS LEFT: <strong id="hud-slingshot-shots" style="color: var(--accent-sage);">5</strong></span>
+                <span>DESTRUCTION: <strong id="hud-slingshot-pct" style="color: var(--orange);">0%</strong></span>
+                <span>SHOTS LEFT: <strong id="hud-slingshot-shots" style="color: var(--emerald);">5</strong></span>
               </div>
             </div>
           </div>
@@ -103,19 +109,19 @@ export class SlingshotScene {
           <!-- Controls Guide -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎯 Siege Instructions</span>
+              <span class="panel-title">SIEGE INSTRUCTIONS</span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--ink-soft);">
               <div><kbd>Click & Drag</kbd> slingshot pouch backwards to aim.</div>
               <div><kbd>Release</kbd> to launch projectile!</div>
-              <div><kbd>Space</kbd> or <kbd>Click during flight</kbd> to detonate / split ammo.</div>
+              <div><kbd>Space</kbd> or <kbd>Click</kbd> during flight to detonate / split ammo.</div>
             </div>
           </div>
 
           <!-- Gravity & Power Tuning -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⚙️ Catapult Power</span>
+              <span class="panel-title">CATAPULT POWER</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">

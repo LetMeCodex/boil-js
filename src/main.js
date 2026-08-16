@@ -187,8 +187,7 @@ class ShowcaseApp {
         window.BOIL_DEBUG.reportSceneError(exp.key, err);
         container.innerHTML = `
           <div class="scene-error-card" style="padding: 40px; text-align: center; border: 2px dashed #DC2626; border-radius: 12px; background: rgba(220, 38, 38, 0.05); margin: 20px;">
-            <div style="font-size: 2rem; margin-bottom: 8px;">⚠️</div>
-            <div style="font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: #DC2626;">EXPERIMENT TEMPORARILY UNAVAILABLE</div>
+            <div style="font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: #DC2626; letter-spacing: 0.05em;">[ EXPERIMENT TEMPORARILY UNAVAILABLE ]</div>
             <div style="font-size: 0.85rem; color: var(--ink-muted); margin-top: 6px; font-family: 'Fira Code', monospace;">${exp.title} (${exp.key})</div>
             <p style="font-size: 0.8rem; margin-top: 12px; color: var(--ink-muted);">${err.message || 'Scene failed to initialize'}</p>
           </div>

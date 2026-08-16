@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class UiKitScene {
   constructor(container, options = {}) {
@@ -38,10 +39,12 @@ export class UiKitScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-reseed-ui" class="tactile-btn outline">
-                <span>🎲 Reseed UI</span>
+                ${renderIcon('dice')}
+                <span>Reseed UI</span>
               </button>
               <button id="btn-open-modal" class="tactile-btn amber">
-                <span>💬 Open Hand-Drawn Modal</span>
+                ${renderIcon('chat')}
+                <span>Open Modal</span>
               </button>
             </div>
           </div>
@@ -55,9 +58,9 @@ export class UiKitScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🕹️ Interactive UI Controls</span>
+              <span class="panel-title">INTERACTIVE UI CONTROLS</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-secondary);">
+            <p style="font-size: 0.78rem; color: var(--ink-soft);">
               Click directly on the hand-drawn elements on the canvas to interact with tactile Anime.js physics:
             </p>
             <div class="control-group">
@@ -69,17 +72,18 @@ export class UiKitScene {
             </div>
             <div class="control-group">
               <button id="btn-trigger-celebrate" class="tactile-btn primary" style="width: 100%;">
-                <span>🎉 Trigger Rough Confetti</span>
+                ${renderIcon('sparkle')}
+                <span>Trigger Rough Confetti</span>
               </button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">💡 Design Architecture</span>
+              <span class="panel-title">DESIGN ARCHITECTURE</span>
             </div>
-            <p style="font-size: 0.78rem; line-height: 1.6; color: var(--text-secondary);">
-              Every UI widget (Button, Slider, Switch, Radio) maintains a <strong>4-frame seed buffer</strong> that rotates at 10 FPS. Hover and active clicks trigger instant spring physics at 60 FPS without redrawing rough geometries from scratch.
+            <p style="font-size: 0.75rem; line-height: 1.6; color: var(--ink-muted);">
+              Every UI widget (Button, Slider, Switch, Radio) maintains a <strong>4-frame seed buffer</strong> that rotates at 10 FPS. Hover and active clicks trigger instant spring physics at 60 FPS.
             </p>
           </div>
         </div>

@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class SpaceBlasterScene {
   constructor(container, options = {}) {
@@ -48,10 +49,12 @@ export class SpaceBlasterScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-space-bomb" class="tactile-btn amber">
-                <span>💣 Ink Shockwave</span>
+                ${renderIcon('bomb')}
+                <span>Ink Shockwave</span>
               </button>
               <button id="btn-space-restart" class="tactile-btn outline">
-                <span>🔄 Restart</span>
+                ${renderIcon('reset')}
+                <span>Restart</span>
               </button>
             </div>
           </div>
@@ -62,12 +65,12 @@ export class SpaceBlasterScene {
             <!-- Touch / Click Controls -->
             <div style="position: absolute; bottom: 16px; left: 24px; right: 24px; display: flex; justify-content: space-between; pointer-events: none;">
               <div style="display: flex; gap: 8px;">
-                <button id="btn-ship-left" class="tactile-btn primary" style="pointer-events: auto; padding: 10px 18px; border-radius: 9999px;">◀ ROTATE (A)</button>
-                <button id="btn-ship-right" class="tactile-btn primary" style="pointer-events: auto; padding: 10px 18px; border-radius: 9999px;">ROTATE ▶ (D)</button>
+                <button id="btn-ship-left" class="tactile-btn primary" style="pointer-events: auto;"><span>ROTATE LEFT (A)</span></button>
+                <button id="btn-ship-right" class="tactile-btn primary" style="pointer-events: auto;"><span>ROTATE RIGHT (D)</span></button>
               </div>
               <div style="display: flex; gap: 8px;">
-                <button id="btn-ship-thrust" class="tactile-btn amber" style="pointer-events: auto; padding: 10px 20px; border-radius: 9999px;">🚀 THRUST (W)</button>
-                <button id="btn-ship-fire" class="tactile-btn primary" style="pointer-events: auto; padding: 10px 22px; border-radius: 9999px; background: var(--accent-terracotta);">🔥 FIRE (SPACE)</button>
+                <button id="btn-ship-thrust" class="tactile-btn amber" style="pointer-events: auto;">${renderIcon('rocket')}<span>THRUST (W)</span></button>
+                <button id="btn-ship-fire" class="tactile-btn primary" style="pointer-events: auto;">${renderIcon('flame')}<span>FIRE (SPACE)</span></button>
               </div>
             </div>
           </div>
@@ -76,17 +79,17 @@ export class SpaceBlasterScene {
         <!-- Controls & Scoreboard Panel -->
         <div class="controls-panel">
           <!-- Arcade Scoreboard -->
-          <div class="panel-card" style="background: var(--bg-surface-alt); border: 2px solid var(--accent-amber);">
+          <div class="panel-card" style="background: var(--paper-card); border: 1px solid var(--orange);">
             <div class="panel-header">
-              <span class="panel-title">🚀 Asteroids Scoreboard</span>
+              <span class="panel-title">ASTEROIDS SCOREBOARD</span>
             </div>
             <div style="text-align: center; padding: 6px 0;">
-              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--accent-amber);" id="hud-space-score">
+              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--orange);" id="hud-space-score">
                 000,000
               </div>
               <div style="display: flex; justify-content: space-around; font-size: 0.8rem; margin-top: 4px;">
-                <span>LIVES: <strong id="hud-space-lives" style="color: var(--accent-terracotta);">❤️❤️❤️</strong></span>
-                <span>SHIELD: <strong id="hud-space-shield" style="color: var(--accent-sage);">100%</strong></span>
+                <span>LIVES: <strong id="hud-space-lives" style="color: var(--vermillion);">3</strong></span>
+                <span>SHIELD: <strong id="hud-space-shield" style="color: var(--emerald);">100%</strong></span>
               </div>
             </div>
           </div>
@@ -94,9 +97,9 @@ export class SpaceBlasterScene {
           <!-- Controls Guide -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🕹️ Flight Controls</span>
+              <span class="panel-title">FLIGHT CONTROLS</span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--ink-soft);">
               <div><kbd>W</kbd> or <kbd>↑</kbd> : Rocket Thrusters</div>
               <div><kbd>A</kbd> / <kbd>D</kbd> or <kbd>←</kbd> / <kbd>→</kbd> : Rotate Ship</div>
               <div><kbd>Space</kbd> : Fire Ink Laser Bullets</div>
@@ -107,7 +110,7 @@ export class SpaceBlasterScene {
           <!-- Weapon Power-Up -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⚡ Weapon Upgrades</span>
+              <span class="panel-title">WEAPON UPGRADES</span>
             </div>
             <div class="style-pills-grid" id="space-weapon-grid" style="grid-template-columns: 1fr 1fr;">
               <button class="style-pill-btn active" data-weapon="single">Single Laser</button>

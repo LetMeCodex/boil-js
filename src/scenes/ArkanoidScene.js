@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 /**
  * ============================================================================
@@ -62,13 +63,16 @@ export class ArkanoidScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-arkanoid-multiball" class="tactile-btn amber">
-                <span>💥 Multiball (3x)</span>
+                ${renderIcon('multiball')}
+                <span>Multiball (3x)</span>
               </button>
               <button id="btn-arkanoid-laser" class="tactile-btn sage">
-                <span>⚡ Laser Paddle</span>
+                ${renderIcon('zap')}
+                <span>Laser Paddle</span>
               </button>
               <button id="btn-arkanoid-reset" class="tactile-btn outline">
-                <span>🔄 New Game</span>
+                ${renderIcon('reset')}
+                <span>New Game</span>
               </button>
             </div>
           </div>
@@ -78,14 +82,15 @@ export class ArkanoidScene {
 
             <!-- On-Screen Paddle Controls -->
             <div style="position: absolute; bottom: 16px; left: 24px; right: 24px; display: flex; justify-content: space-between; pointer-events: none;">
-              <button id="btn-pad-left" class="tactile-btn primary" style="pointer-events: auto; padding: 12px 24px; font-size: 1rem; border-radius: 9999px; box-shadow: var(--shadow-lg);">
-                <span>◀ MOVE LEFT (A)</span>
+              <button id="btn-pad-left" class="tactile-btn primary" style="pointer-events: auto;">
+                <span>LEFT (A)</span>
               </button>
-              <button id="btn-launch-ball" class="tactile-btn amber" style="pointer-events: auto; padding: 12px 20px; font-size: 0.9rem; border-radius: 9999px; box-shadow: var(--shadow-lg);">
-                <span>🚀 LAUNCH / FIRE (SPACE)</span>
+              <button id="btn-launch-ball" class="tactile-btn amber" style="pointer-events: auto;">
+                ${renderIcon('rocket')}
+                <span>LAUNCH / FIRE (SPACE)</span>
               </button>
-              <button id="btn-pad-right" class="tactile-btn primary" style="pointer-events: auto; padding: 12px 24px; font-size: 1rem; border-radius: 9999px; box-shadow: var(--shadow-lg);">
-                <span>MOVE RIGHT (D) ▶</span>
+              <button id="btn-pad-right" class="tactile-btn primary" style="pointer-events: auto;">
+                <span>RIGHT (D)</span>
               </button>
             </div>
           </div>
@@ -94,17 +99,17 @@ export class ArkanoidScene {
         <!-- Controls & Scoreboard Panel -->
         <div class="controls-panel">
           <!-- Arcade Scoreboard Card -->
-          <div class="panel-card" style="background: var(--bg-surface-alt); border: 2px solid var(--accent-amber);">
+          <div class="panel-card" style="background: var(--paper-card); border: 1px solid var(--orange);">
             <div class="panel-header">
-              <span class="panel-title">🏆 Arcade Scoreboard</span>
+              <span class="panel-title">ARCADE SCOREBOARD</span>
             </div>
             <div style="display: flex; flex-direction: column; gap: 8px; text-align: center; padding: 6px 0;">
-              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--accent-amber); line-height: 1;" id="hud-arkanoid-score">
+              <div style="font-family: 'Fira Code', monospace; font-size: 2.2rem; font-weight: 800; color: var(--orange); line-height: 1;" id="hud-arkanoid-score">
                 000,000
               </div>
               <div style="display: flex; justify-content: space-around; font-size: 0.78rem; font-family: 'Space Grotesk', sans-serif;">
-                <span>COMBO: <strong id="hud-arkanoid-combo" style="color: var(--accent-terracotta);">0x</strong></span>
-                <span>LIVES: <strong id="hud-arkanoid-lives" style="color: var(--accent-sage);">❤️❤️❤️</strong></span>
+                <span>COMBO: <strong id="hud-arkanoid-combo" style="color: var(--vermillion);">0x</strong></span>
+                <span>LIVES: <strong id="hud-arkanoid-lives" style="color: var(--emerald);">3</strong></span>
                 <span>LEVEL: <strong id="hud-arkanoid-level">1</strong></span>
               </div>
             </div>
@@ -113,9 +118,9 @@ export class ArkanoidScene {
           <!-- Controls Guide -->
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎮 Arcade Controls</span>
+              <span class="panel-title">ARCADE CONTROLS</span>
             </div>
-            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.8rem; color: var(--text-secondary);">
+            <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--ink-soft);">
               <div><kbd>Mouse</kbd> or <kbd>Touch</kbd> : Direct Paddle Aim</div>
               <div><kbd>A</kbd> / <kbd>D</kbd> or <kbd>←</kbd> / <kbd>→</kbd> : Move Paddle</div>
               <div><kbd>Space</kbd> : Launch Ball / Shoot Lasers</div>
@@ -124,7 +129,7 @@ export class ArkanoidScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⚡ Ball Speed Tuning</span>
+              <span class="panel-title">BALL SPEED TUNING</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -394,7 +399,7 @@ export class ArkanoidScene {
 
     const livesEl = document.getElementById('hud-arkanoid-lives');
     if (livesEl) {
-      livesEl.textContent = '❤️'.repeat(Math.max(0, this.lives));
+      livesEl.textContent = Math.max(0, this.lives);
     }
 
     const levelEl = document.getElementById('hud-arkanoid-level');

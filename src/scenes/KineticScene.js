@@ -2,6 +2,7 @@ import rough from 'roughjs';
 import anime from 'animejs';
 import { BoilShape, BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class KineticScene {
   constructor(container, options = {}) {
@@ -40,10 +41,11 @@ export class KineticScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-reseed-kinetic" class="tactile-btn outline" title="Generate new rough seeds">
-                <span>🎲 Reseed</span>
+                ${renderIcon('dice')}
+                <span>Reseed</span>
               </button>
               <button id="btn-playpause-kinetic" class="tactile-btn amber">
-                <span id="playpause-icon">⏸️</span>
+                <span id="playpause-icon">${renderIcon('pause')}</span>
                 <span id="playpause-text">Pause</span>
               </button>
             </div>
@@ -57,7 +59,7 @@ export class KineticScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎛️ Physics & Motion</span>
+              <span class="panel-title">PHYSICS & MOTION</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -77,7 +79,7 @@ export class KineticScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">✏️ Rough.js Geometry</span>
+              <span class="panel-title">ROUGH.JS GEOMETRY</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -526,11 +528,11 @@ export class KineticScene {
 
     if (this.isRunning) {
       this.animations.forEach(a => a.play());
-      if (btnIcon) btnIcon.textContent = '⏸️';
+      if (btnIcon) btnIcon.innerHTML = renderIcon('pause');
       if (btnText) btnText.textContent = 'Pause';
     } else {
       this.animations.forEach(a => a.pause());
-      if (btnIcon) btnIcon.textContent = '▶️';
+      if (btnIcon) btnIcon.innerHTML = renderIcon('play');
       if (btnText) btnText.textContent = 'Play';
     }
     SoundFX.playPop(500);

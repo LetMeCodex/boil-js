@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class CodeExporter {
   constructor(container, options = {}) {
@@ -182,7 +183,8 @@ export class BoilShape {
               <button class="code-tab-btn" data-snippet="class">BoilShape Class</button>
             </div>
             <button id="btn-copy-code" class="tactile-btn amber" style="padding: 4px 12px; font-size: 0.75rem;">
-              <span>📋 Copy Code</span>
+              ${renderIcon('sparkle')}
+              <span>Copy Code</span>
             </button>
           </div>
           <div class="code-block" id="code-snippet-display">
@@ -202,7 +204,8 @@ export class BoilShape {
           <div style="display: flex; justify-content: space-between; align-items: center; font-size: 0.8rem; color: var(--text-secondary);">
             <span>Interactive Rough.js + Anime.js pipeline</span>
             <button id="btn-trigger-pulse" class="tactile-btn outline" style="padding: 4px 10px; font-size: 0.75rem;">
-              <span>⚡ Trigger Anime Pulse</span>
+              ${renderIcon('zap')}
+              <span>Trigger Anime Pulse</span>
             </button>
           </div>
         </div>
@@ -303,9 +306,9 @@ export class BoilShape {
       confetti({ particleCount: 30, spread: 50 });
       const copyBtn = document.getElementById('btn-copy-code');
       if (copyBtn) {
-        copyBtn.innerHTML = '<span>✅ Copied!</span>';
+        copyBtn.innerHTML = '<span>Copied to Clipboard!</span>';
         setTimeout(() => {
-          copyBtn.innerHTML = '<span>📋 Copy Code</span>';
+          copyBtn.innerHTML = `${renderIcon('sparkle')}<span>Copy Code</span>`;
         }, 2000);
       }
     });

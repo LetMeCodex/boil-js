@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class BubbleScene {
   constructor(container, options = {}) {
@@ -36,18 +37,20 @@ export class BubbleScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-bubble-gun" class="tactile-btn amber">
-                <span>🫧 Bubble Spray (x15)</span>
+                ${renderIcon('sparkle')}
+                <span>Bubble Spray (x15)</span>
               </button>
               <button id="btn-bubble-clear" class="tactile-btn outline">
-                <span>🔄 Reset</span>
+                ${renderIcon('reset')}
+                <span>Reset</span>
               </button>
             </div>
           </div>
 
           <div class="canvas-wrapper" id="bubble-canvas-wrap" style="min-height: 500px; cursor: crosshair;">
             <canvas id="bubble-stage-canvas" class="main-stage-canvas"></canvas>
-            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(8px); padding: 4px 12px; border-radius: 9999px; pointer-events: none;">
-              🖱️ Slice or click bubbles to POP • Click & drag anywhere to stretch gooey slime webs
+            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Slice or click bubbles to POP • Click & drag anywhere to stretch gooey slime webs
             </div>
           </div>
         </div>
@@ -55,25 +58,25 @@ export class BubbleScene {
         <!-- Controls Panel -->
         <div class="controls-panel">
           <!-- Pop Scoreboard -->
-          <div class="panel-card" style="background: var(--bg-surface-alt); border: 2px solid var(--accent-sage);">
+          <div class="panel-card" style="background: var(--paper-card); border: 1px solid var(--emerald);">
             <div class="panel-header">
-              <span class="panel-title">🫧 Bubble Pop Counter</span>
+              <span class="panel-title">BUBBLE POP COUNTER</span>
             </div>
             <div style="text-align: center; padding: 8px 0;">
-              <div style="font-family: 'Fira Code', monospace; font-size: 2.5rem; font-weight: 800; color: var(--accent-sage);" id="hud-bubble-score">
+              <div style="font-family: 'Fira Code', monospace; font-size: 2.5rem; font-weight: 800; color: var(--emerald);" id="hud-bubble-score">
                 0
               </div>
-              <div style="font-size: 0.78rem; color: var(--text-secondary);">BUBBLES POPPED</div>
+              <div style="font-size: 0.75rem; color: var(--ink-muted);">BUBBLES POPPED</div>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🧲 Bubble Physics</span>
+              <span class="panel-title">BUBBLE PHYSICS</span>
             </div>
             <div class="style-pills-grid" style="grid-template-columns: 1fr;">
-              <button class="tactile-btn primary" id="btn-giant-bubble">🫧 Spawn Giant Mega-Bubble</button>
-              <button class="tactile-btn outline" id="btn-invert-bubbles">🛸 Invert Buoyancy (Float Down)</button>
+              <button class="tactile-btn primary" id="btn-giant-bubble">${renderIcon('multiball')}<span>Spawn Giant Mega-Bubble</span></button>
+              <button class="tactile-btn outline" id="btn-invert-bubbles"><span>Invert Buoyancy (Float Down)</span></button>
             </div>
           </div>
         </div>

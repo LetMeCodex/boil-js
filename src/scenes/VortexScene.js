@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class VortexScene {
   constructor(container, options = {}) {
@@ -43,15 +44,16 @@ export class VortexScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-supernova" class="tactile-btn amber">
-                <span>✨ Supernova Blast</span>
+                ${renderIcon('sparkle')}
+                <span>Supernova Blast</span>
               </button>
             </div>
           </div>
 
           <div class="canvas-wrapper" id="vortex-canvas-wrap">
             <canvas id="vortex-stage-canvas" class="main-stage-canvas"></canvas>
-            <div id="vortex-hint" style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 9999px; pointer-events: none;">
-              🖱️ Move cursor over stage to bend spacetime field • Click to blast
+            <div id="vortex-hint" style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Move cursor over stage to bend spacetime field • Click to blast
             </div>
           </div>
         </div>
@@ -60,18 +62,18 @@ export class VortexScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🌌 Gravitational Modes</span>
+              <span class="panel-title">GRAVITATIONAL MODES</span>
             </div>
             <div class="style-pills-grid" id="vortex-modes-grid" style="grid-template-columns: 1fr;">
-              <button class="style-pill-btn active" data-mode="attract">🕳️ Gravitational Singularity</button>
-              <button class="style-pill-btn" data-mode="repel">⚡ Supernova Repulsion</button>
-              <button class="style-pill-btn" data-mode="fibonacci">🌀 Golden Fibonacci Spiral</button>
+              <button class="style-pill-btn active" data-mode="attract">${renderIcon('galaxy')}<span>Gravitational Singularity</span></button>
+              <button class="style-pill-btn" data-mode="repel">${renderIcon('zap')}<span>Supernova Repulsion</span></button>
+              <button class="style-pill-btn" data-mode="fibonacci">${renderIcon('torus')}<span>Golden Fibonacci Spiral</span></button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🌪️ Vortex Physics</span>
+              <span class="panel-title">VORTEX PHYSICS</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -91,7 +93,7 @@ export class VortexScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">✏️ Line Boil</span>
+              <span class="panel-title">LINE BOIL</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">

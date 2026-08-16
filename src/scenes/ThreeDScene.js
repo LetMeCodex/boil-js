@@ -2,6 +2,7 @@ import * as THREE from 'three';
 import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 /**
  * ============================================================================
@@ -194,10 +195,12 @@ export class ThreeDScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-3d-explode" class="tactile-btn amber">
-                <span>💥 Exploded View</span>
+                ${renderIcon('sparkle')}
+                <span>Exploded View</span>
               </button>
               <button id="btn-3d-pulse" class="tactile-btn outline">
-                <span>⚡ Spring Jump</span>
+                ${renderIcon('zap')}
+                <span>Spring Jump</span>
               </button>
             </div>
           </div>
@@ -207,12 +210,12 @@ export class ThreeDScene {
             
             <!-- Real-Time HUD Overlay -->
             <div style="position: absolute; top: 16px; left: 16px; display: flex; gap: 8px; pointer-events: none;">
-              <span class="stat-badge pulse-badge" id="threed-fps-badge">⚡ 60 FPS (Hardware)</span>
+              <span class="stat-badge pulse-badge" id="threed-fps-badge">${renderIcon('zap')} 60 FPS</span>
               <span class="stat-badge">GLSL Cross-Hatch</span>
             </div>
 
-            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(8px); padding: 4px 12px; border-radius: 9999px; pointer-events: none; box-shadow: var(--shadow-sm);">
-              🖱️ Drag anywhere to rotate in 3D • Scroll to zoom in/out
+            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Drag anywhere to rotate in 3D • Scroll to zoom
             </div>
           </div>
         </div>
@@ -221,21 +224,21 @@ export class ThreeDScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🧊 3D Worlds & Meshes</span>
+              <span class="panel-title">3D WORLDS & MESHES</span>
             </div>
             <div class="style-pills-grid" id="threed-models-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="style-pill-btn active" data-model="torus">Torus Knot</button>
-              <button class="style-pill-btn" data-model="island">Floating Island</button>
-              <button class="style-pill-btn" data-model="crystal">Low-Poly Crystal</button>
-              <button class="style-pill-btn" data-model="tesseract">4D Tesseract</button>
-              <button class="style-pill-btn" data-model="galaxy">3D Star Galaxy</button>
-              <button class="style-pill-btn" data-model="dna">DNA Double Helix</button>
+              <button class="style-pill-btn active" data-model="torus">${renderIcon('torus')}<span>Torus Knot</span></button>
+              <button class="style-pill-btn" data-model="island">${renderIcon('island')}<span>Floating Island</span></button>
+              <button class="style-pill-btn" data-model="crystal">${renderIcon('crystal')}<span>Low-Poly Crystal</span></button>
+              <button class="style-pill-btn" data-model="tesseract">${renderIcon('tesseract')}<span>4D Tesseract</span></button>
+              <button class="style-pill-btn" data-model="galaxy">${renderIcon('galaxy')}<span>3D Star Galaxy</span></button>
+              <button class="style-pill-btn" data-model="dna">${renderIcon('dna')}<span>DNA Double Helix</span></button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎛️ Dynamics & Kinematics</span>
+              <span class="panel-title">DYNAMICS & KINEMATICS</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -262,7 +265,7 @@ export class ThreeDScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎨 Visual FX</span>
+              <span class="panel-title">VISUAL FX</span>
             </div>
             <div class="style-pills-grid" style="grid-template-columns: 1fr 1fr;">
               <button class="tactile-btn outline" id="btn-toggle-wire">Wireframe Overlay</button>
@@ -651,7 +654,7 @@ export class ThreeDScene {
         this.fpsData.frames = 0;
         this.fpsData.lastTime = timestamp;
         const badge = document.getElementById('threed-fps-badge');
-        if (badge) badge.textContent = `⚡ ${this.fpsData.fps} FPS (Hardware)`;
+        if (badge) badge.textContent = `${this.fpsData.fps} FPS (Hardware Accelerated)`;
       }
 
       // 2. Smooth Lerp Orbit Rotation

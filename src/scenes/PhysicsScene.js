@@ -4,6 +4,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class PhysicsScene {
   constructor(container, options = {}) {
@@ -39,18 +40,20 @@ export class PhysicsScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-physics-explode" class="tactile-btn amber" title="Click on canvas or here to trigger shockwave explosion">
-                <span>💥 Shockwave Blast</span>
+                ${renderIcon('sparkle')}
+                <span>Shockwave Blast</span>
               </button>
               <button id="btn-physics-clear" class="tactile-btn outline">
-                <span>🗑️ Reset World</span>
+                ${renderIcon('reset')}
+                <span>Reset World</span>
               </button>
             </div>
           </div>
 
           <div class="canvas-wrapper" id="physics-canvas-wrap">
             <canvas id="physics-stage-canvas" class="main-stage-canvas"></canvas>
-            <div id="physics-hint" style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(8px); padding: 4px 10px; border-radius: 9999px; pointer-events: none;">
-              🖱️ Click & Drag to fling objects • Click empty space to trigger shockwaves
+            <div id="physics-hint" style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Click & Drag to fling objects • Click empty space to trigger shockwaves
             </div>
           </div>
         </div>
@@ -59,35 +62,36 @@ export class PhysicsScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">📦 Spawn Objects</span>
+              <span class="panel-title">SPAWN OBJECTS</span>
             </div>
             <div class="style-pills-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="tactile-btn outline" id="btn-spawn-balls">🎾 5 Bouncy Balls</button>
-              <button class="tactile-btn outline" id="btn-spawn-crates">📦 Crate Tower</button>
-              <button class="tactile-btn outline" id="btn-spawn-dominos">🪜 Domino Run</button>
-              <button class="tactile-btn outline" id="btn-spawn-stars">⭐ Bouncy Stars</button>
+              <button class="tactile-btn outline" id="btn-spawn-balls">${renderIcon('multiball')}<span>5 Balls</span></button>
+              <button class="tactile-btn outline" id="btn-spawn-crates">${renderIcon('tesseract')}<span>Crate Tower</span></button>
+              <button class="tactile-btn outline" id="btn-spawn-dominos">${renderIcon('dna')}<span>Domino Run</span></button>
+              <button class="tactile-btn outline" id="btn-spawn-stars">${renderIcon('sparkle')}<span>Stars</span></button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🌌 Gravity & Forces</span>
+              <span class="panel-title">GRAVITY & FORCES</span>
             </div>
             <div class="style-pills-grid" id="gravity-pills-grid" style="grid-template-columns: 1fr 1fr 1fr;">
-              <button class="style-pill-btn active" data-gravity="down">Normal ⬇️</button>
-              <button class="style-pill-btn" data-gravity="up">Inverted ⬆️</button>
-              <button class="style-pill-btn" data-gravity="zero">Zero-G 🛸</button>
+              <button class="style-pill-btn active" data-gravity="down">Normal ↓</button>
+              <button class="style-pill-btn" data-gravity="up">Inverted ↑</button>
+              <button class="style-pill-btn" data-gravity="zero">Zero-G</button>
             </div>
             <div class="control-group" style="margin-top: 10px;">
               <button id="btn-wind-storm" class="tactile-btn primary" style="width: 100%;">
-                <span>🌪️ Trigger Wind Vortex</span>
+                ${renderIcon('galaxy')}
+                <span>Trigger Wind Vortex</span>
               </button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">✏️ Line Boil Geometry</span>
+              <span class="panel-title">LINE BOIL GEOMETRY</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">

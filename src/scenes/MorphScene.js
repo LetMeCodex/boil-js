@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class MorphScene {
   constructor(container, options = {}) {
@@ -45,7 +46,7 @@ export class MorphScene {
             </div>
             <div class="toolbar-actions">
               <button id="btn-morph-toggle" class="tactile-btn amber">
-                <span id="morph-play-icon">⏸️</span>
+                <span id="morph-play-icon">${renderIcon('pause')}</span>
                 <span id="morph-play-text">Pause Morph</span>
               </button>
             </div>
@@ -60,23 +61,23 @@ export class MorphScene {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🔮 Morph Targets</span>
+              <span class="panel-title">MORPH TARGETS</span>
             </div>
             <div class="style-pills-grid" id="morph-targets-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="style-pill-btn active" data-idx="0">❤️ Heart</button>
-              <button class="style-pill-btn" data-idx="1">💀 Skull</button>
-              <button class="style-pill-btn" data-idx="2">💡 Lightbulb</button>
-              <button class="style-pill-btn" data-idx="3">🚀 Rocket</button>
-              <button class="style-pill-btn" data-idx="4">💎 Diamond</button>
-              <button class="style-pill-btn" data-idx="5">🕊️ Origami Bird</button>
-              <button class="style-pill-btn" data-idx="6">☕ Coffee Mug</button>
-              <button class="style-pill-btn" data-idx="7">♾️ Infinity</button>
+              <button class="style-pill-btn active" data-idx="0">${renderIcon('heart')}<span>Heart</span></button>
+              <button class="style-pill-btn" data-idx="1">${renderIcon('skull')}<span>Skull</span></button>
+              <button class="style-pill-btn" data-idx="2">${renderIcon('lightbulb')}<span>Lightbulb</span></button>
+              <button class="style-pill-btn" data-idx="3">${renderIcon('rocket')}<span>Rocket</span></button>
+              <button class="style-pill-btn" data-idx="4">${renderIcon('diamond')}<span>Diamond</span></button>
+              <button class="style-pill-btn" data-idx="5">${renderIcon('bird')}<span>Origami Bird</span></button>
+              <button class="style-pill-btn" data-idx="6">${renderIcon('coffee')}<span>Coffee Mug</span></button>
+              <button class="style-pill-btn" data-idx="7">${renderIcon('infinity')}<span>Infinity</span></button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">⏱️ Morph Dynamics</span>
+              <span class="panel-title">MORPH DYNAMICS</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -96,7 +97,7 @@ export class MorphScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎨 Hatching Pattern</span>
+              <span class="panel-title">HATCHING PATTERN</span>
             </div>
             <div class="style-pills-grid" id="morph-fill-grid">
               <button class="style-pill-btn active" data-fill="hachure">Hachure</button>
@@ -377,7 +378,7 @@ export class MorphScene {
       const icon = document.getElementById('morph-play-icon');
       const text = document.getElementById('morph-play-text');
       if (this.isAutoMorphing) {
-        if (icon) icon.textContent = '⏸️';
+        if (icon) icon.innerHTML = renderIcon('pause');
         if (text) text.textContent = 'Pause Morph';
         this.startAutoMorph();
       } else {
@@ -386,7 +387,7 @@ export class MorphScene {
           this.autoMorphTimeout = null;
         }
         if (this.morphTimeline) this.morphTimeline.pause();
-        if (icon) icon.textContent = '▶️';
+        if (icon) icon.innerHTML = renderIcon('play');
         if (text) text.textContent = 'Resume Morph';
       }
       SoundFX.playPop(520);

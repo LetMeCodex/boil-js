@@ -941,6 +941,115 @@ body {
   background: transparent;
 }
 
+/* Style Pills & Sub-Selection Buttons */
+.style-pills-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(auto-fit, minmax(110px, 1fr));
+}
+
+.style-pill-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-weight: 600;
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  border: 1px solid var(--line-strong);
+  background: var(--paper);
+  color: var(--ink);
+  transition: transform 0.15s var(--ease-elastic), background 0.2s, border-color 0.2s, color 0.2s;
+}
+
+.style-pill-btn svg {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+}
+
+.style-pill-btn:hover {
+  transform: translateY(-1px);
+  background: var(--orange-faint);
+  border-color: var(--orange);
+  color: var(--orange);
+}
+
+.style-pill-btn.active {
+  background: var(--ink);
+  color: var(--paper);
+  border-color: var(--ink);
+}
+
+.style-pill-btn.active svg {
+  color: var(--orange);
+}
+
+/* Stat & HUD Badges */
+.stat-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 10px;
+  background: var(--paper-card);
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-xs);
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--ink);
+}
+
+.pulse-badge {
+  color: #10B981;
+  border-color: rgba(16, 185, 129, 0.4);
+}
+
+/* Scene Inner Layout Elements */
+.toolbar-title-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.controls-panel {
+  flex: 0 0 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.canvas-wrapper {
+  position: relative;
+  width: 100%;
+  flex: 1;
+  min-height: 480px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.main-stage-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
 /* Custom Paper Tooltips */
 .lab-paper-tooltip {
   position: fixed;

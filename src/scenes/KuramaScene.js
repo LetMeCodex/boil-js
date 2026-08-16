@@ -4,6 +4,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 /**
  * ============================================================================
@@ -67,15 +68,17 @@ export class KuramaScene {
         <div class="canvas-viewport-card" style="min-height: 620px; position: relative;">
           <div class="viewport-toolbar">
             <div class="toolbar-title-group">
-              <span class="toolbar-title">🦊 Naruto Kurama Chakra Mode (KCM)</span>
+              <span class="toolbar-title">Naruto Kurama Chakra Mode (KCM)</span>
               <span class="toolbar-badge">Nine-Tails 3D & Line Boil</span>
             </div>
             <div class="toolbar-actions">
               <button id="btn-kurama-roar" class="tactile-btn amber">
-                <span>🔊 Bijuu Roar</span>
+                ${renderIcon('soundOn')}
+                <span>Bijuu Roar</span>
               </button>
-              <button id="btn-kurama-blast" class="tactile-btn primary" style="background: var(--accent-terracotta);">
-                <span>💥 Tailed Beast Bomb</span>
+              <button id="btn-kurama-blast" class="tactile-btn primary">
+                ${renderIcon('flame')}
+                <span>Tailed Beast Bomb</span>
               </button>
             </div>
           </div>
@@ -107,17 +110,17 @@ export class KuramaScene {
             </div>
 
             <!-- Interaction Hint -->
-            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.75rem; color: var(--text-secondary); background: var(--bg-glass); backdrop-filter: blur(10px); padding: 4px 14px; border-radius: 9999px; pointer-events: none; border: 1px solid var(--border-subtle);">
-              🖱️ Move cursor to direct Rasengan vortex • Click buttons to trigger Bijuu bomb detonation
+            <div style="position: absolute; bottom: 16px; left: 16px; font-size: 0.72rem; color: var(--ink-muted); background: var(--paper-card); border: 1px solid var(--line); padding: 4px 12px; border-radius: var(--radius-xs); pointer-events: none;">
+              Move cursor to direct Rasengan vortex • Click buttons to trigger Bijuu bomb detonation
             </div>
           </div>
         </div>
 
         <!-- Controls Inspector Panel -->
         <div class="controls-panel">
-          <div class="panel-card" style="background: var(--bg-surface-alt); border: 2px solid var(--accent-gold);">
+          <div class="panel-card" style="background: var(--paper-card); border: 1px solid var(--orange);">
             <div class="panel-header">
-              <span class="panel-title">🔥 Kyuubi Chakra Matrix</span>
+              <span class="panel-title">KYUUBI CHAKRA MATRIX</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
@@ -137,21 +140,21 @@ export class KuramaScene {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🌀 Jutsu Selection</span>
+              <span class="panel-title">JUTSU SELECTION</span>
             </div>
             <div class="style-pills-grid" id="jutsu-select-grid" style="grid-template-columns: 1fr 1fr;">
-              <button class="style-pill-btn active" data-jutsu="rasengan">🌀 Rasengan</button>
-              <button class="style-pill-btn" data-jutsu="rasenshuriken">✨ Rasenshuriken</button>
-              <button class="style-pill-btn" data-jutsu="bijuudama">💣 Bijuudama</button>
-              <button class="style-pill-btn" data-jutsu="avatar">🦊 Kurama Avatar</button>
+              <button class="style-pill-btn active" data-jutsu="rasengan">${renderIcon('galaxy')}<span>Rasengan</span></button>
+              <button class="style-pill-btn" data-jutsu="rasenshuriken">${renderIcon('sparkle')}<span>Rasenshuriken</span></button>
+              <button class="style-pill-btn" data-jutsu="bijuudama">${renderIcon('bomb')}<span>Bijuudama</span></button>
+              <button class="style-pill-btn" data-jutsu="avatar">${renderIcon('flame')}<span>Kurama Avatar</span></button>
             </div>
           </div>
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">📜 Sealing Formula Spec</span>
+              <span class="panel-title">SEALING FORMULA SPEC</span>
             </div>
-            <p style="font-size: 0.75rem; font-family: 'Fira Code', monospace; line-height: 1.6; color: var(--text-muted);">
+            <p style="font-size: 0.72rem; font-family: 'Fira Code', monospace; line-height: 1.6; color: var(--ink-muted);">
               SEAL: Eight Trigrams (Hakke no Fūin Shiki)<br>
               CLOAK: Yang-Kurama Golden Flame Shroud<br>
               MAGATAMA: Rikudō Sennin 6-Paths Collar

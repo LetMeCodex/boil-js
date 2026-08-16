@@ -3,6 +3,7 @@ import anime from 'animejs';
 import confetti from 'canvas-confetti';
 import { BoilShape, BoilEngine } from '../engine/BoilEngine.js';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 export class Sketchpad {
   constructor(container, options = {}) {
@@ -43,11 +44,11 @@ export class Sketchpad {
         <div class="canvas-viewport-card">
           <div class="viewport-toolbar">
             <div class="tool-palette" id="sketchpad-tools">
-              <button class="tool-btn active" data-tool="freehand" title="Freehand Pen (Draw anything!)">✏️</button>
-              <button class="tool-btn" data-tool="rectangle" title="Rough Rectangle">⬛</button>
-              <button class="tool-btn" data-tool="circle" title="Rough Circle">⚪</button>
-              <button class="tool-btn" data-tool="line" title="Rough Line">📏</button>
-              <button class="tool-btn" data-tool="star" title="Rough 5-Point Star">⭐</button>
+              <button class="tool-btn active" data-tool="freehand" title="Freehand Pen">${renderIcon('origami')}</button>
+              <button class="tool-btn" data-tool="rectangle" title="Rough Rectangle">${renderIcon('tesseract')}</button>
+              <button class="tool-btn" data-tool="circle" title="Rough Circle">${renderIcon('torus')}</button>
+              <button class="tool-btn" data-tool="line" title="Rough Line">${renderIcon('dna')}</button>
+              <button class="tool-btn" data-tool="star" title="Rough 5-Point Star">${renderIcon('sparkle')}</button>
             </div>
 
             <!-- Color Swatches -->
@@ -62,13 +63,15 @@ export class Sketchpad {
 
             <div class="toolbar-actions">
               <button id="btn-sketch-undo" class="tactile-btn outline" title="Undo stroke">
-                <span>↩️ Undo</span>
+                <span>Undo</span>
               </button>
               <button id="btn-sketch-clear" class="tactile-btn outline" title="Clear canvas">
-                <span>🗑️ Clear</span>
+                ${renderIcon('reset')}
+                <span>Clear</span>
               </button>
               <button id="btn-sketch-export" class="tactile-btn primary" title="Export as high-res PNG">
-                <span>📸 Snapshot</span>
+                ${renderIcon('sparkle')}
+                <span>Snapshot</span>
               </button>
             </div>
           </div>
@@ -82,9 +85,9 @@ export class Sketchpad {
         <div class="controls-panel">
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">✨ Anime.js Motion Presets</span>
+              <span class="panel-title">ANIME.JS MOTION PRESETS</span>
             </div>
-            <p style="font-size: 0.78rem; color: var(--text-secondary);">Apply kinetic motion directly to your hand-drawn boiling shapes:</p>
+            <p style="font-size: 0.75rem; color: var(--ink-muted);">Apply kinetic motion directly to your hand-drawn boiling shapes:</p>
             <div class="style-pills-grid" id="motion-presets-grid">
               <button class="style-pill-btn active" data-motion="none">Static Boil</button>
               <button class="style-pill-btn" data-motion="float">Float & Sway</button>
@@ -97,7 +100,7 @@ export class Sketchpad {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">🎨 Pattern Fill</span>
+              <span class="panel-title">PATTERN FILL</span>
             </div>
             <div class="style-pills-grid" id="sketch-fill-grid">
               <button class="style-pill-btn active" data-fill="hachure">Hachure</button>
@@ -111,7 +114,7 @@ export class Sketchpad {
 
           <div class="panel-card">
             <div class="panel-header">
-              <span class="panel-title">📐 Geometry Tuning</span>
+              <span class="panel-title">GEOMETRY TUNING</span>
             </div>
             <div class="control-group">
               <div class="control-label-row">
