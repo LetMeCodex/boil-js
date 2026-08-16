@@ -33,6 +33,7 @@ class ShowcaseApp {
     this.currentFps = 60;
 
     this.initDebugSuite();
+    this.initVisibility();
     this.initTheme();
     this.initCursor();
     this.initBrandLogo();
@@ -258,6 +259,13 @@ class ShowcaseApp {
     window.DevTools = DevTools;
   }
 
+  initVisibility() {
+    this.visibilityManager = new VisibilityManager({
+      rootMargin: '200px 0px 200px 0px',
+      threshold: [0.0, 0.1]
+    });
+  }
+
   initHero() {
     const heroCanvas = document.getElementById('hero-living-canvas');
     if (heroCanvas) {
@@ -265,6 +273,11 @@ class ShowcaseApp {
         this.heroLab = new HeroLab(heroCanvas);
         this.scenes.hero = this.heroLab;
         window.BOIL_DEBUG.sceneStatuses.hero = 'RUNNING';
+
+        const heroSection = document.getElementById('section-hero');
+        if (heroSection && this.visibilityManager) {
+          this.visibilityManager.register(heroSection, this.heroLab);
+        }
       } catch (err) {
         window.BOIL_DEBUG.reportSceneError('hero', err);
       }
@@ -272,8 +285,6 @@ class ShowcaseApp {
   }
 
   initChapters() {
-    this.visibilityManager = new VisibilityManager();
-
     EXPERIMENTS.forEach(exp => {
       const container = document.getElementById(exp.stageId);
       if (!container) {
@@ -340,6 +351,11 @@ class ShowcaseApp {
         this.footerLab = new FooterLab(footerCanvas);
         this.scenes.footer = this.footerLab;
         window.BOIL_DEBUG.sceneStatuses.footer = 'RUNNING';
+
+        const footerSection = document.getElementById('section-footer');
+        if (footerSection && this.visibilityManager) {
+          this.visibilityManager.register(footerSection, this.footerLab);
+        }
       } catch (err) {
         window.BOIL_DEBUG.reportSceneError('footer', err);
       }

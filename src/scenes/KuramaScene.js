@@ -175,8 +175,8 @@ export class KuramaScene {
     const resize = () => {
       const wrap = document.getElementById('kurama-canvas-wrap');
       const rect = wrap ? wrap.getBoundingClientRect() : null;
-      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 780);
-      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 540);
+      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 300);
+      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 440);
       const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
       this.width = w;

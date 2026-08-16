@@ -1501,7 +1501,34 @@ main, header, section, footer, aside, dl, pre,
 }
 
 /* ==========================================================================
-   RESPONSIVE DESIGN
+   PERFORMANCE & HARDWARE ACCELERATION
+   ========================================================================== */
+.showcase-chapter-section,
+.canvas-viewport-card,
+.lab-hero-stage,
+.lab-footer-stage,
+.tech-ecosystem-section {
+  contain: layout style;
+}
+
+canvas.main-stage-canvas,
+canvas.canvas-stage,
+canvas#threed-gl-canvas,
+canvas#physics-stage-canvas,
+canvas#arkanoid-stage-canvas,
+canvas#slingshot-stage-canvas,
+canvas#puppet-stage-canvas,
+canvas#bubble-stage-canvas,
+canvas#kurama-stage-canvas,
+canvas#space-stage-canvas,
+canvas#pinball-stage-canvas {
+  touch-action: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+}
+
+/* ==========================================================================
+   RESPONSIVE DESIGN (TABLET & MOBILE)
    ========================================================================== */
 @media (max-width: 1100px) {
   .rail-chapter-track {
@@ -1510,38 +1537,136 @@ main, header, section, footer, aside, dl, pre,
   .mobile-chapter-trigger {
     display: inline-flex;
   }
+  .aesthetic-brand-header {
+    padding: 18px 24px;
+  }
 }
 
 @media (max-width: 1024px) {
   .scene-layout {
     flex-direction: column;
+    gap: 24px;
   }
-  .controls-sidebar {
+  .controls-sidebar,
+  .controls-panel {
     flex: 1 1 100%;
+    max-width: 100%;
+  }
+  .canvas-wrapper {
+    min-height: 400px;
   }
 }
 
 @media (max-width: 768px) {
-  .kinetic-control-rail {
-    top: 10px;
-    width: calc(100% - 20px);
-    height: 48px;
-    padding: 0 10px;
+  .aesthetic-brand-header {
+    padding: 12px 16px;
   }
-  .brand-titles {
+  .brand-ambient-identity {
+    gap: 8px;
+    padding: 4px 6px;
+  }
+  .brand-glyph-box {
+    width: 36px;
+    height: 36px;
+  }
+  .brand-glyph-box canvas {
+    width: 36px !important;
+    height: 36px !important;
+  }
+  .brand-main {
+    font-size: 1.15rem;
+  }
+  .brand-sub {
     display: none;
   }
-  .artboard-inner-frame {
-    padding: 16px;
+  .ambient-controls-block {
+    gap: 6px;
   }
-  .hero-registration-mark {
-    display: none;
+  .ambient-icon-btn {
+    width: 36px;
+    height: 36px;
+  }
+  .rough-theme-toggle-btn {
+    width: 76px;
+    height: 38px;
+  }
+  .rough-theme-toggle-btn canvas {
+    width: 76px !important;
+    height: 38px !important;
+  }
+  .lab-hero-stage {
+    padding: 70px 16px 40px;
+    min-height: auto;
+  }
+  .hero-canvas-artboard {
+    height: 340px;
+  }
+  .hero-actions-row {
+    flex-direction: column;
+    width: 100%;
+    max-width: 320px;
+    margin: 0 auto 36px;
+  }
+  .hero-actions-row .tactile-hero-btn {
+    width: 100%;
   }
   .hero-metrics-bar {
-    flex-direction: column;
-    gap: 6px;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    padding: 16px;
   }
   .metric-divider {
     display: none;
+  }
+  .viewport-toolbar {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+  .toolbar-actions {
+    width: 100%;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .toolbar-actions .tactile-btn {
+    flex: 1 1 calc(50% - 6px);
+  }
+  .canvas-wrapper {
+    min-height: 340px;
+  }
+  .style-pills-grid {
+    grid-template-columns: 1fr 1fr !important;
+  }
+  .lab-footer-stage {
+    padding: 60px 16px 40px;
+    min-height: auto;
+  }
+  .footer-nav-row {
+    flex-direction: column;
+    gap: 10px;
+  }
+  .footer-nav-link {
+    width: 100%;
+    max-width: 300px;
+    text-align: center;
+  }
+  .footer-bottom-bar {
+    flex-direction: column;
+    text-align: center;
+    gap: 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .canvas-wrapper {
+    min-height: 300px;
+  }
+  .hero-canvas-artboard {
+    height: 280px;
+  }
+  .style-pills-grid {
+    grid-template-columns: 1fr !important;
   }
 }

@@ -102,15 +102,19 @@ export class CharacterScene {
       const wrap = document.getElementById('char-canvas-wrap');
       if (!wrap) return;
       const rect = wrap.getBoundingClientRect();
-      const dpr = window.devicePixelRatio || 1;
+      const w = Math.max(rect.width || 0, 300);
+      const h = Math.max(rect.height || 0, 380);
+      const dpr = Math.min(window.devicePixelRatio || 1, 2.0);
 
-      this.canvas.width = rect.width * dpr;
-      this.canvas.height = rect.height * dpr;
-      this.canvas.style.width = `${rect.width}px`;
-      this.canvas.style.height = `${rect.height}px`;
+      this.canvas.width = Math.floor(w * dpr);
+      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.style.width = `${w}px`;
+      this.canvas.style.height = `${h}px`;
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.ctx.scale(dpr, dpr);
-      this.width = rect.width;
-      this.height = rect.height;
+      this.width = w;
+      this.height = h;
+      this.rc = rough.canvas(this.canvas);
     };
 
     window.addEventListener('resize', resize);

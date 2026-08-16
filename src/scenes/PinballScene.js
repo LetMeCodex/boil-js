@@ -137,8 +137,8 @@ export class PinballScene {
     const resize = () => {
       const wrap = document.getElementById('pinball-canvas-wrap');
       const rect = wrap ? wrap.getBoundingClientRect() : null;
-      const w = Math.max(rect ? Math.floor(rect.width) : 0, wrap ? wrap.clientWidth : 0, 780);
-      const h = Math.max(rect ? Math.floor(rect.height) : 0, wrap ? wrap.clientHeight : 0, 520);
+      const w = Math.max(rect ? Math.floor(rect.width) : 0, wrap ? wrap.clientWidth : 0, 300);
+      const h = Math.max(rect ? Math.floor(rect.height) : 0, wrap ? wrap.clientHeight : 0, 440);
 
       this.width = w;
       this.height = h;
