@@ -8,7 +8,6 @@ import { EXPERIMENTS, getExperimentByKey } from './engine/ExperimentRegistry.js'
 import { CursorDirector } from './utils/CursorDirector.js';
 import { KeyboardDirector } from './utils/KeyboardDirector.js';
 import { LabUiSystem } from './utils/LabUiSystem.js';
-import { BootSequence } from './showcase/BootSequence.js';
 import { DevTools } from './showcase/DevTools.js';
 import { HeroLab } from './showcase/HeroLab.js';
 import { TechEcosystem } from './showcase/TechEcosystem.js';
@@ -50,9 +49,6 @@ class ShowcaseApp {
     this.initMobileDrawer();
     this.bindGlobalEvents();
     this.startFpsLoop();
-
-    // Trigger boot sequence
-    BootSequence.init();
   }
 
   initDebugSuite() {
