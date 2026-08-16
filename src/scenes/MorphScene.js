@@ -233,6 +233,16 @@ export class MorphScene {
       morphT: [0, 1],
       duration: 2000 / this.settings.speed,
       easing: 'easeInOutCubic',
+      update: () => {
+        const slider = document.getElementById('slider-morph-progress');
+        const val = document.getElementById('val-morph-progress');
+        const pct = Math.round(this.morphT * 100);
+        if (slider) {
+          slider.value = pct;
+          slider.style.setProperty('--slider-fill-pct', `${pct}%`);
+        }
+        if (val) val.textContent = `${pct}%`;
+      },
       complete: () => {
         SoundFX.playPop(550);
         confetti({
@@ -273,6 +283,16 @@ export class MorphScene {
       morphT: [0, 1],
       duration: 1200 / this.settings.speed,
       easing: 'easeInOutCubic',
+      update: () => {
+        const slider = document.getElementById('slider-morph-progress');
+        const val = document.getElementById('val-morph-progress');
+        const pct = Math.round(this.morphT * 100);
+        if (slider) {
+          slider.value = pct;
+          slider.style.setProperty('--slider-fill-pct', `${pct}%`);
+        }
+        if (val) val.textContent = `${pct}%`;
+      },
       complete: () => {
         this.currentShapeIdx = idx;
         this.targetShapeIdx = (idx + 1) % this.shapePresets.length;

@@ -248,7 +248,11 @@ export class TextMotionScene {
     const title = document.getElementById('phase-title-text');
     const body = document.getElementById('phase-body-text');
 
-    if (slider) slider.value = (this.progress * 100).toFixed(1);
+    if (slider) {
+      const pct = (this.progress * 100).toFixed(1);
+      slider.value = pct;
+      slider.style.setProperty('--slider-fill-pct', `${pct}%`);
+    }
     if (val) val.textContent = `${Math.round(this.progress * 100)}%`;
 
     let activePhase = 0;

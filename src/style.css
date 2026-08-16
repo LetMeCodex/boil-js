@@ -887,29 +887,64 @@ main, header, section, footer, aside, dl, pre,
   -webkit-appearance: none;
   appearance: none;
   width: 100%;
-  height: 4px;
-  background: linear-gradient(to right, var(--orange) 0%, var(--orange) var(--slider-fill-pct, 50%), var(--line-strong) var(--slider-fill-pct, 50%), var(--line-strong) 100%);
+  height: 6px;
+  background: linear-gradient(to right, var(--orange) 0%, var(--orange) var(--slider-fill-pct, 0%), var(--line-strong) var(--slider-fill-pct, 0%), var(--line-strong) 100%);
   border-radius: var(--radius-pill);
   outline: none;
   cursor: pointer;
+  margin: 6px 0;
+}
+
+.custom-range::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: transparent;
 }
 
 .custom-range::-webkit-slider-thumb {
   -webkit-appearance: none;
   appearance: none;
-  width: 14px;
-  height: 14px;
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
   background: var(--paper);
   border: 2px solid var(--orange);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
   cursor: grab;
-  transition: transform 0.15s var(--ease-elastic);
+  margin-top: -5px; /* Center 16px thumb on 6px track */
+  transition: transform 0.15s var(--ease-elastic), background 0.15s;
 }
 
-.custom-range::-webkit-slider-thumb:hover {
-  transform: scale(1.25);
+.custom-range::-webkit-slider-thumb:hover,
+.custom-range::-webkit-slider-thumb:active {
+  transform: scale(1.2);
   background: var(--orange);
+  cursor: grabbing;
+}
+
+.custom-range::-moz-range-track {
+  height: 6px;
+  border-radius: var(--radius-pill);
+  background: transparent;
+  border: none;
+}
+
+.custom-range::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: var(--paper);
+  border: 2px solid var(--orange);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  cursor: grab;
+  transition: transform 0.15s var(--ease-elastic), background 0.15s;
+}
+
+.custom-range::-moz-range-thumb:hover,
+.custom-range::-moz-range-thumb:active {
+  transform: scale(1.2);
+  background: var(--orange);
+  cursor: grabbing;
 }
 
 .btn-grid-row {

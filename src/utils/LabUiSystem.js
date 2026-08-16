@@ -55,18 +55,43 @@ export class LabUiSystem {
    * 2. Custom Physical Sliders
    */
   static bindCustomSliders() {
-    document.querySelectorAll('input[type="range"].custom-range, input[type="range"].mini-range').forEach(slider => {
-      const updateSliderTrack = () => {
-        const min = parseFloat(slider.min) || 0;
-        const max = parseFloat(slider.max) || 100;
-        const val = parseFloat(slider.value) || 0;
-        const pct = ((val - min) / (max - min)) * 100;
-        slider.style.setProperty('--slider-fill-pct', `${pct}%`);
-      };
+    const updateSlider = (slider) => {
+      if (!slider) return;
+      const min = parseFloat(slider.min !== '' ? slider.min : 0);
+      const max = parseFloat(slider.max !== '' ? slider.max : 100);
+      const val = parseFloat(slider.value !== '' ? slider.value : min);
+      const pct = max > min ? Math.max(0, Math.min(100, ((val - min) / (max - min)) * 100)) : 50;
+      slider.style.setProperty('--slider-fill-pct', `${pct}%`);
+    };
 
-      slider.addEventListener('input', updateSliderTrack);
-      updateSliderTrack();
+    // Global event delegation for all dynamic range inputs
+    document.addEventListener('input', (e) => {
+      if (e.target && e.target.matches && e.target.matches('input[type="range"]')) {
+        updateSlider(e.target);
+      }
     });
+
+    document.addEventListener('change', (e) => {
+      if (e.target && e.target.matches && e.target.matches('input[type="range"]')) {
+        updateSlider(e.target);
+      }
+    });
+
+    // Refresh all currently mounted sliders
+    const refreshAll = () => {
+      document.querySelectorAll('input[type="range"]').forEach(updateSlider);
+    };
+
+    refreshAll();
+    setTimeout(refreshAll, 100);
+    setTimeout(refreshAll, 500);
+    setTimeout(refreshAll, 1500);
+
+    // Watch for dynamically added scenes & inputs
+    const observer = new MutationObserver(() => {
+      refreshAll();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
   }
 
   /**

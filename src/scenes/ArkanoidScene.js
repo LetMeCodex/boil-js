@@ -25,11 +25,13 @@ export class ArkanoidScene {
     this.combo = 0;
     this.lives = 3;
     this.level = 1;
+    this.gameOver = false;
+    this.gameWon = false;
 
     this.paddle = {
       x: 400,
       y: 470,
-      w: 110,
+      w: 120,
       h: 16,
       vx: 0,
       targetX: 400,
@@ -43,11 +45,12 @@ export class ArkanoidScene {
     this.lasers = [];
     this.particles = [];
     this.keys = { left: false, right: false, space: false };
+    this.speedMult = 1.0;
 
     this.initDOM();
     this.setupCanvas();
     this.buildLevel();
-    this.spawnBall();
+    this.spawnBall(true);
     this.startRenderLoop();
   }
 
@@ -66,7 +69,7 @@ export class ArkanoidScene {
                 ${renderIcon('multiball')}
                 <span>Multiball (3x)</span>
               </button>
-              <button id="btn-arkanoid-laser" class="tactile-btn sage">
+              <button id="btn-arkanoid-laser" class="tactile-btn outline">
                 ${renderIcon('zap')}
                 <span>Laser Paddle</span>
               </button>
@@ -77,7 +80,7 @@ export class ArkanoidScene {
             </div>
           </div>
 
-          <div class="canvas-wrapper" id="arkanoid-canvas-wrap" style="min-height: 520px; user-select: none; position: relative;">
+          <div class="canvas-wrapper" id="arkanoid-canvas-wrap" style="min-height: 520px; user-select: none; position: relative; cursor: pointer;">
             <canvas id="arkanoid-stage-canvas" class="main-stage-canvas"></canvas>
 
             <!-- On-Screen Paddle Controls -->
@@ -109,7 +112,7 @@ export class ArkanoidScene {
               </div>
               <div style="display: flex; justify-content: space-around; font-size: 0.78rem; font-family: 'Space Grotesk', sans-serif;">
                 <span>COMBO: <strong id="hud-arkanoid-combo" style="color: var(--vermillion);">0x</strong></span>
-                <span>LIVES: <strong id="hud-arkanoid-lives" style="color: var(--emerald);">3</strong></span>
+                <span>LIVES: <strong id="hud-arkanoid-lives" style="color: #10B981;">3</strong></span>
                 <span>LEVEL: <strong id="hud-arkanoid-level">1</strong></span>
               </div>
             </div>
@@ -123,7 +126,7 @@ export class ArkanoidScene {
             <div style="display: flex; flex-direction: column; gap: 6px; font-size: 0.78rem; color: var(--ink-soft);">
               <div><kbd>Mouse</kbd> or <kbd>Touch</kbd> : Direct Paddle Aim</div>
               <div><kbd>A</kbd> / <kbd>D</kbd> or <kbd>←</kbd> / <kbd>→</kbd> : Move Paddle</div>
-              <div><kbd>Space</kbd> : Launch Ball / Shoot Lasers</div>
+              <div><kbd>Space</kbd> / <kbd>Click</kbd> : Launch Ball / Shoot Lasers</div>
             </div>
           </div>
 
@@ -167,7 +170,7 @@ export class ArkanoidScene {
       this.rc = rough.canvas(this.canvas);
 
       this.paddle.y = h - 50;
-      if (this.paddle.targetX === 400) this.paddle.targetX = w / 2;
+      if (this.paddle.targetX === 400 || this.paddle.targetX > w) this.paddle.targetX = w / 2;
     };
 
     this.resizeHandler = resize;
@@ -178,22 +181,32 @@ export class ArkanoidScene {
   }
 
   setupMouseTracking() {
-    this.handlePointerMove = (e) => {
+    const updatePaddlePos = (clientX) => {
       if (!this.canvas) return;
       const rect = this.canvas.getBoundingClientRect();
-      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
       const mouseX = clientX - rect.left;
-      this.paddle.targetX = Math.max(this.paddle.w / 2 + 10, Math.min(this.width - this.paddle.w / 2 - 10, mouseX));
+      const w = this.width || 800;
+      this.paddle.targetX = Math.max(this.paddle.w / 2 + 10, Math.min(w - this.paddle.w / 2 - 10, mouseX));
     };
 
-    this.handleCanvasClick = () => {
+    this.canvas.addEventListener('mousemove', (e) => updatePaddlePos(e.clientX));
+    this.canvas.addEventListener('touchmove', (e) => {
+      if (e.touches && e.touches.length > 0) {
+        updatePaddlePos(e.touches[0].clientX);
+      }
+    }, { passive: true });
+
+    const handleAction = (clientX) => {
+      if (clientX !== undefined) updatePaddlePos(clientX);
+      if (this.gameOver || this.gameWon) {
+        this.resetGame();
+        return;
+      }
       this.launchStuckBalls();
       if (this.paddle.isLaser) this.fireLasers();
     };
 
-    this.canvas.addEventListener('mousemove', this.handlePointerMove);
-    this.canvas.addEventListener('touchmove', this.handlePointerMove, { passive: true });
-    this.canvas.addEventListener('click', this.handleCanvasClick);
+    this.canvas.addEventListener('pointerdown', (e) => handleAction(e.clientX));
   }
 
   bindEvents() {
@@ -210,6 +223,10 @@ export class ArkanoidScene {
     });
 
     document.getElementById('btn-launch-ball')?.addEventListener('click', () => {
+      if (this.gameOver || this.gameWon) {
+        this.resetGame();
+        return;
+      }
       this.launchStuckBalls();
       if (this.paddle.isLaser) this.fireLasers();
     });
@@ -218,20 +235,22 @@ export class ArkanoidScene {
     const btnLeft = document.getElementById('btn-pad-left');
     const btnRight = document.getElementById('btn-pad-right');
 
-    const startLeft = () => { this.keys.left = true; };
-    const stopLeft = () => { this.keys.left = false; };
-    const startRight = () => { this.keys.right = true; };
-    const stopRight = () => { this.keys.right = false; };
+    const startLeft = (e) => { e.preventDefault(); this.keys.left = true; };
+    const stopLeft = (e) => { e.preventDefault(); this.keys.left = false; };
+    const startRight = (e) => { e.preventDefault(); this.keys.right = true; };
+    const stopRight = (e) => { e.preventDefault(); this.keys.right = false; };
 
     btnLeft?.addEventListener('mousedown', startLeft);
     btnLeft?.addEventListener('mouseup', stopLeft);
-    btnLeft?.addEventListener('touchstart', startLeft);
-    btnLeft?.addEventListener('touchend', stopLeft);
+    btnLeft?.addEventListener('mouseleave', stopLeft);
+    btnLeft?.addEventListener('touchstart', startLeft, { passive: false });
+    btnLeft?.addEventListener('touchend', stopLeft, { passive: false });
 
     btnRight?.addEventListener('mousedown', startRight);
     btnRight?.addEventListener('mouseup', stopRight);
-    btnRight?.addEventListener('touchstart', startRight);
-    btnRight?.addEventListener('touchend', stopRight);
+    btnRight?.addEventListener('mouseleave', stopRight);
+    btnRight?.addEventListener('touchstart', startRight, { passive: false });
+    btnRight?.addEventListener('touchend', stopRight, { passive: false });
 
     // Keyboard
     this.keyDownHandler = (e) => {
@@ -240,6 +259,10 @@ export class ArkanoidScene {
       if (e.code === 'Space') {
         if (e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'BUTTON')) return;
         e.preventDefault();
+        if (this.gameOver || this.gameWon) {
+          this.resetGame();
+          return;
+        }
         this.launchStuckBalls();
         if (this.paddle.isLaser) this.fireLasers();
       }
@@ -273,7 +296,7 @@ export class ArkanoidScene {
     const w = this.width || 800;
     const cols = 8;
     const rows = 5;
-    const marginX = w * 0.08;
+    const marginX = w * 0.06;
     const brickW = (w - marginX * 2 - (cols - 1) * 10) / cols;
     const brickH = 24;
     const startY = 60;
@@ -290,7 +313,7 @@ export class ArkanoidScene {
       for (let c = 0; c < cols; c++) {
         const x = marginX + c * (brickW + 10);
         const y = startY + r * (brickH + 10);
-        const isGold = Math.random() < 0.2;
+        const isGold = (r === 1 && (c === 0 || c === 1 || c === 3 || c === 4)) || (r === 4 && (c === 0 || c === 4 || c === 5));
 
         this.bricks.push({
           x,
@@ -310,7 +333,7 @@ export class ArkanoidScene {
 
   spawnBall(isStuck = true) {
     const p = this.paddle;
-    const speed = 6 * this.speedMult;
+    const speed = 6.5 * this.speedMult;
     const angle = -Math.PI / 2 + (Math.random() * 0.4 - 0.2);
 
     this.balls.push({
@@ -326,25 +349,30 @@ export class ArkanoidScene {
   }
 
   launchStuckBalls() {
+    let launched = false;
     for (const b of this.balls) {
       if (b.stuck) {
         b.stuck = false;
         const angle = -Math.PI / 2 + (Math.random() * 0.6 - 0.3);
-        const speed = 6 * this.speedMult;
+        const speed = 6.5 * this.speedMult;
         b.vx = Math.cos(angle) * speed;
         b.vy = Math.sin(angle) * speed;
-        SoundFX.triggerBoilPop();
+        launched = true;
       }
+    }
+    if (launched) {
+      SoundFX.triggerBoilPop();
     }
   }
 
   triggerMultiball() {
+    if (this.gameOver) this.resetGame();
     if (this.balls.length === 0) this.spawnBall(false);
     const origin = this.balls[0] || { x: this.paddle.x, y: this.paddle.y - 20 };
 
     for (let i = 0; i < 2; i++) {
-      const angle = -Math.PI / 2 + (i === 0 ? -0.5 : 0.5);
-      const speed = 6.5 * this.speedMult;
+      const angle = -Math.PI / 2 + (i === 0 ? -0.45 : 0.45);
+      const speed = 7.0 * this.speedMult;
       this.balls.push({
         x: origin.x,
         y: origin.y,
@@ -361,7 +389,7 @@ export class ArkanoidScene {
 
   activateLaser() {
     this.paddle.isLaser = true;
-    this.paddle.laserTimer = 350; // frames
+    this.paddle.laserTimer = 400;
     SoundFX.triggerBumperHit('E5');
   }
 
@@ -374,16 +402,44 @@ export class ArkanoidScene {
     SoundFX.triggerBoilPop();
   }
 
+  applyPowerup(type) {
+    if (type === 'multiball') {
+      this.triggerMultiball();
+    } else if (type === 'laser') {
+      this.activateLaser();
+    } else if (type === 'wide') {
+      this.paddle.w = Math.min(180, this.paddle.w + 30);
+    } else if (type === 'life') {
+      this.lives = Math.min(5, this.lives + 1);
+      this.updateHUD();
+    }
+  }
+
+  spawnPowerup(x, y) {
+    const types = ['multiball', 'laser', 'wide', 'life'];
+    const colors = { multiball: '#F59E0B', laser: '#EF4444', wide: '#3B82F6', life: '#10B981' };
+    const type = types[Math.floor(Math.random() * types.length)];
+    this.powerups.push({
+      x,
+      y,
+      type,
+      color: colors[type],
+      vy: 2.2
+    });
+  }
+
   resetGame() {
     this.score = 0;
     this.combo = 0;
     this.lives = 3;
     this.level = 1;
+    this.gameOver = false;
+    this.gameWon = false;
     this.balls = [];
     this.powerups = [];
     this.lasers = [];
     this.particles = [];
-    this.paddle.w = 110;
+    this.paddle.w = 120;
     this.paddle.isLaser = false;
     this.buildLevel();
     this.spawnBall(true);
@@ -417,10 +473,10 @@ export class ArkanoidScene {
       const h = this.height || 520;
 
       // 1. Update Paddle
-      if (this.keys.left) this.paddle.targetX -= 8;
-      if (this.keys.right) this.paddle.targetX += 8;
+      if (this.keys.left) this.paddle.targetX -= 10;
+      if (this.keys.right) this.paddle.targetX += 10;
       this.paddle.targetX = Math.max(this.paddle.w / 2 + 10, Math.min(w - this.paddle.w / 2 - 10, this.paddle.targetX));
-      this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.25;
+      this.paddle.x += (this.paddle.targetX - this.paddle.x) * 0.28;
 
       if (this.paddle.isLaser) {
         this.paddle.laserTimer--;
@@ -466,19 +522,19 @@ export class ArkanoidScene {
         b.x += b.vx;
         b.y += b.vy;
 
-        // Wall collisions
-        if (b.x - b.r < 10) {
-          b.x = 10 + b.r;
+        // Wall collisions with boundary displacement
+        if (b.x - b.r < 12) {
+          b.x = 12 + b.r;
           b.vx = Math.abs(b.vx);
           SoundFX.triggerBoilPop();
-        } else if (b.x + b.r > w - 10) {
-          b.x = w - 10 - b.r;
+        } else if (b.x + b.r > w - 12) {
+          b.x = w - 12 - b.r;
           b.vx = -Math.abs(b.vx);
           SoundFX.triggerBoilPop();
         }
 
-        if (b.y - b.r < 10) {
-          b.y = 10 + b.r;
+        if (b.y - b.r < 12) {
+          b.y = 12 + b.r;
           b.vy = Math.abs(b.vy);
           SoundFX.triggerBoilPop();
         }
@@ -491,12 +547,14 @@ export class ArkanoidScene {
             this.combo = 0;
             this.updateHUD();
             if (this.lives > 0) {
-              setTimeout(() => this.spawnBall(true), 500);
-            } else {
               setTimeout(() => {
-                alert(`Game Over! Final Score: ${this.score}`);
-                this.resetGame();
-              }, 300);
+                if (!this.gameOver && !this.gameWon) {
+                  this.spawnBall(true);
+                }
+              }, 400);
+            } else {
+              this.gameOver = true;
+              SoundFX.triggerBumperHit('A3');
             }
           }
           continue;
@@ -507,45 +565,61 @@ export class ArkanoidScene {
         if (
           b.y + b.r >= p.y - p.h / 2 &&
           b.y - b.r <= p.y + p.h / 2 &&
-          b.x >= p.x - p.w / 2 - 4 &&
-          b.x <= p.x + p.w / 2 + 4 &&
+          b.x >= p.x - p.w / 2 - 8 &&
+          b.x <= p.x + p.w / 2 + 8 &&
           b.vy > 0
         ) {
-          b.y = p.y - p.h / 2 - b.r;
+          // Push ball cleanly above paddle top
+          b.y = p.y - p.h / 2 - b.r - 0.5;
+
           const hitOffset = (b.x - p.x) / (p.w / 2); // -1 to 1
-          const maxAngle = Math.PI * 0.38; // 68 degrees
-          const angle = hitOffset * maxAngle - Math.PI / 2;
+          const maxAngle = Math.PI * 0.38; // ~68 degrees
+          const angle = Math.max(-Math.PI * 0.85, Math.min(-Math.PI * 0.15, hitOffset * maxAngle - Math.PI / 2));
           const currentSpeed = Math.hypot(b.vx, b.vy);
-          const newSpeed = Math.min(currentSpeed * 1.02, 11 * this.speedMult);
+          const newSpeed = Math.min(currentSpeed * 1.015, 11 * this.speedMult);
 
           b.vx = Math.cos(angle) * newSpeed;
           b.vy = Math.sin(angle) * newSpeed;
+
+          // Prevent near-horizontal trapping
+          if (Math.abs(b.vy) < 2.5) {
+            b.vy = -2.5;
+          }
+
           this.combo = 0;
           this.updateHUD();
           SoundFX.triggerBumperHit('G4');
         }
 
-        // Brick Collisions
+        // Brick Collisions with robust penetration ejection
         for (let j = this.bricks.length - 1; j >= 0; j--) {
           const br = this.bricks[j];
-          if (
-            b.x + b.r >= br.x &&
-            b.x - b.r <= br.x + br.w &&
-            b.y + b.r >= br.y &&
-            b.y - b.r <= br.y + br.h
-          ) {
-            // Collision response
-            if (!b.fireball) {
-              const overlapLeft = (b.x + b.r) - br.x;
-              const overlapRight = (br.x + br.w) - (b.x - b.r);
-              const overlapTop = (b.y + b.r) - br.y;
-              const overlapBottom = (br.y + br.h) - (b.y - b.r);
-              const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+          const overlapLeft = (b.x + b.r) - br.x;
+          const overlapRight = (br.x + br.w) - (b.x - b.r);
+          const overlapTop = (b.y + b.r) - br.y;
+          const overlapBottom = (br.y + br.h) - (b.y - b.r);
 
-              if (minOverlap === overlapLeft || minOverlap === overlapRight) {
-                b.vx = -b.vx;
+          if (overlapLeft > 0 && overlapRight > 0 && overlapTop > 0 && overlapBottom > 0) {
+            const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+
+            if (!b.fireball) {
+              if (minOverlap === overlapLeft) {
+                b.x = br.x - b.r - 0.5;
+                b.vx = -Math.abs(b.vx);
+              } else if (minOverlap === overlapRight) {
+                b.x = br.x + br.w + b.r + 0.5;
+                b.vx = Math.abs(b.vx);
+              } else if (minOverlap === overlapTop) {
+                b.y = br.y - b.r - 0.5;
+                b.vy = -Math.abs(b.vy);
               } else {
-                b.vy = -b.vy;
+                b.y = br.y + br.h + b.r + 0.5;
+                b.vy = Math.abs(b.vy);
+              }
+
+              // Ensure minimal vertical velocity so ball doesn't get stuck in horizontal bounces
+              if (Math.abs(b.vy) < 2.0) {
+                b.vy = b.vy < 0 ? -2.0 : 2.0;
               }
             }
 
@@ -572,7 +646,7 @@ export class ArkanoidScene {
                 this.updateHUD();
               }
             }
-            break;
+            break; // Handle one brick collision per frame
           }
         }
       }
@@ -580,7 +654,7 @@ export class ArkanoidScene {
       // 4. Update Powerups
       for (let i = this.powerups.length - 1; i >= 0; i--) {
         const pw = this.powerups[i];
-        pw.y += 2.5;
+        pw.y += pw.vy;
 
         // Catch powerup
         const p = this.paddle;
@@ -714,6 +788,39 @@ export class ArkanoidScene {
               fillStyle: 'solid'
             });
           }
+
+          // Launch Hint prompt if ball is waiting on paddle
+          if (this.balls.some(b => b.stuck) && !this.gameOver) {
+            this.ctx.save();
+            this.ctx.font = "700 12px 'Space Grotesk', sans-serif";
+            this.ctx.textAlign = "center";
+            this.ctx.fillStyle = isDark ? "#F59E0B" : "#D97706";
+            const bounce = Math.sin(timestamp * 0.008) * 4;
+            this.ctx.fillText("CLICK OR PRESS SPACE TO LAUNCH", p.x, p.y - 32 + bounce);
+            this.ctx.restore();
+          }
+
+          // Game Over Overlay
+          if (this.gameOver) {
+            this.ctx.save();
+            this.ctx.fillStyle = isDark ? "rgba(10, 13, 17, 0.85)" : "rgba(244, 239, 230, 0.88)";
+            this.ctx.fillRect(8, 8, w - 16, h - 16);
+
+            this.ctx.font = "800 24px 'Space Grotesk', sans-serif";
+            this.ctx.textAlign = "center";
+            this.ctx.fillStyle = "#EF4444";
+            this.ctx.fillText("GAME OVER", w / 2, h / 2 - 20);
+
+            this.ctx.font = "600 13px 'Fira Code', monospace";
+            this.ctx.fillStyle = ink;
+            this.ctx.fillText(`FINAL SCORE: ${this.score.toLocaleString()}`, w / 2, h / 2 + 10);
+
+            this.ctx.font = "700 12px 'Space Grotesk', sans-serif";
+            this.ctx.fillStyle = isDark ? "#F59E0B" : "#D97706";
+            this.ctx.fillText("CLICK CANVAS OR PRESS SPACE TO PLAY AGAIN", w / 2, h / 2 + 42);
+            this.ctx.restore();
+          }
+
         } catch (err) {
           // Native 2D Fallback
           this.ctx.fillStyle = '#D97706';
@@ -748,30 +855,8 @@ export class ArkanoidScene {
     }
   }
 
-  spawnPowerup(x, y) {
-    const types = [
-      { type: 'multiball', color: '#10B981' },
-      { type: 'wide', color: '#3B82F6' },
-      { type: 'laser', color: '#EF4444' }
-    ];
-    const chosen = types[Math.floor(Math.random() * types.length)];
-    this.powerups.push({
-      x,
-      y,
-      type: chosen.type,
-      color: chosen.color
-    });
-  }
-
-  applyPowerup(type) {
-    if (type === 'multiball') {
-      this.triggerMultiball();
-    } else if (type === 'wide') {
-      this.paddle.w = 160;
-      setTimeout(() => { this.paddle.w = 110; }, 8000);
-    } else if (type === 'laser') {
-      this.activateLaser();
-    }
+  setBoilFps(fps) {
+    this.options.boilFps = fps;
   }
 
   suspend() {
@@ -783,24 +868,15 @@ export class ArkanoidScene {
   }
 
   resume() {
-    if (this.running) return;
+    this.running = true;
     this.startRenderLoop();
   }
 
   destroy() {
     this.suspend();
-    if (this.resizeHandler) {
-      window.removeEventListener('resize', this.resizeHandler);
-    }
-    if (this.canvas && this.handlePointerMove) {
-      this.canvas.removeEventListener('mousemove', this.handlePointerMove);
-      this.canvas.removeEventListener('touchmove', this.handlePointerMove);
-      this.canvas.removeEventListener('click', this.handleCanvasClick);
-    }
-    if (this.keyDownHandler) {
-      window.removeEventListener('keydown', this.keyDownHandler);
-      window.removeEventListener('keyup', this.keyUpHandler);
-      window.removeEventListener('blur', this.blurHandler);
-    }
+    if (this.resizeHandler) window.removeEventListener('resize', this.resizeHandler);
+    if (this.keyDownHandler) window.removeEventListener('keydown', this.keyDownHandler);
+    if (this.keyUpHandler) window.removeEventListener('keyup', this.keyUpHandler);
+    if (this.blurHandler) window.removeEventListener('blur', this.blurHandler);
   }
 }

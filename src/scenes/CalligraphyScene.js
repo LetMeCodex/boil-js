@@ -226,8 +226,12 @@ export class CalligraphyScene {
       update: () => {
         const slider = document.getElementById('slider-callig-progress');
         const val = document.getElementById('val-callig-progress');
-        if (slider) slider.value = Math.round(this.state.progress * 100);
-        if (val) val.textContent = `${Math.round(this.state.progress * 100)}%`;
+        const pct = Math.round(this.state.progress * 100);
+        if (slider) {
+          slider.value = pct;
+          slider.style.setProperty('--slider-fill-pct', `${pct}%`);
+        }
+        if (val) val.textContent = `${pct}%`;
       },
       complete: () => {
         SoundFX.playPop(600);
