@@ -6,11 +6,14 @@ import { ShowcaseScrollEngine } from './engine/ShowcaseScrollEngine.js';
 import { VisibilityManager } from './engine/VisibilityManager.js';
 import { EXPERIMENTS, getExperimentByKey } from './engine/ExperimentRegistry.js';
 import { CursorDirector } from './utils/CursorDirector.js';
+import { KeyboardDirector } from './utils/KeyboardDirector.js';
+import { BootSequence } from './showcase/BootSequence.js';
 import { DevTools } from './showcase/DevTools.js';
 import { HeroLab } from './showcase/HeroLab.js';
 import { TechEcosystem } from './showcase/TechEcosystem.js';
 import { FooterLab } from './showcase/FooterLab.js';
 import { KineticCollageScene } from './engine/KineticCollageScene.js';
+import { renderIcon } from './utils/SvgIcons.js';
 
 class ShowcaseApp {
   constructor() {
@@ -19,9 +22,15 @@ class ShowcaseApp {
     this.theme = localStorage.getItem('rough-theme') || 'parchment';
     this.soundEnabled = true;
 
+    // Real FPS Tracker
+    this.fpsHistory = [];
+    this.lastFrameTime = performance.now();
+    this.currentFps = 60;
+
     this.initDebugSuite();
     this.initTheme();
     this.initCursor();
+    this.initBrandLogo();
     this.initDevTools();
     this.initCollageBackground();
     this.initHero();
@@ -29,7 +38,12 @@ class ShowcaseApp {
     this.initTechEcosystem();
     this.initFooter();
     this.initScrollEngine();
+    this.initKeyboardDirector();
     this.bindGlobalEvents();
+    this.startFpsLoop();
+
+    // Trigger boot sequence
+    BootSequence.init();
   }
 
   initDebugSuite() {
@@ -45,6 +59,34 @@ class ShowcaseApp {
         window.BOIL_DEBUG.sceneStatuses[key] = 'ERROR';
       }
     };
+  }
+
+  initBrandLogo() {
+    const canvas = document.getElementById('brand-logo-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    const rc = rough.canvas(canvas);
+
+    let frame = 0;
+    const draw = () => {
+      ctx.clearRect(0, 0, 32, 32);
+      const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+      const color = isDark ? '#F59E0B' : '#E8790C';
+
+      rc.circle(16, 16, 24, {
+        seed: 100 + (frame % 4) * 10,
+        roughness: 1.5,
+        stroke: color,
+        strokeWidth: 2,
+        fill: color,
+        fillStyle: 'dots'
+      });
+    };
+
+    setInterval(() => {
+      frame++;
+      draw();
+    }, 150);
   }
 
   initCollageBackground() {
@@ -76,9 +118,9 @@ class ShowcaseApp {
 
   initTheme() {
     document.documentElement.setAttribute('data-theme', this.theme);
-    const themeBtn = document.getElementById('theme-toggle-btn');
-    if (themeBtn) {
-      themeBtn.innerHTML = this.theme === 'dark' ? '<span class="theme-icon">☀️</span>' : '<span class="theme-icon">🌙</span>';
+    const themeIconSpan = document.getElementById('theme-btn-icon');
+    if (themeIconSpan) {
+      themeIconSpan.innerHTML = this.theme === 'dark' ? renderIcon('sun') : renderIcon('moon');
     }
   }
 
@@ -91,6 +133,10 @@ class ShowcaseApp {
 
   initCursor() {
     this.cursor = new CursorDirector();
+  }
+
+  initKeyboardDirector() {
+    this.keyboardDirector = new KeyboardDirector(this);
   }
 
   initDevTools() {
@@ -136,8 +182,8 @@ class ShowcaseApp {
           <div class="scene-error-card" style="padding: 40px; text-align: center; border: 2px dashed #DC2626; border-radius: 12px; background: rgba(220, 38, 38, 0.05); margin: 20px;">
             <div style="font-size: 2rem; margin-bottom: 8px;">⚠️</div>
             <div style="font-weight: 700; font-family: 'Space Grotesk', sans-serif; color: #DC2626;">EXPERIMENT TEMPORARILY UNAVAILABLE</div>
-            <div style="font-size: 0.85rem; color: var(--text-secondary); margin-top: 6px; font-family: 'Fira Code', monospace;">${exp.title} (${exp.key})</div>
-            <p style="font-size: 0.8rem; margin-top: 12px; color: var(--text-secondary);">${err.message || 'Scene failed to initialize'}</p>
+            <div style="font-size: 0.85rem; color: var(--ink-muted); margin-top: 6px; font-family: 'Fira Code', monospace;">${exp.title} (${exp.key})</div>
+            <p style="font-size: 0.8rem; margin-top: 12px; color: var(--ink-muted);">${err.message || 'Scene failed to initialize'}</p>
           </div>
         `;
       }
@@ -221,7 +267,6 @@ class ShowcaseApp {
             this.scenes[key].resume();
           }
           this.scrollEngine.scrollToElement(targetEl, 1.2);
-          setTimeout(() => window.dispatchEvent(new Event('resize')), 200);
         }
       });
     });
@@ -238,27 +283,50 @@ class ShowcaseApp {
     document.getElementById('btn-hero-source')?.addEventListener('click', () => {
       DevTools.openSource('textmotion');
     });
+
+    document.getElementById('footer-btn-shortcuts')?.addEventListener('click', () => {
+      const modal = document.getElementById('modal-shortcuts');
+      if (modal) {
+        modal.style.display = 'flex';
+        SoundFX.playPop(520);
+      }
+    });
   }
 
   bindGlobalEvents() {
     document.getElementById('theme-toggle-btn')?.addEventListener('click', () => this.toggleTheme());
 
     const audioBtn = document.getElementById('audio-toggle-btn');
+    const audioIconSpan = document.getElementById('audio-btn-icon');
+    if (audioIconSpan) {
+      audioIconSpan.innerHTML = renderIcon('soundOn');
+    }
+
     audioBtn?.addEventListener('click', () => {
       this.soundEnabled = !this.soundEnabled;
       SoundFX.enabled = this.soundEnabled;
-      audioBtn.innerHTML = this.soundEnabled ? '<span class="btn-icon">🔊</span>' : '<span class="btn-icon">🔇</span>';
+      if (audioIconSpan) {
+        audioIconSpan.innerHTML = this.soundEnabled ? renderIcon('soundOn') : renderIcon('soundOff');
+      }
       if (this.soundEnabled) SoundFX.playPop(520);
     });
 
     const fpsSlider = document.getElementById('global-fps-slider');
-    const fpsVal = document.getElementById('global-fps-val');
+    const boilVal = document.getElementById('global-boil-val');
     fpsSlider?.addEventListener('input', (e) => {
-      this.boilFps = parseInt(e.target.value);
-      if (fpsVal) fpsVal.textContent = `${this.boilFps} FPS`;
+      this.boilFps = parseInt(e.target.value, 10);
+      if (boilVal) boilVal.textContent = `${this.boilFps}Hz`;
       Object.values(this.scenes).forEach(s => {
         if (typeof s.setBoilFps === 'function') s.setBoilFps(this.boilFps);
       });
+    });
+
+    document.getElementById('shortcuts-btn')?.addEventListener('click', () => {
+      const modal = document.getElementById('modal-shortcuts');
+      if (modal) {
+        modal.style.display = 'flex';
+        SoundFX.playPop(600);
+      }
     });
 
     // Handle background tab switching and visibility
@@ -269,10 +337,30 @@ class ShowcaseApp {
         this.visibilityManager?.resumeVisible();
       }
     });
+  }
 
-    window.addEventListener('blur', () => {
-      // Release any stuck dragging or keys in active scenes
-    });
+  startFpsLoop() {
+    const fpsValEl = document.getElementById('global-fps-val');
+    let frames = 0;
+    let lastTime = performance.now();
+
+    const checkFps = (time) => {
+      frames++;
+      if (time >= lastTime + 500) {
+        const fps = Math.round((frames * 1000) / (time - lastTime));
+        this.currentFps = Math.min(60, fps);
+        if (fpsValEl) {
+          fpsValEl.textContent = `${this.currentFps} FPS`;
+        }
+        if (window.BOIL_DEBUG) {
+          window.BOIL_DEBUG.fps = this.currentFps;
+        }
+        frames = 0;
+        lastTime = time;
+      }
+      requestAnimationFrame(checkFps);
+    };
+    requestAnimationFrame(checkFps);
   }
 }
 

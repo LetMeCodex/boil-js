@@ -6,10 +6,11 @@ gsap.registerPlugin(ScrollTrigger);
 
 /**
  * ============================================================================
- * SHOWCASE SCROLL ENGINE
+ * SHOWCASE SCROLL ENGINE & KINETIC CHOREOGRAPHER
  * ============================================================================
  * Coordinates Lenis inertial smooth scrolling with GSAP ScrollTrigger
- * across all chapters of the Boil.js showcase.
+ * across all 11 chapters. Orchestrates section entry transitions and
+ * color moods.
  */
 
 export class ShowcaseScrollEngine {
@@ -46,10 +47,31 @@ export class ShowcaseScrollEngine {
 
   setupTriggers(chapterElements) {
     this.chapterTriggers = chapterElements.map((el, idx) => {
+      // Entry animation timeline for each chapter artboard
+      const header = el.querySelector('.chapter-header');
+      const card = el.querySelector('.chapter-stage-container');
+
+      if (header && card) {
+        gsap.fromTo([header, card], {
+          opacity: 0.85,
+          y: 20
+        }, {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          ease: 'power3.out',
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 75%',
+            toggleActions: 'play none none reverse'
+          }
+        });
+      }
+
       return ScrollTrigger.create({
         trigger: el,
-        start: 'top 80%',
-        end: 'bottom 20%',
+        start: 'top 60%',
+        end: 'bottom 40%',
         onEnter: () => this.setActiveChapter(idx),
         onEnterBack: () => this.setActiveChapter(idx),
         onUpdate: (self) => {
@@ -87,15 +109,24 @@ export class ShowcaseScrollEngine {
 
   setActiveChapter(index) {
     this.activeChapter = index;
-    // Update floating nav pills active state
-    document.querySelectorAll('.lab-index-item').forEach((item, idx) => {
+    // Update floating nav items active state and scroll indicator
+    const navItems = document.querySelectorAll('.lab-index-item');
+    navItems.forEach((item, idx) => {
       item.classList.toggle('active', idx === index);
     });
+
+    // Center active nav item in horizontal track on mobile
+    const activeNav = navItems[index];
+    if (activeNav && activeNav.parentElement) {
+      const parent = activeNav.parentElement;
+      const scrollLeft = activeNav.offsetLeft - parent.clientWidth / 2 + activeNav.clientWidth / 2;
+      parent.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    }
   }
 
-  scrollToElement(target, duration = 1.4) {
+  scrollToElement(target, duration = 1.3) {
     if (this.lenis) {
-      this.lenis.scrollTo(target, { duration, offset: -40 });
+      this.lenis.scrollTo(target, { duration, offset: -70 });
     }
   }
 

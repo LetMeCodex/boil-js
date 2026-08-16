@@ -1,13 +1,13 @@
 import confetti from 'canvas-confetti';
 import { SoundFX } from '../engine/AnimeBoilBridge.js';
 import { getExperimentByKey, EXPERIMENTS } from '../engine/ExperimentRegistry.js';
+import { renderIcon } from '../utils/SvgIcons.js';
 
 /**
  * ============================================================================
- * DEV TOOLS & EXPERIMENT DEVELOPER SUITE
+ * BOIL.JS — DEV TOOLS & LIVE REMIX LABORATORY SUITE
  * ============================================================================
- * Manages [INSPECT], [VIEW SOURCE], [COPY PROMPT], [REMIX THIS], and [FULLSCREEN].
- * Derives directly from canonical ExperimentRegistry.
+ * Manages [INSPECT], [VIEW SOURCE], [COPY PROMPT], [LIVE REMIX], and [FULLSCREEN].
  */
 
 async function copyTextToClipboard(text) {
@@ -39,6 +39,37 @@ export class DevTools {
   static init() {
     this.createModalDOM();
     this.bindModalCloseEvents();
+    this.populateChapterToolbars();
+  }
+
+  static populateChapterToolbars() {
+    document.querySelectorAll('.chapter-toolbar').forEach(toolbar => {
+      const key = toolbar.getAttribute('data-key');
+      if (!key) return;
+
+      toolbar.innerHTML = `
+        <button class="tool-btn" data-action="inspect" data-key="${key}" data-cursor="INSPECT">
+          ${renderIcon('inspect')}
+          <span>Inspect</span>
+        </button>
+        <button class="tool-btn" data-action="source" data-key="${key}" data-cursor="CODE">
+          ${renderIcon('source')}
+          <span>Source</span>
+        </button>
+        <button class="tool-btn" data-action="prompt" data-key="${key}" data-cursor="PROMPT">
+          ${renderIcon('prompt')}
+          <span>Prompt</span>
+        </button>
+        <button class="tool-btn" data-action="remix" data-key="${key}" data-cursor="REMIX">
+          ${renderIcon('remix')}
+          <span>Remix</span>
+        </button>
+        <button class="tool-btn" data-action="fullscreen" data-target="stage-${key === 'textmotion' ? '01' : (key === 'kurama' ? 'kurama' : (key === 'arkanoid' ? '02' : (key === 'puppet' ? '03' : (key === 'bubble' ? '04' : (key === 'slingshot' ? '05' : (key === 'threed' ? '06' : (key === 'morph' ? '07' : (key === 'physics' ? '08' : key))))))))}" data-cursor="FULLSCREEN">
+          ${renderIcon('fullscreen')}
+          <span>Fullscreen</span>
+        </button>
+      `;
+    });
   }
 
   static createModalDOM() {
@@ -61,7 +92,10 @@ export class DevTools {
           </div>
           <div class="dev-modal-footer">
             <button class="tactile-btn outline dev-modal-close">Close</button>
-            <button class="tactile-btn amber" id="btn-inspector-copy-spec">📋 Copy Specification</button>
+            <button class="tactile-btn amber" id="btn-inspector-copy-spec">
+              ${renderIcon('copy')}
+              <span>Copy Specification</span>
+            </button>
           </div>
         </div>
       </div>
@@ -70,15 +104,18 @@ export class DevTools {
       <div id="modal-source" class="dev-modal-backdrop" style="display: none;">
         <div class="dev-modal-card wide">
           <div class="dev-modal-header">
-            <div class="dev-modal-title" id="source-title">SOURCE CODE</div>
+            <div class="dev-modal-title" id="source-title">SOURCE CODE // LIVE IMPLEMENTATION</div>
             <button class="dev-modal-close" aria-label="Close modal">&times;</button>
           </div>
           <div class="dev-modal-body">
-            <pre class="code-snippet-wrap"><code id="source-code-content">// Loading...</code></pre>
+            <pre class="code-snippet-wrap"><code id="source-code-content">// Loading source...</code></pre>
           </div>
           <div class="dev-modal-footer">
             <button class="tactile-btn outline dev-modal-close">Close</button>
-            <button class="tactile-btn amber" id="btn-copy-code"><span>📋 Copy Code</span></button>
+            <button class="tactile-btn amber" id="btn-copy-code">
+              ${renderIcon('copy')}
+              <span>Copy Source Code</span>
+            </button>
           </div>
         </div>
       </div>
@@ -97,33 +134,46 @@ export class DevTools {
           </div>
           <div class="dev-modal-footer">
             <button class="tactile-btn outline dev-modal-close">Close</button>
-            <button class="tactile-btn amber" id="btn-copy-prompt"><span>✨ Copy Prompt</span></button>
+            <button class="tactile-btn amber" id="btn-copy-prompt">
+              ${renderIcon('copy')}
+              <span>Copy Generative Prompt</span>
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- REMIX MODAL -->
+      <!-- LIVE REMIX MODAL -->
       <div id="modal-remix" class="dev-modal-backdrop" style="display: none;">
         <div class="dev-modal-card">
           <div class="dev-modal-header">
-            <div class="dev-modal-title" id="remix-title">REMIX EXPERIMENT PARAMETERS</div>
+            <div class="dev-modal-title" id="remix-title">LIVE EXPERIMENT REMIX CONSOLE</div>
             <button class="dev-modal-close" aria-label="Close modal">&times;</button>
           </div>
           <div class="dev-modal-body">
-            <p style="font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 16px;">
-              Inject custom turbulence, chaotic turbulence fields, and alternate palettes into this live experiment.
+            <p style="font-size: 0.85rem; color: var(--ink-soft); margin-bottom: 18px;">
+              Directly modulate kinetic speed, line boil cadence, and simulation physics on the active experiment in real-time.
             </p>
             <div class="control-group">
               <div class="control-label-row">
-                <span>Remix Turbulence Multiplier:</span>
-                <span id="val-remix-intensity" class="control-val">1.5x</span>
+                <span>Simulation Speed Multiplier:</span>
+                <span id="val-remix-speed" class="control-val">1.0x</span>
               </div>
-              <input type="range" id="slider-remix-intensity" min="0.2" max="3.0" step="0.1" value="1.5" class="custom-range">
+              <input type="range" id="slider-remix-speed" min="0.3" max="2.5" step="0.1" value="1.0" class="custom-range">
+            </div>
+            <div class="control-group" style="margin-top: 14px;">
+              <div class="control-label-row">
+                <span>Turbulence / Elastic Energy:</span>
+                <span id="val-remix-intensity" class="control-val">1.2x</span>
+              </div>
+              <input type="range" id="slider-remix-intensity" min="0.2" max="3.0" step="0.1" value="1.2" class="custom-range">
             </div>
           </div>
           <div class="dev-modal-footer">
-            <button class="tactile-btn outline dev-modal-close">Cancel</button>
-            <button class="tactile-btn primary" id="btn-apply-remix">⚡ Apply Live Remix</button>
+            <button class="tactile-btn outline dev-modal-close">Done</button>
+            <button class="tactile-btn primary" id="btn-apply-remix">
+              ${renderIcon('zap')}
+              <span>Apply Live Modulation</span>
+            </button>
           </div>
         </div>
       </div>
@@ -131,10 +181,17 @@ export class DevTools {
 
     document.body.appendChild(modalContainer);
 
-    const slider = document.getElementById('slider-remix-intensity');
-    const val = document.getElementById('val-remix-intensity');
-    slider?.addEventListener('input', (e) => {
-      if (val) val.textContent = `${parseFloat(e.target.value).toFixed(1)}x`;
+    // Live slider readouts
+    const speedSlider = document.getElementById('slider-remix-speed');
+    const speedVal = document.getElementById('val-remix-speed');
+    speedSlider?.addEventListener('input', (e) => {
+      if (speedVal) speedVal.textContent = `${parseFloat(e.target.value).toFixed(1)}x`;
+    });
+
+    const turbSlider = document.getElementById('slider-remix-intensity');
+    const turbVal = document.getElementById('val-remix-intensity');
+    turbSlider?.addEventListener('input', (e) => {
+      if (turbVal) turbVal.textContent = `${parseFloat(e.target.value).toFixed(1)}x`;
     });
   }
 
@@ -189,10 +246,12 @@ export class DevTools {
       copyBtn.onclick = async () => {
         const specStr = `// ${spec.title}\nEngine: ${spec.engine}\nLibraries: ${spec.libraries}\nParticles: ${spec.particles}\nPhysics: ${spec.physics}\nParameters: ${spec.parameters}`;
         const success = await copyTextToClipboard(specStr);
-        copyBtn.textContent = success ? 'COPIED ✓' : 'COPY FAILED';
+        copyBtn.innerHTML = `<span>${success ? '✓ COPIED TO CLIPBOARD' : 'COPY FAILED'}</span>`;
         SoundFX.playPop(success ? 700 : 300);
         if (success) confetti({ particleCount: 20, spread: 45 });
-        setTimeout(() => { copyBtn.textContent = '📋 Copy Specification'; }, 2000);
+        setTimeout(() => {
+          copyBtn.innerHTML = `${renderIcon('copy')}<span>Copy Specification</span>`;
+        }, 2000);
       };
     }
 
@@ -203,16 +262,18 @@ export class DevTools {
   static openSource(key) {
     const spec = DevTools.getSpec(key);
     document.getElementById('source-title').textContent = `SOURCE // ${spec.title}`;
-    document.getElementById('source-code-content').textContent = spec.sourceCode || 'SOURCE NOT AVAILABLE';
+    document.getElementById('source-code-content').textContent = spec.sourceCode || '// Source code snippet available';
 
     const copyBtn = document.getElementById('btn-copy-code');
     if (copyBtn) {
       copyBtn.onclick = async () => {
         const success = await copyTextToClipboard(spec.sourceCode);
-        copyBtn.innerHTML = `<span>${success ? 'COPIED ✓' : 'COPY FAILED'}</span>`;
+        copyBtn.innerHTML = `<span>${success ? '✓ COPIED TO CLIPBOARD' : 'COPY FAILED'}</span>`;
         SoundFX.playPop(success ? 700 : 300);
         if (success) confetti({ particleCount: 20, spread: 45 });
-        setTimeout(() => { copyBtn.innerHTML = '<span>📋 Copy Code</span>'; }, 2000);
+        setTimeout(() => {
+          copyBtn.innerHTML = `${renderIcon('copy')}<span>Copy Source Code</span>`;
+        }, 2000);
       };
     }
 
@@ -223,16 +284,18 @@ export class DevTools {
   static openPrompt(key) {
     const spec = DevTools.getSpec(key);
     document.getElementById('prompt-title').textContent = `PROMPT // ${spec.title}`;
-    document.getElementById('prompt-text-content').textContent = spec.prompt || 'PROMPT NOT AVAILABLE';
+    document.getElementById('prompt-text-content').textContent = spec.prompt || '// Prompt specification';
 
     const copyBtn = document.getElementById('btn-copy-prompt');
     if (copyBtn) {
       copyBtn.onclick = async () => {
         const success = await copyTextToClipboard(spec.prompt);
-        copyBtn.innerHTML = `<span>${success ? 'PROMPT COPIED ✓' : 'COPY FAILED'}</span>`;
+        copyBtn.innerHTML = `<span>${success ? '✓ COPIED TO CLIPBOARD' : 'COPY FAILED'}</span>`;
         SoundFX.playPop(success ? 750 : 300);
         if (success) confetti({ particleCount: 25, spread: 50 });
-        setTimeout(() => { copyBtn.innerHTML = '<span>✨ Copy Prompt</span>'; }, 2000);
+        setTimeout(() => {
+          copyBtn.innerHTML = `${renderIcon('copy')}<span>Copy Generative Prompt</span>`;
+        }, 2000);
       };
     }
 
@@ -247,14 +310,22 @@ export class DevTools {
     const applyBtn = document.getElementById('btn-apply-remix');
     if (applyBtn) {
       applyBtn.onclick = () => {
-        const intensity = parseFloat(document.getElementById('slider-remix-intensity')?.value || 1.5);
-        if (sceneInstance && typeof sceneInstance.setTurbulence === 'function') {
-          sceneInstance.setTurbulence(intensity);
-        } else if (sceneInstance && typeof sceneInstance.setSpeed === 'function') {
-          sceneInstance.setSpeed(intensity);
+        const speed = parseFloat(document.getElementById('slider-remix-speed')?.value || 1.0);
+        const intensity = parseFloat(document.getElementById('slider-remix-intensity')?.value || 1.2);
+
+        if (sceneInstance) {
+          if (typeof sceneInstance.setTurbulence === 'function') {
+            sceneInstance.setTurbulence(intensity);
+          }
+          if (typeof sceneInstance.setSpeed === 'function') {
+            sceneInstance.setSpeed(speed);
+          } else if (sceneInstance.speedMult !== undefined) {
+            sceneInstance.speedMult = speed;
+          }
         }
+
         SoundFX.playHarmonicChord();
-        confetti({ particleCount: 30, spread: 60 });
+        confetti({ particleCount: 35, spread: 60 });
         DevTools.hideModals();
       };
     }

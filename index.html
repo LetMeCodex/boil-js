@@ -2,112 +2,146 @@
 <html lang="en" data-theme="parchment">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>BOIL.JS — Kinetic Hand-Drawn Animation Lab & Showcase</title>
-  <meta name="description" content="An experimental kinetic animation laboratory and interactive showcase featuring WebGL, physics, SVG, 3D cel-shading, and particle systems.">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0">
+  <title>BOIL.JS // Kinetic Hand-Drawn Animation Laboratory</title>
+  <meta name="description" content="An experimental motion laboratory and creative coding showcase exploring 11 procedural animation paradigms built with Three.js, Rough.js, Anime.js, Matter.js, and GSAP.">
+
+  <!-- Editorial Typography Stack -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600;700&family=Fira+Code:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&family=Syne:wght@700;800&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="/src/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,700;1,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700;800&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="./src/style.css">
 </head>
 <body>
-  <!-- Ambient Paper Grain Noise Overlay -->
+  <!-- Ambient Procedural Paper Grain Overlay -->
   <div class="noise-overlay" aria-hidden="true"></div>
 
-  <!-- Procedural Paper-Collage Background Landscape -->
+  <!-- Background Procedural Canvas -->
   <canvas id="kinetic-collage-bg" class="kinetic-collage-canvas" aria-hidden="true"></canvas>
 
-  <!-- Global Master Scroll Progress Bar -->
-  <div class="global-scroll-track">
+  <!-- Global Master Scroll Progress Track -->
+  <div class="global-scroll-track" aria-hidden="true">
     <div id="global-scroll-progress" class="global-scroll-fill"></div>
   </div>
 
   <div id="app" class="showcase-app">
-    <!-- Floating Laboratory Index Navigation -->
-    <header class="showcase-nav-header">
-      <div class="nav-brand-group">
-        <canvas id="brand-logo-canvas" width="36" height="36" class="brand-canvas"></canvas>
-        <div class="brand-text">
-          <span class="brand-title">BOIL<span class="brand-dot">.JS</span></span>
-          <span class="brand-sub">LAB SHOWCASE</span>
+    <!-- =========================================================================
+         FLOATING LABORATORY CONTROL STRIP
+         ========================================================================= -->
+    <header class="lab-control-strip" role="banner">
+      <!-- Left: Brand ID -->
+      <a href="#section-hero" class="lab-brand-link" aria-label="Boil.js Home">
+        <div class="brand-glyph">
+          <canvas id="brand-logo-canvas" width="32" height="32" class="brand-canvas"></canvas>
         </div>
-      </div>
+        <div class="brand-info">
+          <span class="brand-name">BOIL<span class="brand-dot">.JS</span></span>
+          <span class="brand-tag">MOTION LAB</span>
+        </div>
+      </a>
 
-      <!-- Laboratory Chapter Index -->
-      <nav class="lab-index-nav" aria-label="Laboratory Chapters">
-        <a href="#section-01" class="lab-index-item active" data-chapter="0">
-          <span class="index-num">01</span><span class="index-name">TEXT</span>
+      <!-- Center: Chapter Index Strip -->
+      <nav class="lab-nav-track" aria-label="Laboratory Experiments">
+        <a href="#section-01" class="lab-index-item active" data-chapter="0" data-key="textmotion">
+          <span class="nav-item-num">01</span><span class="nav-item-label">TEXT</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-kurama" class="lab-index-item" data-chapter="kurama">
-          <span class="index-num">🦊</span><span class="index-name">KURAMA</span>
+        <a href="#section-kurama" class="lab-index-item" data-chapter="1" data-key="kurama">
+          <span class="nav-item-num">02</span><span class="nav-item-label">KURAMA</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-02" class="lab-index-item" data-chapter="1">
-          <span class="index-num">02</span><span class="index-name">BRICKS</span>
+        <a href="#section-02" class="lab-index-item" data-chapter="2" data-key="arkanoid">
+          <span class="nav-item-num">03</span><span class="nav-item-label">BRICKS</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-03" class="lab-index-item" data-chapter="2">
-          <span class="index-num">03</span><span class="index-name">PUPPET</span>
+        <a href="#section-03" class="lab-index-item" data-chapter="3" data-key="puppet">
+          <span class="nav-item-num">04</span><span class="nav-item-label">PUPPET</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-04" class="lab-index-item" data-chapter="3">
-          <span class="index-num">04</span><span class="index-name">BUBBLE</span>
+        <a href="#section-04" class="lab-index-item" data-chapter="4" data-key="bubble">
+          <span class="nav-item-num">05</span><span class="nav-item-label">BUBBLE</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-05" class="lab-index-item" data-chapter="4">
-          <span class="index-num">05</span><span class="index-name">SIEGE</span>
+        <a href="#section-05" class="lab-index-item" data-chapter="5" data-key="slingshot">
+          <span class="nav-item-num">06</span><span class="nav-item-label">SIEGE</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-06" class="lab-index-item" data-chapter="5">
-          <span class="index-num">06</span><span class="index-name">3D</span>
+        <a href="#section-06" class="lab-index-item" data-chapter="6" data-key="threed">
+          <span class="nav-item-num">07</span><span class="nav-item-label">3D</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-07" class="lab-index-item" data-chapter="6">
-          <span class="index-num">07</span><span class="index-name">VECTOR</span>
+        <a href="#section-07" class="lab-index-item" data-chapter="7" data-key="morph">
+          <span class="nav-item-num">08</span><span class="nav-item-label">VECTOR</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-08" class="lab-index-item" data-chapter="7">
-          <span class="index-num">08</span><span class="index-name">PHYSICS</span>
+        <a href="#section-08" class="lab-index-item" data-chapter="8" data-key="physics">
+          <span class="nav-item-num">09</span><span class="nav-item-label">PHYSICS</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-uikit" class="lab-index-item" data-chapter="uikit">
-          <span class="index-num">🎛️</span><span class="index-name">UI KIT</span>
+        <a href="#section-uikit" class="lab-index-item" data-chapter="9" data-key="uikit">
+          <span class="nav-item-num">10</span><span class="nav-item-label">UI KIT</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
-        <a href="#section-synth" class="lab-index-item" data-chapter="synth">
-          <span class="index-num">🎹</span><span class="index-name">PIANO</span>
+        <a href="#section-synth" class="lab-index-item" data-chapter="10" data-key="synth">
+          <span class="nav-item-num">11</span><span class="nav-item-label">PIANO</span>
+          <svg class="nav-item-indicator" viewBox="0 0 40 4"><line x1="0" y1="2" x2="40" y2="2"/></svg>
         </a>
       </nav>
 
-      <!-- Global Controls -->
-      <div class="nav-controls-group">
-        <div class="global-fps-pill" title="Boiling frame rate (cycles per second)">
-          <span class="fps-indicator-dot"></span>
-          <span id="global-fps-val" class="fps-value">10 FPS</span>
-          <input type="range" id="global-fps-slider" min="2" max="24" value="10" step="1" class="mini-range" aria-label="Boil Rate">
+      <!-- Right: System Status & Controls -->
+      <div class="lab-status-controls">
+        <div class="system-meter-pill" title="Live rendering frame rate">
+          <span class="meter-live-dot"></span>
+          <span id="global-fps-val" class="meter-val">60 FPS</span>
         </div>
-        <button id="audio-toggle-btn" class="icon-btn" title="Toggle audio haptics" aria-label="Toggle sound">
-          <span class="btn-icon">🔊</span>
+        <div class="boil-cadence-pill" title="Line boil rate (seed cycles/sec)">
+          <span class="cadence-label">BOIL:</span>
+          <input type="range" id="global-fps-slider" min="2" max="24" value="10" step="1" class="mini-range" aria-label="Boil rate cadence">
+          <span id="global-boil-val" class="cadence-val">10Hz</span>
+        </div>
+        <button id="audio-toggle-btn" class="lab-icon-btn" title="Toggle audio haptics [M]" aria-label="Toggle sound">
+          <span class="btn-icon-svg" id="audio-btn-icon"></span>
         </button>
-        <button id="theme-toggle-btn" class="icon-btn" title="Toggle warm parchment / slate dark theme" aria-label="Toggle theme">
-          <span class="theme-icon">🌙</span>
+        <button id="theme-toggle-btn" class="lab-icon-btn" title="Toggle parchment / charcoal theme [T]" aria-label="Toggle theme">
+          <span class="btn-icon-svg" id="theme-btn-icon"></span>
+        </button>
+        <button id="shortcuts-btn" class="lab-icon-btn" title="Keyboard shortcuts [?]" aria-label="Keyboard shortcuts">
+          <span class="btn-icon-kbd">?</span>
         </button>
       </div>
     </header>
 
     <!-- =========================================================================
-         00. LIVING HERO LAB (Breathing Hand-Drawn Vector Typography)
+         00. HERO SECTION — KINETIC LABORATORY PROLOGUE
          ========================================================================= -->
-    <section id="section-hero" class="showcase-hero-section">
-      <div class="hero-top-badge-group">
-        <div class="hero-badge-pill">
-          <span class="badge-dot"></span>
-          <span>EXPERIMENTAL MOTION LABORATORY</span>
+    <section id="section-hero" class="lab-hero-stage">
+      <div class="hero-registration-mark top-left">+ 00.00° N / 00.00° E</div>
+      <div class="hero-registration-mark top-right">REF: BOIL-LAB-2026</div>
+
+      <div class="hero-eyebrow-wrapper">
+        <div class="hero-tech-eyebrow">
+          <span class="eyebrow-accent-dot"></span>
+          <span>KINETIC EXPERIMENTAL MOTION LAB // 2026</span>
         </div>
       </div>
 
-      <div class="hero-canvas-container">
+      <!-- Kinetic Living Hero Canvas -->
+      <div class="hero-canvas-artboard">
         <canvas id="hero-living-canvas"></canvas>
       </div>
 
-      <div class="hero-content-overlay">
-        <p class="hero-tagline">
-          "Experiments in motion. Things that probably didn't need to move."
+      <!-- Hero Typographic Statement -->
+      <div class="hero-narrative-overlay">
+        <h1 class="hero-display-tagline" id="hero-headline">
+          "Things that probably didn't need to move."
+        </h1>
+        <p class="hero-subtext">
+          An interactive laboratory of 11 kinetic animation paradigms. Exploring procedural physics, line boiling, vertex noise, and Web Audio.
         </p>
 
-        <div class="hero-actions">
-          <a href="#section-01" class="tactile-hero-btn primary" id="btn-hero-explore">
+        <div class="hero-actions-row">
+          <a href="#section-01" class="tactile-hero-btn primary" id="btn-hero-explore" data-cursor="EXPLORE">
             <span>EXPLORE EXPERIMENTS ↓</span>
           </a>
           <button class="tactile-hero-btn outline" id="btn-hero-source" data-cursor="CODE">
@@ -115,11 +149,27 @@
           </button>
         </div>
 
-        <div class="hero-metadata-bar">
-          <div class="meta-pill"><span class="meta-accent">09</span> EXPERIMENTS</div>
-          <div class="meta-pill"><span class="meta-accent">14,000+</span> PARTICLES</div>
-          <div class="meta-pill">WEBGL / PHYSICS / SVG</div>
-          <div class="meta-pill">OPEN SOURCE MIT</div>
+        <!-- Technical Laboratory Statistics -->
+        <div class="hero-metrics-bar">
+          <div class="metric-block">
+            <span class="metric-value">11</span>
+            <span class="metric-label">EXPERIMENTS</span>
+          </div>
+          <div class="metric-divider">/</div>
+          <div class="metric-block">
+            <span class="metric-value">14,000+</span>
+            <span class="metric-label">GPU PARTICLES</span>
+          </div>
+          <div class="metric-divider">/</div>
+          <div class="metric-block">
+            <span class="metric-value">WEBGL + SVG</span>
+            <span class="metric-label">PHYSICS STACK</span>
+          </div>
+          <div class="metric-divider">/</div>
+          <div class="metric-block">
+            <span class="metric-value">MIT</span>
+            <span class="metric-label">OPEN SOURCE</span>
+          </div>
         </div>
       </div>
     </section>
@@ -127,536 +177,291 @@
     <!-- =========================================================================
          01. CHAPTER 01 — 3D TEXT MOTION (CREATE ➔ MATTER)
          ========================================================================= -->
-    <section id="section-01" class="showcase-chapter-section" data-key="textmotion">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 01</span>
+    <section id="section-01" class="showcase-chapter-section artboard-grid" data-key="textmotion">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 01 // TEXT</span>
+            <span class="chapter-tech-tag">THREE.JS • GLSL SHADERS • CUBIC BÉZIER</span>
+          </div>
           <h2 class="chapter-title">3D Text Motion</h2>
-          <p class="chapter-subtitle">14,000 GPU particles transforming through 3D cubic Bézier trajectories.</p>
+          <p class="chapter-subtitle">14,000 GPU particles transforming through 3D cubic Bézier trajectories from "CREATE" into "MATTER".</p>
+          <div class="chapter-toolbar" data-key="textmotion">
+            <!-- Dynamically populated with SVG buttons -->
+          </div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="textmotion" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="textmotion" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="textmotion" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="textmotion" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-01">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-01" class="chapter-stage-container">
-        <!-- TextMotionScene will mount here -->
+        <div id="stage-01" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         FEATURED: NARUTO KURAMA CHAKRA MODE (KCM / NINE-TAILS 3D)
+         02. CHAPTER 02 — NARUTO KURAMA CHAKRA MODE (3D + 2D)
          ========================================================================= -->
-    <section id="section-kurama" class="showcase-chapter-section" data-key="kurama">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">FEATURED SHINOBI LAB</span>
-          <h2 class="chapter-title">🦊 Naruto Kurama Mode (KCM)</h2>
-          <p class="chapter-subtitle">Nine-Tails blazing flame chakra cloak, 9 kinetic waving tails, and 3D Rasenshuriken / Bijuudama.</p>
+    <section id="section-kurama" class="showcase-chapter-section artboard-flame" data-key="kurama">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 02 // SHINOBI</span>
+            <span class="chapter-tech-tag">ROUGH.JS • THREE.JS • CHAKRA SPLINES</span>
+          </div>
+          <h2 class="chapter-title">Naruto Kurama Mode (KCM)</h2>
+          <p class="chapter-subtitle">Nine-Tails blazing flame chakra cloak, 9 kinetic waving tails, and interactive 3D Rasenshuriken / Bijuudama.</p>
+          <div class="chapter-toolbar" data-key="kurama"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="kurama" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="kurama" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="kurama" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="kurama" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-kurama">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-kurama" class="chapter-stage-container">
-        <!-- KuramaScene will mount here -->
+        <div id="stage-kurama" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         02. CHAPTER 02 — BRICK BREAKER (NEO-ARKANOID)
+         03. CHAPTER 03 — BRICK BREAKER (NEO-ARKANOID)
          ========================================================================= -->
-    <section id="section-02" class="showcase-chapter-section" data-key="arkanoid">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 02</span>
-          <h2 class="chapter-title">Brick Breaker</h2>
+    <section id="section-02" class="showcase-chapter-section artboard-arcade" data-key="arkanoid">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 03 // ARCADE</span>
+            <span class="chapter-tech-tag">CANVAS 2D • ANIME.JS • WEB AUDIO HAPTICS</span>
+          </div>
+          <h2 class="chapter-title">Sketch Brick Breaker</h2>
           <p class="chapter-subtitle">Kinetic neo-Arkanoid arcade with hand-drawn boiling bricks, powerup capsules, multiball, and laser blasters.</p>
+          <div class="chapter-toolbar" data-key="arkanoid"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="arkanoid" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="arkanoid" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="arkanoid" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="arkanoid" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-02">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-02" class="chapter-stage-container">
-        <!-- ArkanoidScene will mount here -->
+        <div id="stage-02" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         03. CHAPTER 03 — PUPPET MONSTER
+         04. CHAPTER 04 — PUPPET MONSTER
          ========================================================================= -->
-    <section id="section-03" class="showcase-chapter-section" data-key="puppet">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 03</span>
+    <section id="section-03" class="showcase-chapter-section artboard-stage" data-key="puppet">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 04 // THEATRE</span>
+            <span class="chapter-tech-tag">MATTER.JS • VERLET CONSTRAINTS • RAGDOLL</span>
+          </div>
           <h2 class="chapter-title">Puppet Monster</h2>
-          <p class="chapter-subtitle">Articulated ragdoll constraint physics, snack feeding, and interactive tickling.</p>
+          <p class="chapter-subtitle">Articulated ragdoll constraint physics, snack feeding, and interactive tentacle tickling.</p>
+          <div class="chapter-toolbar" data-key="puppet"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="puppet" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="puppet" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="puppet" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="puppet" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-03">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-03" class="chapter-stage-container">
-        <!-- PuppetScene will mount here -->
+        <div id="stage-03" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         04. CHAPTER 04 — BUBBLE POPPER & SLIME
+         05. CHAPTER 05 — BUBBLE POPPER & SLIME
          ========================================================================= -->
-    <section id="section-04" class="showcase-chapter-section" data-key="bubble">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 04</span>
+    <section id="section-04" class="showcase-chapter-section artboard-fluid" data-key="bubble">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 05 // FLUID</span>
+            <span class="chapter-tech-tag">ROUGH.JS • SINE DRIFT • SLICE PHYSICS</span>
+          </div>
           <h2 class="chapter-title">Bubble Popper & Slime</h2>
-          <p class="chapter-subtitle">Buoyant floating bubbles with slicing pop mechanics and stretchy slime webs.</p>
+          <p class="chapter-subtitle">Buoyant floating bubbles with slicing pop mechanics and stretchy kinetic slime webs.</p>
+          <div class="chapter-toolbar" data-key="bubble"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="bubble" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="bubble" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="bubble" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="bubble" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-04">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-04" class="chapter-stage-container">
-        <!-- BubbleScene will mount here -->
+        <div id="stage-04" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         05. CHAPTER 05 — SLINGSHOT SIEGE (CASTLE DEMOLITION)
+         06. CHAPTER 06 — SLINGSHOT SIEGE (CASTLE DEMOLITION)
          ========================================================================= -->
-    <section id="section-05" class="showcase-chapter-section" data-key="slingshot">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 05</span>
+    <section id="section-05" class="showcase-chapter-section artboard-blueprint" data-key="slingshot">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 06 // BALLISTICS</span>
+            <span class="chapter-tech-tag">RIGID COLLISION • TRAJECTORY AIM • PARABOLIC</span>
+          </div>
           <h2 class="chapter-title">Slingshot Siege</h2>
           <p class="chapter-subtitle">Procedural castle demolition physics with elastic slingshot trajectory aiming, cluster bombs, and tumbling towers.</p>
+          <div class="chapter-toolbar" data-key="slingshot"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="slingshot" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="slingshot" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="slingshot" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="slingshot" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-05">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-05" class="chapter-stage-container">
-        <!-- SlingshotScene will mount here -->
+        <div id="stage-05" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         06. CHAPTER 06 — 3D DIMENSION & CEL SHADING
+         07. CHAPTER 07 — 3D DIMENSION & CEL SHADING
          ========================================================================= -->
-    <section id="section-06" class="showcase-chapter-section" data-key="threed">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 06</span>
+    <section id="section-06" class="showcase-chapter-section artboard-chamber" data-key="threed">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 07 // DIMENSION</span>
+            <span class="chapter-tech-tag">THREE.JS • CUSTOM GLSL CEL SHADER • VERTEX NOISE</span>
+          </div>
           <h2 class="chapter-title">3D Dimension</h2>
-          <p class="chapter-subtitle">Three.js hardware cel-shading with stepped vertex noise jitter and cross-hatching.</p>
+          <p class="chapter-subtitle">Hardware WebGL cel-shading with stepped vertex noise jitter and cross-hatching.</p>
+          <div class="chapter-toolbar" data-key="threed"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="threed" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="threed" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="threed" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="threed" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-06">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-06" class="chapter-stage-container">
-        <!-- ThreeDScene will mount here -->
+        <div id="stage-06" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         07. CHAPTER 07 — VECTOR PATH MORPH
+         08. CHAPTER 08 — VECTOR PATH MORPH
          ========================================================================= -->
-    <section id="section-07" class="showcase-chapter-section" data-key="morph">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 07</span>
+    <section id="section-07" class="showcase-chapter-section artboard-drafting" data-key="morph">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 08 // MORPHOLOGY</span>
+            <span class="chapter-tech-tag">ROUGH.JS • 8-SHAPE SVG INTERPOLATION • BOIL CURVES</span>
+          </div>
           <h2 class="chapter-title">Vector Path Morph</h2>
           <p class="chapter-subtitle">Continuous geometric SVG morphing across 8 shapes with hand-drawn boiling line paths.</p>
+          <div class="chapter-toolbar" data-key="morph"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="morph" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="morph" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="morph" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="morph" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-07">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-07" class="chapter-stage-container">
-        <!-- MorphScene will mount here -->
+        <div id="stage-07" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         08. CHAPTER 08 — PHYSICS SANDBOX
+         09. CHAPTER 09 — PHYSICS SANDBOX
          ========================================================================= -->
-    <section id="section-08" class="showcase-chapter-section" data-key="physics">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">CHAPTER 08</span>
+    <section id="section-08" class="showcase-chapter-section artboard-notebook" data-key="physics">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 09 // SIMULATION</span>
+            <span class="chapter-tech-tag">MATTER.JS • IMPULSE VECTORS • GRAVITY INVERTER</span>
+          </div>
           <h2 class="chapter-title">Physics Sandbox</h2>
           <p class="chapter-subtitle">Open-ended 2D rigid-body playground with kinetic shockwaves and gravity inverters.</p>
+          <div class="chapter-toolbar" data-key="physics"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="physics" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="physics" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="physics" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="physics" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-08">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-08" class="chapter-stage-container">
-        <!-- PhysicsScene will mount here -->
+        <div id="stage-08" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         FEATURED: HAND-DRAWN BOILING UI KIT & TACTILE BUTTONS
+         10. CHAPTER 10 — ANIMATED UI KIT & BUTTONS
          ========================================================================= -->
-    <section id="section-uikit" class="showcase-chapter-section" data-key="uikit">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">INTERACTIVE UI LAB</span>
-          <h2 class="chapter-title">🎛️ Animated UI Kit & Tactile Buttons</h2>
+    <section id="section-uikit" class="showcase-chapter-section artboard-workbench" data-key="uikit">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 10 // INTERFACE</span>
+            <span class="chapter-tech-tag">ANIME.JS • ELASTIC SPRINGS • TACTILE BUFFER</span>
+          </div>
+          <h2 class="chapter-title">Animated UI Kit & Tactile Buttons</h2>
           <p class="chapter-subtitle">Hand-drawn boiling buttons, animated toggle switches, custom sliders, checkboxes, and modal dialogs.</p>
+          <div class="chapter-toolbar" data-key="uikit"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="uikit" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="uikit" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="uikit" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="uikit" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-uikit">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-uikit" class="chapter-stage-container">
-        <!-- UiKitScene will mount here -->
+        <div id="stage-uikit" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         FEATURED: INTERACTIVE PIANO & WEB AUDIO SYNTHESIZER
+         11. CHAPTER 11 — INTERACTIVE PIANO & SYNTH
          ========================================================================= -->
-    <section id="section-synth" class="showcase-chapter-section" data-key="synth">
-      <div class="chapter-header">
-        <div class="chapter-title-group">
-          <span class="chapter-number">AUDIO-REACTIVE LAB</span>
-          <h2 class="chapter-title">🎹 Interactive Piano & Audio Synth</h2>
+    <section id="section-synth" class="showcase-chapter-section artboard-acoustics" data-key="synth">
+      <div class="artboard-inner-frame">
+        <div class="chapter-header">
+          <div class="chapter-meta-line">
+            <span class="chapter-num-badge">EXPERIMENT 11 // ACOUSTICS</span>
+            <span class="chapter-tech-tag">WEB AUDIO API • 16-BAND FFT • HARMONIC ARPEGGIO</span>
+          </div>
+          <h2 class="chapter-title">Interactive Piano & Audio Synth</h2>
           <p class="chapter-subtitle">Playable hand-drawn boiling piano keys with Web Audio oscillators, FFT spectrum visualizer, and lo-fi arpeggio.</p>
+          <div class="chapter-toolbar" data-key="synth"></div>
         </div>
-        <div class="chapter-toolbar">
-          <button class="tool-btn" data-action="inspect" data-key="synth" data-cursor="INSPECT">
-            <span>🔍 Inspect</span>
-          </button>
-          <button class="tool-btn" data-action="source" data-key="synth" data-cursor="CODE">
-            <span>📋 Source</span>
-          </button>
-          <button class="tool-btn" data-action="prompt" data-key="synth" data-cursor="PROMPT">
-            <span>✨ Prompt</span>
-          </button>
-          <button class="tool-btn" data-action="remix" data-key="synth" data-cursor="REMIX">
-            <span>🎛️ Remix</span>
-          </button>
-          <button class="tool-btn" data-action="fullscreen" data-target="stage-synth">
-            <span>⛶ Fullscreen</span>
-          </button>
-        </div>
-      </div>
-      <div id="stage-synth" class="chapter-stage-container">
-        <!-- AudioSynthScene will mount here -->
+        <div id="stage-synth" class="chapter-stage-container artboard-canvas-card"></div>
       </div>
     </section>
 
     <!-- =========================================================================
-         09. LIVING TECH ECOSYSTEM
+         12. TECHNOLOGY ECOSYSTEM & LIVING ARCHITECTURE
          ========================================================================= -->
     <section id="section-tech" class="showcase-tech-section">
       <div class="section-title-wrapper">
-        <span class="section-eyebrow">TECHNOLOGY ECOSYSTEM</span>
-        <h2 class="section-main-title">Living Animation Architecture</h2>
-        <p class="section-desc">Six interconnected creative-coding libraries driving real-time procedural kinetic graphics.</p>
+        <div class="tech-eyebrow">CORE TECHNOLOGY ECOSYSTEM</div>
+        <h2 class="section-main-title">Living Animation Stack</h2>
+        <p class="section-desc">Six interconnected creative-coding libraries powering real-time kinetic graphics.</p>
       </div>
 
       <div class="tech-cards-grid">
         <div class="tech-card" id="tech-three">
           <div class="tech-card-header">
-            <span class="tech-icon">🧊</span>
-            <span class="tech-name">THREE.JS</span>
+            <span class="tech-badge">WEBGL</span>
+            <h3 class="tech-name">Three.js</h3>
           </div>
           <p class="tech-desc">Hardware WebGL 3D rendering, custom GLSL shaders, camera choreography, and distance fog.</p>
-          <div class="tech-tag">WebGL / Shaders</div>
         </div>
 
         <div class="tech-card" id="tech-matter">
           <div class="tech-card-header">
-            <span class="tech-icon">⚡</span>
-            <span class="tech-name">MATTER.JS</span>
+            <span class="tech-badge">PHYSICS</span>
+            <h3 class="tech-name">Matter.js</h3>
           </div>
           <p class="tech-desc">2D rigid-body simulation, verlet constraints, restitution impulses, and ragdoll joints.</p>
-          <div class="tech-tag">Physics Engine</div>
         </div>
 
         <div class="tech-card" id="tech-gsap">
           <div class="tech-card-header">
-            <span class="tech-icon">⏱️</span>
-            <span class="tech-name">GSAP</span>
+            <span class="tech-badge">MOTION</span>
+            <h3 class="tech-name">GSAP + Lenis</h3>
           </div>
-          <p class="tech-desc">Master scroll scrub timeline, parametric Bezier interpolation, and velocity synchronization.</p>
-          <div class="tech-tag">Choreography</div>
-        </div>
-
-        <div class="tech-card" id="tech-lenis">
-          <div class="tech-card-header">
-            <span class="tech-icon">🌊</span>
-            <span class="tech-name">LENIS</span>
-          </div>
-          <p class="tech-desc">Inertial smooth scrolling layer providing normalized progress (0.0 to 1.0) and velocity tracking.</p>
-          <div class="tech-tag">Smooth Scroll</div>
-        </div>
-
-        <div class="tech-card" id="tech-anime">
-          <div class="tech-card-header">
-            <span class="tech-icon">🌀</span>
-            <span class="tech-name">ANIME.JS</span>
-          </div>
-          <p class="tech-desc">Micro-motion, elastic spring pulses, SVG path morphing, and autonomous animation loops.</p>
-          <div class="tech-tag">Vector Motion</div>
+          <p class="tech-desc">Inertial scroll choreography, pinning, and timeline sequencing.</p>
         </div>
 
         <div class="tech-card" id="tech-rough">
           <div class="tech-card-header">
-            <span class="tech-icon">✏️</span>
-            <span class="tech-name">ROUGH.JS</span>
+            <span class="tech-badge">HAND-DRAWN</span>
+            <h3 class="tech-name">Rough.js</h3>
           </div>
-          <p class="tech-desc">Hand-drawn sketchy graphics generator with seed-stepped boiling line cadences.</p>
-          <div class="tech-tag">Line Boiling</div>
+          <p class="tech-desc">Procedural sketchy vector rendering, boiling line buffers, and cross-hatching.</p>
+        </div>
+
+        <div class="tech-card" id="tech-anime">
+          <div class="tech-card-header">
+            <span class="tech-badge">HAPTICS</span>
+            <h3 class="tech-name">Anime.js</h3>
+          </div>
+          <p class="tech-desc">Micro-animations, elastic button spring physics, and SVG path morphing.</p>
+        </div>
+
+        <div class="tech-card" id="tech-webaudio">
+          <div class="tech-card-header">
+            <span class="tech-badge">AUDIO</span>
+            <h3 class="tech-name">Web Audio API</h3>
+          </div>
+          <p class="tech-desc">Real-time oscillator synthesis, resonant biquad filtering, and FFT spectrum visualizer.</p>
         </div>
       </div>
     </section>
 
     <!-- =========================================================================
-         10. KINETIC EXPERIMENT INDEX
+         13. FINALE & FOOTER — KEEP MAKING THINGS MOVE
          ========================================================================= -->
-    <section id="section-index" class="showcase-index-section">
-      <div class="section-title-wrapper">
-        <span class="section-eyebrow">EXPERIMENT DIRECTORY</span>
-        <h2 class="section-main-title">Kinetic Laboratory Index</h2>
-      </div>
-
-      <div class="kinetic-index-list">
-        <a href="#section-01" class="index-row-item">
-          <span class="row-num">01</span>
-          <span class="row-title">3D TEXT MOTION</span>
-          <span class="row-tag">14,000 GPU PARTICLES</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-kurama" class="index-row-item">
-          <span class="row-num">🦊</span>
-          <span class="row-title">NARUTO KURAMA MODE</span>
-          <span class="row-tag">9-TAILS & 3D RASENSHURIKEN</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-02" class="index-row-item">
-          <span class="row-num">02</span>
-          <span class="row-title">PINBALL ARCADE</span>
-          <span class="row-tag">FLIPPERS & BUMPERS</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-03" class="index-row-item">
-          <span class="row-num">03</span>
-          <span class="row-title">PUPPET MONSTER</span>
-          <span class="row-tag">RAGDOLL CONSTRAINTS</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-04" class="index-row-item">
-          <span class="row-num">04</span>
-          <span class="row-title">BUBBLE POPPER & SLIME</span>
-          <span class="row-tag">SOFT-BODY ELASTICS</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-05" class="index-row-item">
-          <span class="row-num">05</span>
-          <span class="row-title">SPACE BLASTER</span>
-          <span class="row-tag">VECTOR ASTEROIDS</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-06" class="index-row-item">
-          <span class="row-num">06</span>
-          <span class="row-title">3D DIMENSION</span>
-          <span class="row-tag">HARDWARE CEL-SHADING</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-07" class="index-row-item">
-          <span class="row-num">07</span>
-          <span class="row-title">VECTOR PATH MORPH</span>
-          <span class="row-tag">8-SHAPE SVG INTERPOLATION</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-08" class="index-row-item">
-          <span class="row-num">08</span>
-          <span class="row-title">PHYSICS SANDBOX</span>
-          <span class="row-tag">KINETIC SHOCKWAVES</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-uikit" class="index-row-item">
-          <span class="row-num">🎛️</span>
-          <span class="row-title">ANIMATED UI KIT & BUTTONS</span>
-          <span class="row-tag">TACTILE SPRING MICRO-INTERACTIONS</span>
-          <span class="row-arrow">↗</span>
-        </a>
-        <a href="#section-synth" class="index-row-item">
-          <span class="row-num">🎹</span>
-          <span class="row-title">INTERACTIVE PIANO & SYNTH</span>
-          <span class="row-tag">WEB AUDIO API & FFT SPECTRUM</span>
-          <span class="row-arrow">↗</span>
-        </a>
-      </div>
-    </section>
-
-    <!-- =========================================================================
-         11. LIVING CONVERGENCE FOOTER
-         ========================================================================= -->
-    <footer id="section-footer" class="showcase-footer-section">
+    <footer class="lab-footer-stage" role="contentinfo">
+      <div class="footer-registration-mark">+ LAB CONCLUSION</div>
       <div class="footer-canvas-container">
         <canvas id="footer-living-canvas"></canvas>
       </div>
+      <div class="footer-content-overlay">
+        <h2 class="footer-headline">"KEEP MAKING THINGS MOVE."</h2>
+        <p class="footer-statement">Built by creative technologists who believe animation is the soul of software.</p>
 
-      <div class="footer-bottom-bar">
-        <div class="footer-brand-group">
-          <span class="footer-brand">BOIL.JS</span>
-          <span class="footer-quote">"Things that probably didn't need to move."</span>
+        <div class="footer-nav-row">
+          <a href="#section-hero" class="footer-nav-link">Top of Laboratory ↑</a>
+          <a href="https://github.com/LetMeCodex/boil-js" target="_blank" rel="noopener noreferrer" class="footer-nav-link">GitHub Repository ↗</a>
+          <button id="footer-btn-shortcuts" class="footer-nav-link">Keyboard Shortcuts [?]</button>
         </div>
 
-        <div class="footer-links">
-          <a href="https://github.com/LetMeCodex/boil-js" target="_blank" rel="noopener">GITHUB</a>
-          <a href="#section-01">EXPERIMENTS</a>
-          <button class="link-btn" onclick="DevTools.openSource('textmotion')">SOURCE</button>
-          <button class="link-btn" onclick="DevTools.openPrompt('textmotion')">PROMPTS</button>
+        <div class="footer-bottom-bar">
+          <span>BOIL.JS // OPEN SOURCE EXPERIMENTAL LAB</span>
+          <span>CRAFTED WITH ROUGH.JS & THREE.JS</span>
+          <span>© 2026 MIT LICENSE</span>
         </div>
       </div>
     </footer>
   </div>
 
-  <script type="module" src="/src/main.js"></script>
+  <script type="module" src="./src/main.js"></script>
 </body>
 </html>
