@@ -435,8 +435,6 @@ class ShowcaseApp {
   }
 
   bindGlobalEvents() {
-    document.getElementById('theme-toggle-btn')?.addEventListener('click', () => this.toggleTheme());
-
     const audioBtn = document.getElementById('audio-toggle-btn');
     const audioIconSpan = document.getElementById('audio-btn-icon');
     if (audioIconSpan) {

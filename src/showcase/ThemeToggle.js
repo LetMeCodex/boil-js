@@ -404,8 +404,9 @@ export class ThemeToggle {
   }
 
   bindEvents() {
-    this.button.addEventListener('click', (e) => {
+    const handleToggle = (e) => {
       e.preventDefault();
+      e.stopPropagation();
       const current = getTheme();
       const next = current === 'night' ? 'day' : 'night';
       toggleTheme();
@@ -414,7 +415,9 @@ export class ThemeToggle {
       } catch (err) {
         // audio fallback
       }
-    });
+    };
+
+    this.button.addEventListener('click', handleToggle);
 
     // Hover scale spring
     this.button.addEventListener('mouseenter', () => {
