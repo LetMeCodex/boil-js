@@ -114,17 +114,16 @@ export class UiKitScene {
     const resize = () => {
       const wrap = document.getElementById('uikit-canvas-wrap');
       const rect = wrap ? wrap.getBoundingClientRect() : null;
-      const w = Math.max(rect ? rect.width : 0, wrap ? wrap.clientWidth : 0, 780);
-      const h = Math.max(rect ? rect.height : 0, wrap ? wrap.clientHeight : 0, 600);
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      const w = Math.max(rect ? Math.floor(rect.width) : 0, wrap ? wrap.clientWidth : 0, 780);
+      const h = Math.max(rect ? Math.floor(rect.height) : 0, wrap ? wrap.clientHeight : 0, 600);
 
       this.width = w;
       this.height = h;
-      this.canvas.width = Math.floor(w * dpr);
-      this.canvas.height = Math.floor(h * dpr);
+      this.canvas.width = w;
+      this.canvas.height = h;
       this.canvas.style.width = `${w}px`;
       this.canvas.style.height = `${h}px`;
-      this.ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      this.ctx.setTransform(1, 0, 0, 1, 0, 0);
       this.rc = rough.canvas(this.canvas);
       this.buildUiBuffers();
     };
