@@ -430,11 +430,47 @@ export class SpaceBlasterScene {
     this.renderLoop = requestAnimationFrame(loop);
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   setBoilFps(fps) {
     this.options.boilFps = fps;
   }
 
   bindEvents() {
+    // Direct Mouse Aiming & Firing on Canvas
+    this.canvas.addEventListener('pointerdown', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const targetX = e.clientX - rect.left;
+      const targetY = e.clientY - rect.top;
+
+      // Aim ship directly at cursor click
+      this.ship.angle = Math.atan2(targetY - this.ship.y, targetX - this.ship.x);
+      // Give small forward thrust
+      this.ship.vx += Math.cos(this.ship.angle) * 1.5;
+      this.ship.vy += Math.sin(this.ship.angle) * 1.5;
+      this.fireBullet();
+    });
+
+    this.canvas.addEventListener('pointermove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const targetX = e.clientX - rect.left;
+      const targetY = e.clientY - rect.top;
+      // Smoothly steer ship angle towards mouse cursor
+      const targetAngle = Math.atan2(targetY - this.ship.y, targetX - this.ship.x);
+      this.ship.angle += (targetAngle - this.ship.angle) * 0.15;
+    });
+
     this.keyDownHandler = (e) => {
       this.keys[e.key] = true;
       if (e.code === 'Space') {
@@ -454,12 +490,12 @@ export class SpaceBlasterScene {
     window.addEventListener('keyup', this.keyUpHandler);
 
     // On-screen Buttons
-    document.getElementById('btn-ship-left')?.addEventListener('mousedown', () => { this.keys['ArrowLeft'] = true; });
-    document.getElementById('btn-ship-left')?.addEventListener('mouseup', () => { this.keys['ArrowLeft'] = false; });
-    document.getElementById('btn-ship-right')?.addEventListener('mousedown', () => { this.keys['ArrowRight'] = true; });
-    document.getElementById('btn-ship-right')?.addEventListener('mouseup', () => { this.keys['ArrowRight'] = false; });
-    document.getElementById('btn-ship-thrust')?.addEventListener('mousedown', () => { this.keys['ArrowUp'] = true; });
-    document.getElementById('btn-ship-thrust')?.addEventListener('mouseup', () => { this.keys['ArrowUp'] = false; });
+    document.getElementById('btn-ship-left')?.addEventListener('pointerdown', () => { this.keys['ArrowLeft'] = true; });
+    document.getElementById('btn-ship-left')?.addEventListener('pointerup', () => { this.keys['ArrowLeft'] = false; });
+    document.getElementById('btn-ship-right')?.addEventListener('pointerdown', () => { this.keys['ArrowRight'] = true; });
+    document.getElementById('btn-ship-right')?.addEventListener('pointerup', () => { this.keys['ArrowRight'] = false; });
+    document.getElementById('btn-ship-thrust')?.addEventListener('pointerdown', () => { this.keys['ArrowUp'] = true; });
+    document.getElementById('btn-ship-thrust')?.addEventListener('pointerup', () => { this.keys['ArrowUp'] = false; });
     document.getElementById('btn-ship-fire')?.addEventListener('click', () => this.fireBullet());
     document.getElementById('btn-space-bomb')?.addEventListener('click', () => this.triggerShockwave());
     document.getElementById('btn-space-restart')?.addEventListener('click', () => {
@@ -483,7 +519,7 @@ export class SpaceBlasterScene {
   }
 
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
     window.removeEventListener('keydown', this.keyDownHandler);
     window.removeEventListener('keyup', this.keyUpHandler);
   }

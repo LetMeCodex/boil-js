@@ -384,8 +384,21 @@ export class AudioSynthScene {
     });
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
     if (this.arpTimer) clearInterval(this.arpTimer);
     if (this.keyHandler) window.removeEventListener('keydown', this.keyHandler);
     if (this.audioCtx) this.audioCtx.close();

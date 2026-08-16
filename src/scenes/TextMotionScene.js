@@ -423,8 +423,21 @@ export class TextMotionScene {
     }
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
     if (this.autoPlayAnim) this.autoPlayAnim.pause();
     window.removeEventListener('resize', this.resizeHandler);
     if (this.renderer) {

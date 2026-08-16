@@ -696,8 +696,21 @@ export class KuramaScene {
     });
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
     if (this.threeRenderer) {
       this.threeRenderer.dispose();
       this.threeRenderer.forceContextLoss();

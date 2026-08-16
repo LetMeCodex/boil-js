@@ -526,11 +526,94 @@ export class PinballScene {
     this.renderLoop = requestAnimationFrame(loop);
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   setBoilFps(fps) {
     this.options.boilFps = fps;
   }
 
   bindEvents() {
+    // Direct Canvas Click & Drag for Flippers & Ball Flinging
+    let isDraggingBall = false;
+    let draggedBall = null;
+
+    this.canvas.addEventListener('pointerdown', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+
+      // Check if user clicked on any ball to drag/fling
+      for (const b of this.balls) {
+        if (Math.hypot(x - b.position.x, y - b.position.y) < 32) {
+          isDraggingBall = true;
+          draggedBall = b;
+          Matter.Body.setVelocity(b, { x: 0, y: 0 });
+          return;
+        }
+      }
+
+      // If clicked on bottom table, trigger flippers!
+      if (y > (this.height || 520) * 0.4) {
+        if (x < (this.width || 800) * 0.5) {
+          this.flipperKeys.left = true;
+          SoundFX.playPop(480);
+        } else {
+          this.flipperKeys.right = true;
+          SoundFX.playPop(480);
+        }
+      } else {
+        // Upper canvas click triggers bumper explosion / ball impulse
+        for (const b of this.balls) {
+          const dx = b.position.x - x;
+          const dy = b.position.y - y;
+          const dist = Math.hypot(dx, dy) || 1;
+          if (dist < 180) {
+            Matter.Body.applyForce(b, b.position, {
+              x: (dx / dist) * 0.04,
+              y: (dy / dist) * 0.04 - 0.03
+            });
+            SoundFX.playPop(560);
+          }
+        }
+      }
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (isDraggingBall && draggedBall) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = Math.max(50, Math.min((this.width || 800) - 50, e.clientX - rect.left));
+        const y = Math.max(50, Math.min((this.height || 520) - 50, e.clientY - rect.top));
+        Matter.Body.setPosition(draggedBall, { x, y });
+        Matter.Body.setVelocity(draggedBall, { x: 0, y: 0 });
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (isDraggingBall && draggedBall) {
+        isDraggingBall = false;
+        // Fling with release impulse
+        Matter.Body.setVelocity(draggedBall, {
+          x: (Math.random() - 0.5) * 8,
+          y: -8 - Math.random() * 6
+        });
+        SoundFX.playPop(620);
+        draggedBall = null;
+      }
+      this.flipperKeys.left = false;
+      this.flipperKeys.right = false;
+    });
+
     // Keyboard Controls
     this.keyDownHandler = (e) => {
       if (e.repeat) return;
@@ -562,15 +645,12 @@ export class PinballScene {
 
     // On-screen Buttons
     const leftBtn = document.getElementById('btn-flip-left');
-    leftBtn?.addEventListener('mousedown', () => { this.flipperKeys.left = true; SoundFX.playPop(480); });
-    window.addEventListener('mouseup', () => { this.flipperKeys.left = false; this.flipperKeys.right = false; });
-    leftBtn?.addEventListener('touchstart', (e) => { e.preventDefault(); this.flipperKeys.left = true; SoundFX.playPop(480); });
-    leftBtn?.addEventListener('touchend', () => { this.flipperKeys.left = false; });
+    leftBtn?.addEventListener('pointerdown', () => { this.flipperKeys.left = true; SoundFX.playPop(480); });
+    leftBtn?.addEventListener('pointerup', () => { this.flipperKeys.left = false; });
 
     const rightBtn = document.getElementById('btn-flip-right');
-    rightBtn?.addEventListener('mousedown', () => { this.flipperKeys.right = true; SoundFX.playPop(480); });
-    rightBtn?.addEventListener('touchstart', (e) => { e.preventDefault(); this.flipperKeys.right = true; SoundFX.playPop(480); });
-    rightBtn?.addEventListener('touchend', () => { this.flipperKeys.right = false; });
+    rightBtn?.addEventListener('pointerdown', () => { this.flipperKeys.right = true; SoundFX.playPop(480); });
+    rightBtn?.addEventListener('pointerup', () => { this.flipperKeys.right = false; });
 
     document.getElementById('btn-plunger-pull')?.addEventListener('click', () => this.launchPlunger());
     document.getElementById('btn-pinball-multiball')?.addEventListener('click', () => this.triggerMultiball());
@@ -585,7 +665,7 @@ export class PinballScene {
   }
 
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
     window.removeEventListener('keydown', this.keyDownHandler);
     window.removeEventListener('keyup', this.keyUpHandler);
     Matter.World.clear(this.world, false);

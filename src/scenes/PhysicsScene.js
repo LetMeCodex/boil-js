@@ -161,22 +161,63 @@ export class PhysicsScene {
   }
 
   setupMouseInteraction() {
+    const mouse = Matter.Mouse.create(this.canvas);
+    mouse.pixelRatio = 1;
     this.mouseConstraint = Matter.MouseConstraint.create(this.matterEngine, {
-      element: this.canvas,
+      mouse: mouse,
       constraint: {
-        stiffness: 0.2,
+        stiffness: 0.3,
+        damping: 0.05,
         render: { visible: false }
       }
     });
     Matter.World.add(this.world, this.mouseConstraint);
 
-    // Click on empty canvas triggers shockwave explosion
-    this.canvas.addEventListener('click', (e) => {
-      if (this.mouseConstraint.body) return; // Dragged an object
+    // Direct pointer drag & fling fallback for guaranteed responsiveness
+    let isGrabbing = false;
+    let grabbedBody = null;
+
+    this.canvas.addEventListener('pointerdown', (e) => {
       const rect = this.canvas.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
+
+      // Check if clicked directly on any physics body
+      const dynamicBodies = this.world.bodies.filter(b => !b.isStatic);
+      for (const b of dynamicBodies) {
+        if (Math.hypot(b.position.x - x, b.position.y - y) < 45) {
+          isGrabbing = true;
+          grabbedBody = b;
+          Matter.Body.setVelocity(b, { x: 0, y: 0 });
+          SoundFX.playPop(520);
+          return;
+        }
+      }
+
+      // If clicked on empty canvas, trigger shockwave explosion!
       this.triggerShockwave(x, y);
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      if (isGrabbing && grabbedBody) {
+        const rect = this.canvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        Matter.Body.setPosition(grabbedBody, { x, y });
+        Matter.Body.setVelocity(grabbedBody, { x: 0, y: 0 });
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (isGrabbing && grabbedBody) {
+        isGrabbing = false;
+        Matter.Body.setVelocity(grabbedBody, {
+          x: (Math.random() - 0.5) * 8,
+          y: -5 - Math.random() * 5
+        });
+        grabbedBody = null;
+        SoundFX.playPop(580);
+      }
     });
   }
 
@@ -502,6 +543,19 @@ export class PhysicsScene {
       this.renderLoop = requestAnimationFrame(loop);
     };
     this.renderLoop = requestAnimationFrame(loop);
+  }
+
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
   }
 
   setBoilFps(fps) {

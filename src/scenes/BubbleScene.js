@@ -328,6 +328,19 @@ export class BubbleScene {
     this.renderLoop = requestAnimationFrame(loop);
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   setBoilFps(fps) {
     this.options.boilFps = fps;
   }
@@ -358,6 +371,6 @@ export class BubbleScene {
   }
 
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
   }
 }

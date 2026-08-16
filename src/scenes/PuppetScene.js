@@ -142,16 +142,66 @@ export class PuppetScene {
   }
 
   setupMouseInteraction() {
+    const mouse = Matter.Mouse.create(this.canvas);
+    mouse.pixelRatio = 1;
     this.mouseConstraint = Matter.MouseConstraint.create(this.matterEngine, {
-      element: this.canvas,
-      constraint: { stiffness: 0.15, render: { visible: false } }
+      mouse: mouse,
+      constraint: { stiffness: 0.25, damping: 0.1, render: { visible: false } }
     });
     Matter.World.add(this.world, this.mouseConstraint);
 
-    this.canvas.addEventListener('mousemove', (e) => {
+    // Direct pointer drag & tracking
+    let isGrabbing = false;
+    let grabbedBody = null;
+
+    this.canvas.addEventListener('pointerdown', (e) => {
       const rect = this.canvas.getBoundingClientRect();
-      this.mouseWorld.x = e.clientX - rect.left;
-      this.mouseWorld.y = e.clientY - rect.top;
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      this.mouseWorld.x = x;
+      this.mouseWorld.y = y;
+
+      // Find nearest physics body to grab
+      const allBodies = this.world.bodies.filter(b => !b.isStatic);
+      for (const b of allBodies) {
+        if (Math.hypot(b.position.x - x, b.position.y - y) < 60) {
+          isGrabbing = true;
+          grabbedBody = b;
+          Matter.Body.setVelocity(b, { x: 0, y: 0 });
+          SoundFX.playPop(520);
+          return;
+        }
+      }
+
+      // If clicked on empty space, drop a snack!
+      const snackTypes = ['donut', 'apple', 'fish'];
+      const chosen = snackTypes[Math.floor(Math.random() * snackTypes.length)];
+      this.spawnSnack(chosen, x, y);
+    });
+
+    window.addEventListener('pointermove', (e) => {
+      const rect = this.canvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      this.mouseWorld.x = x;
+      this.mouseWorld.y = y;
+
+      if (isGrabbing && grabbedBody) {
+        Matter.Body.setPosition(grabbedBody, { x, y });
+        Matter.Body.setVelocity(grabbedBody, { x: 0, y: 0 });
+      }
+    });
+
+    window.addEventListener('pointerup', (e) => {
+      if (isGrabbing && grabbedBody) {
+        isGrabbing = false;
+        Matter.Body.setVelocity(grabbedBody, {
+          x: (Math.random() - 0.5) * 6,
+          y: -4 - Math.random() * 4
+        });
+        grabbedBody = null;
+        SoundFX.playPop(620);
+      }
     });
   }
 
@@ -535,6 +585,19 @@ export class PuppetScene {
       this.renderLoop = requestAnimationFrame(loop);
     };
     this.renderLoop = requestAnimationFrame(loop);
+  }
+
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
   }
 
   setBoilFps(fps) {

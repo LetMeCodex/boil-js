@@ -121,6 +121,11 @@ export class KineticCollageScene {
     this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     this.resize();
     this.last = performance.now();
+    this.startLoop();
+  }
+
+  startLoop() {
+    if (this.raf) return;
     const loop = (now) => {
       this.raf = requestAnimationFrame(loop);
       const dt = Math.min(48, now - this.last) / 1000;
@@ -130,6 +135,20 @@ export class KineticCollageScene {
       this.render();
     };
     this.raf = requestAnimationFrame(loop);
+  }
+
+  suspend() {
+    this.visible = false;
+    if (this.raf) {
+      cancelAnimationFrame(this.raf);
+      this.raf = 0;
+    }
+  }
+
+  resume() {
+    this.visible = true;
+    this.last = performance.now();
+    this.startLoop();
   }
 
   setMouse(x, y) {
@@ -151,11 +170,12 @@ export class KineticCollageScene {
 
   setVisible(v) {
     this.visible = v;
+    if (!v) this.suspend();
+    else this.resume();
   }
 
   resize() {
-    const maxDpr = this.quality === "mobile" ? 1.25 : 1.6;
-    this.dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+    this.dpr = Math.min(window.devicePixelRatio || 1, 1.25);
     this.W = this.canvas.clientWidth || window.innerWidth;
     this.H = this.canvas.clientHeight || window.innerHeight;
     this.canvas.width = Math.floor(this.W * this.dpr);

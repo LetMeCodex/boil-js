@@ -735,8 +735,21 @@ export class ThreeDScene {
     });
   }
 
+  suspend() {
+    if (this.renderLoop) {
+      cancelAnimationFrame(this.renderLoop);
+      this.renderLoop = null;
+    }
+  }
+
+  resume() {
+    if (!this.renderLoop) {
+      this.startRenderLoop();
+    }
+  }
+
   destroy() {
-    if (this.renderLoop) cancelAnimationFrame(this.renderLoop);
+    this.suspend();
     window.removeEventListener('resize', this.resizeHandler);
     if (this.renderer) {
       this.renderer.dispose();
