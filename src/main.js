@@ -7,6 +7,7 @@ import { VisibilityManager } from './engine/VisibilityManager.js';
 import { EXPERIMENTS, getExperimentByKey } from './engine/ExperimentRegistry.js';
 import { CursorDirector } from './utils/CursorDirector.js';
 import { KeyboardDirector } from './utils/KeyboardDirector.js';
+import { LabUiSystem } from './utils/LabUiSystem.js';
 import { BootSequence } from './showcase/BootSequence.js';
 import { DevTools } from './showcase/DevTools.js';
 import { HeroLab } from './showcase/HeroLab.js';
@@ -32,6 +33,7 @@ class ShowcaseApp {
     this.initCursor();
     this.initBrandLogo();
     this.initDevTools();
+    this.initLabUi();
     this.initCollageBackground();
     this.initHero();
     this.initChapters();
@@ -39,6 +41,7 @@ class ShowcaseApp {
     this.initFooter();
     this.initScrollEngine();
     this.initKeyboardDirector();
+    this.initMobileDrawer();
     this.bindGlobalEvents();
     this.startFpsLoop();
 
@@ -61,6 +64,10 @@ class ShowcaseApp {
     };
   }
 
+  initLabUi() {
+    LabUiSystem.init();
+  }
+
   initBrandLogo() {
     const canvas = document.getElementById('brand-logo-canvas');
     if (!canvas) return;
@@ -69,15 +76,15 @@ class ShowcaseApp {
 
     let frame = 0;
     const draw = () => {
-      ctx.clearRect(0, 0, 32, 32);
+      ctx.clearRect(0, 0, 28, 28);
       const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
       const color = isDark ? '#F59E0B' : '#E8790C';
 
-      rc.circle(16, 16, 24, {
+      rc.circle(14, 14, 20, {
         seed: 100 + (frame % 4) * 10,
-        roughness: 1.5,
+        roughness: 1.4,
         stroke: color,
-        strokeWidth: 2,
+        strokeWidth: 1.8,
         fill: color,
         fillStyle: 'dots'
       });
@@ -86,7 +93,7 @@ class ShowcaseApp {
     setInterval(() => {
       frame++;
       draw();
-    }, 150);
+    }, 160);
   }
 
   initCollageBackground() {
@@ -254,8 +261,8 @@ class ShowcaseApp {
       this.scrollEngine.setupTriggers(chapterSections);
     }
 
-    // Bind nav item click smooth scrolling
-    document.querySelectorAll('.lab-index-item').forEach(item => {
+    // Bind nav item click smooth scrolling (Desktop)
+    document.querySelectorAll('.rail-nav-item').forEach(item => {
       item.addEventListener('click', (e) => {
         e.preventDefault();
         const targetHash = item.getAttribute('href');
@@ -293,6 +300,36 @@ class ShowcaseApp {
     });
   }
 
+  initMobileDrawer() {
+    const btnOpen = document.getElementById('btn-mobile-menu');
+    const drawer = document.getElementById('mobile-index-drawer');
+    const btnClose = document.getElementById('btn-close-drawer');
+
+    btnOpen?.addEventListener('click', () => {
+      if (drawer) {
+        drawer.style.display = drawer.style.display === 'block' ? 'none' : 'block';
+        SoundFX.playPop(550);
+      }
+    });
+
+    btnClose?.addEventListener('click', () => {
+      if (drawer) drawer.style.display = 'none';
+    });
+
+    document.querySelectorAll('.drawer-nav-item').forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (drawer) drawer.style.display = 'none';
+        const targetHash = link.getAttribute('href');
+        const targetEl = document.querySelector(targetHash);
+        if (targetEl && this.scrollEngine) {
+          SoundFX.playPop(520);
+          this.scrollEngine.scrollToElement(targetEl, 1.2);
+        }
+      });
+    });
+  }
+
   bindGlobalEvents() {
     document.getElementById('theme-toggle-btn')?.addEventListener('click', () => this.toggleTheme());
 
@@ -309,16 +346,6 @@ class ShowcaseApp {
         audioIconSpan.innerHTML = this.soundEnabled ? renderIcon('soundOn') : renderIcon('soundOff');
       }
       if (this.soundEnabled) SoundFX.playPop(520);
-    });
-
-    const fpsSlider = document.getElementById('global-fps-slider');
-    const boilVal = document.getElementById('global-boil-val');
-    fpsSlider?.addEventListener('input', (e) => {
-      this.boilFps = parseInt(e.target.value, 10);
-      if (boilVal) boilVal.textContent = `${this.boilFps}Hz`;
-      Object.values(this.scenes).forEach(s => {
-        if (typeof s.setBoilFps === 'function') s.setBoilFps(this.boilFps);
-      });
     });
 
     document.getElementById('shortcuts-btn')?.addEventListener('click', () => {

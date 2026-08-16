@@ -1,16 +1,16 @@
 import Lenis from 'lenis';
 import gsap from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
+import anime from 'animejs';
 
 gsap.registerPlugin(ScrollTrigger);
 
 /**
  * ============================================================================
- * SHOWCASE SCROLL ENGINE & KINETIC CHOREOGRAPHER
+ * SHOWCASE SCROLL ENGINE & KINETIC CONTROL RAIL CHOREOGRAPHER
  * ============================================================================
- * Coordinates Lenis inertial smooth scrolling with GSAP ScrollTrigger
- * across all 11 chapters. Orchestrates section entry transitions and
- * color moods.
+ * Coordinates Lenis inertial smooth scrolling with GSAP ScrollTrigger,
+ * dynamic navbar compression, and smooth traveling active indicators.
  */
 
 export class ShowcaseScrollEngine {
@@ -19,8 +19,10 @@ export class ShowcaseScrollEngine {
     this.progress = 0;
     this.velocity = 0;
     this.activeChapter = 0;
+    this.lastScrollY = 0;
 
     this.initLenis();
+    this.initNavbarScrollTracker();
   }
 
   initLenis() {
@@ -36,6 +38,7 @@ export class ShowcaseScrollEngine {
     this.lenis.on('scroll', (e) => {
       ScrollTrigger.update();
       this.velocity = e.velocity || 0;
+      this.handleNavbarCompression(e.scroll);
     });
 
     this.gsapTicker = (time) => {
@@ -45,20 +48,35 @@ export class ShowcaseScrollEngine {
     gsap.ticker.lagSmoothing(0);
   }
 
+  initNavbarScrollTracker() {
+    // Initial position of traveling indicator
+    setTimeout(() => this.updateTravelIndicator(0), 100);
+  }
+
+  handleNavbarCompression(scrollY) {
+    const rail = document.getElementById('main-control-rail');
+    if (!rail) return;
+
+    if (scrollY > 120) {
+      rail.classList.add('rail-compact');
+    } else {
+      rail.classList.remove('rail-compact');
+    }
+  }
+
   setupTriggers(chapterElements) {
     this.chapterTriggers = chapterElements.map((el, idx) => {
-      // Entry animation timeline for each chapter artboard
       const header = el.querySelector('.chapter-header');
       const card = el.querySelector('.chapter-stage-container');
 
       if (header && card) {
         gsap.fromTo([header, card], {
-          opacity: 0.85,
-          y: 20
+          opacity: 0.88,
+          y: 16
         }, {
           opacity: 1,
           y: 0,
-          duration: 0.8,
+          duration: 0.7,
           ease: 'power3.out',
           scrollTrigger: {
             trigger: el,
@@ -87,7 +105,7 @@ export class ShowcaseScrollEngine {
       });
     });
 
-    // Global document progress trigger
+    // Global progress trigger
     this.masterTrigger = ScrollTrigger.create({
       start: 'top top',
       end: 'bottom bottom',
@@ -109,24 +127,49 @@ export class ShowcaseScrollEngine {
 
   setActiveChapter(index) {
     this.activeChapter = index;
-    // Update floating nav items active state and scroll indicator
-    const navItems = document.querySelectorAll('.lab-index-item');
+
+    const navItems = document.querySelectorAll('.rail-nav-item');
     navItems.forEach((item, idx) => {
       item.classList.toggle('active', idx === index);
     });
 
-    // Center active nav item in horizontal track on mobile
+    this.updateTravelIndicator(index);
+
+    // Update mobile selector label
     const activeNav = navItems[index];
-    if (activeNav && activeNav.parentElement) {
-      const parent = activeNav.parentElement;
-      const scrollLeft = activeNav.offsetLeft - parent.clientWidth / 2 + activeNav.clientWidth / 2;
-      parent.scrollTo({ left: scrollLeft, behavior: 'smooth' });
+    if (activeNav) {
+      const num = activeNav.querySelector('.item-num')?.textContent || '';
+      const name = activeNav.querySelector('.item-name')?.textContent || '';
+      const mobileLabel = document.getElementById('mobile-current-chapter');
+      if (mobileLabel) mobileLabel.textContent = `${num} ${name}`;
     }
+  }
+
+  updateTravelIndicator(index) {
+    const indicator = document.getElementById('nav-travel-indicator');
+    const track = document.getElementById('rail-nav-track');
+    const items = document.querySelectorAll('.rail-nav-item');
+    const targetItem = items[index];
+
+    if (!indicator || !track || !targetItem) return;
+
+    const trackRect = track.getBoundingClientRect();
+    const itemRect = targetItem.getBoundingClientRect();
+    const left = itemRect.left - trackRect.left;
+    const width = itemRect.width;
+
+    anime({
+      targets: indicator,
+      left: `${left}px`,
+      width: `${width}px`,
+      duration: 380,
+      easing: 'easeOutExpo'
+    });
   }
 
   scrollToElement(target, duration = 1.3) {
     if (this.lenis) {
-      this.lenis.scrollTo(target, { duration, offset: -70 });
+      this.lenis.scrollTo(target, { duration, offset: -74 });
     }
   }
 
